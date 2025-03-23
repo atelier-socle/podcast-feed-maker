@@ -1,0 +1,51 @@
+name: Swift Package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+
+      - name: ✅ Build package
+        run: swift build -v
+
+      - name: 🧪 Run tests with raw coverage collection
+        run: |
+          mkdir -p .build/debug/codecov
+          SWIFT_COVERAGE=1 \
+          LLVM_PROFILE_FILE=".build/debug/codecov/%m.profraw" \
+          swift test --enable-code-coverage
+
+      - name: 🔄 Merge raw coverage data into profdata
+        run: |
+          xcrun llvm-profdata merge -sparse .build/debug/codecov/*.profraw -o .build/debug/default.profdata
+
+      - name: 📊 Export coverage to LCOV
+        run: |
+          mkdir -p coverage
+          xcrun llvm-cov export \
+            -format=lcov \
+            .build/debug/PodcastFeedMakerPackageTests.xctest/Contents/MacOS/PodcastFeedMakerPackageTests \
+            -instr-profile .build/debug/default.profdata \
+            > coverage/coverage.lcov
+
+      - name: 📤 Upload LCOV to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/coverage.lcov
+          flags: swift
+          name: podcastfeedmaker

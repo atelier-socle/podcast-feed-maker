@@ -1,0 +1,58 @@
+name: Sanity Check
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  sanity-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+
+      - name: ✅ Check Package.swift format
+        run: swift package dump-package
+
+      - name: 🧾 Build DocC to check documentation validity
+        run: |
+          mkdir -p docs
+          swift package --allow-writing-to-directory docs             generate-documentation --target PodcastFeedMaker             --output-path docs             --disable-indexing             --transform-for-static-hosting
+
+      - name: 🔍 Scan for TODO/FIXME/XXX comments
+        id: todos
+        run: |
+          echo "Scanning for TODOs, FIXMEs, and XXX..."
+          grep -nR --include="*.swift" -E "TODO|FIXME|XXX" Sources/ || echo "✅ No TODOs or FIXMEs found."
+
+      - name: 📦 List Swift package dependencies
+        run: swift package show-dependencies
+
+      - name: 📑 Check Markdown links (filtered)
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          config-file: .mlc_config.json
+          use-quiet-mode: "yes"
+          folder-path: .
+          max-depth: 3
+          file-extension: .md
+          check-modified-files-only: "no"
+          base-branch: main
+
+      - name: 💬 Comment summary in PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "✅ Sanity check completed successfully!\n\n- Package.swift: valid\n- DocC built ✅\n- TODO/FIXME scan done\n- README links checked (filtered)"
+            })
