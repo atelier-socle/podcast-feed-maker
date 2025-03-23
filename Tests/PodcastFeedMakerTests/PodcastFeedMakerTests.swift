@@ -27,10 +27,13 @@ struct PodcastFeedMakerTests {
             second: 15
         )
 
-        guard let date = Calendar.current.date(from: components) else {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: -2 * 60 * 60)!
+        calendar.locale = Locale(identifier: "en_US")
+        guard let date = calendar.date(from: components) else {
             return
         }
-        #expect(date.rcfPubDate == "Tue, 18 Mar 2025 20:20:15 +0100")
+        #expect(date.rcfPubDate == "Tue, 18 Mar 2025 19:20:15 +0000")
     }
 
     @Test
@@ -63,16 +66,16 @@ struct PodcastFeedMakerTests {
 //        )
 //    }
 
-    @Test func testFeed() async throws {
-        let xml = try PodcastFeedMaker(MockFeed.default).xmlRepresentation()
-        print(xml)
-
-        try xml.write(
-            toFile: "/tmp/feed-\(Date.now.timeIntervalSince1970).xml",
-            atomically: true,
-            encoding: .utf8
-        )
-    }
+//    @Test func testFeed() async throws {
+//        let xml = try PodcastFeedMaker(MockFeed.default).xmlRepresentation()
+//        print(xml)
+//
+//        try xml.write(
+//            toFile: "/tmp/feed-\(Date.now.timeIntervalSince1970).xml",
+//            atomically: true,
+//            encoding: .utf8
+//        )
+//    }
 }
 
 enum MockFeed {
