@@ -1,6 +1,8 @@
 # 🎙️ PodcastFeedMaker
 
-![Swift Build](https://github.com/atelier-socle/podcast-feed-maker/actions/workflows/swift.yml/badge.svg) [![codecov](https://codecov.io/github/atelier-socle/podcast-feed-maker/branch/main/graph/badge.svg?token=FRZW6DGEP9)](https://codecov.io/github/atelier-socle/podcast-feed-maker)
+[![Swift Build](https://github.com/atelier-socle/podcast-feed-maker/actions/workflows/swift.yml/badge.svg)](https://github.com/atelier-socle/podcast-feed-maker/actions/workflows/swift.yml)
+[![Sanity Check](https://github.com/atelier-socle/podcast-feed-maker/actions/workflows/sanity-check.yml/badge.svg)](https://github.com/atelier-socle/podcast-feed-maker/actions/workflows/sanity-check.yml)
+[![codecov](https://codecov.io/github/atelier-socle/podcast-feed-maker/branch/main/graph/badge.svg?token=FRZW6DGEP9)](https://codecov.io/github/atelier-socle/podcast-feed-maker)
 
 **PodcastFeedMaker** is a Swift package designed to generate podcast RSS feeds in XML format. It follows the specifications of:
 

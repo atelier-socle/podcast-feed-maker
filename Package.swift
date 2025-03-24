@@ -16,7 +16,10 @@ let package = Package(
     products: [
         .library(
             name: "PodcastFeedMaker",
-            targets: ["PodcastFeedMaker"]),
+            targets: ["PodcastFeedMaker"])
+    ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
     ],
     targets: [
         .target(

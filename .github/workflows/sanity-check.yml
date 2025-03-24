@@ -22,7 +22,8 @@ jobs:
 
       - name: 🧾 Build DocC to check documentation validity
         run: |
-          swift package --allow-writing-to-directory docs             generate-documentation --target PodcastFeedMaker             --output-path docs             --disable-indexing
+          mkdir -p docs
+          swift package --allow-writing-to-directory docs             generate-documentation --target PodcastFeedMaker             --output-path docs             --disable-indexing             --transform-for-static-hosting
 
       - name: 🔍 Scan for TODO/FIXME/XXX comments
         id: todos
@@ -33,7 +34,7 @@ jobs:
       - name: 📦 List Swift package dependencies
         run: swift package show-dependencies
 
-      - name: 📑 Check README Markdown links (optional)
+      - name: 📑 Check README Markdown links
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-quiet-mode: "yes"
