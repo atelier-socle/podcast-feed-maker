@@ -33,10 +33,19 @@ jobs:
         run: |
           xcrun llvm-profdata merge -sparse .build/debug/codecov/*.profraw -o .build/debug/default.profdata
 
-      - name: 📤 Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: 📊 Export coverage to LCOV
+        run: |
+          mkdir -p coverage
+          xcrun llvm-cov export \
+            -format=lcov \
+            .build/debug/PodcastFeedMakerPackageTests.xctest/Contents/MacOS/PodcastFeedMakerPackageTests \
+            -instr-profile .build/debug/default.profdata \
+            > coverage/coverage.lcov
+
+      - name: 📤 Upload LCOV to Codecov
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: .build/debug/default.profdata
+          files: coverage/coverage.lcov
           flags: swift
           name: podcastfeedmaker
