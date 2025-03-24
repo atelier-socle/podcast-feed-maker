@@ -1,0 +1,33 @@
+name: Deploy DocC to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-docc:
+    runs-on: macos-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Set up Swift
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
+
+      - name: 📘 Build documentation
+        run: |
+          mkdir -p docs
+          swift package --allow-writing-to-directory docs             generate-documentation             --target PodcastFeedMaker             --output-path docs             --transform-for-static-hosting             --hosting-base-path podcast-feed-maker             --disable-indexing
+
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
