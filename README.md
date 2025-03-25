@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/github/atelier-socle/podcast-feed-maker/branch/main/graph/badge.svg?token=FRZW6DGEP9)](https://codecov.io/github/atelier-socle/podcast-feed-maker)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-**PodcastFeedMaker** is a Swift package designed to generate podcast RSS feeds in XML format. It follows the specifications of:
+**PodcastFeedMaker** is a Swift package for generating RSS 2.0 podcast feeds. It supports specifications including Apple Podcasts, Podcast Namespace, and the Podcast Standards Project (PSP-1). It’s fully test-covered and compliant with leading podcast validators like [podba.se/validate](https://podba.se/validate). It follows the specifications of:
 
 - [RSS 2.0](https://cyber.harvard.edu/rss/rss.html)
 - [Apple Podcasts](https://help.apple.com/itc/podcasts_connect/)
@@ -26,6 +26,22 @@ This library enables the structured generation of podcast feeds using Swift type
 
 ---
 
+## 🚀 Features
+
+- 🔧 Generate RSS 2.0 compliant feeds
+- 🎙 Supports Apple Podcasts tags (iTunes namespace)
+- 🌐 Includes Podcast Namespace (podcastindex.org)
+- ✅ Fully PSP-1 compliant feed structure
+- 👀 Tag validation (RFC dates, URLs, escaped strings, booleans).
+- 📄 Validated by podba.se, CastFeedValidator, and others
+- 💡 Uses modern Swift features (Swift 6-ready)
+- 🔍 Code coverage > 95%
+- 📦 Open extensibility via `[any XmlRepresentable]`
+- 🧪 Full test suite using the new `@Test` API
+
+
+---
+
 ## 📦 Installation
 
 Use Swift Package Manager by adding the dependency to your `Package.swift`:
@@ -42,42 +58,38 @@ import PodcastFeedMaker
 
 ---
 
-## 💡 Usage Example
+## 📘 Documentation
 
-```swift
-let channel = Channel(
-    title: "Swift Coding Podcast",
-    link: URL(string: "https://swiftcoders.fm")!,
-    description: "All about Swift development"
-)
-
-let item = Item(
-    title: "Episode 1: Hello Feed!",
-    enclosureURL: URL(string: "https://swiftcoders.fm/ep1.mp3")!,
-    pubDate: Date(),
-    guid: "ep1"
-)
-
-let feed = Feed(channel: channel, items: [item])
-let maker = PodcastFeedMaker(feed)
-
-do {
-    let xml = try maker.xmlRepresentation()
-    print(xml)
-} catch {
-    print("Failed to generate XML: \(error)")
-}
-```
+- **DocC Catalog** auto-generated and hosted at [https://atelier-socle.github.io/podcast-feed-maker](https://atelier-socle.github.io/podcast-feed-maker)
+- Developer documentation available via Xcode (⌥ + Click)
+- Namespace & tag-level documentation fully included
 
 ---
 
-## 🧰 Features
+## ✨ Examples
 
-- Strongly typed XML feed generation.
-- Supports iTunes podcast tags (author, summary, episode type, etc.).
-- Podcastindex.org namespace support (transcripts, chapters, locked, etc.).
-- Tag validation (RFC dates, URLs, escaped strings, booleans).
-- Easily extendable via Swift’s `protocol` system.
+See [`Examples.md`](docs/Examples.md) for:
+- ✅ Minimum compliant feed
+- 🎯 Recommended PSP-1 feed
+- 🛠 Complex feed with advanced tags
+
+---
+
+## 🧩 Tags Coverage
+
+| Namespace | Required | Optional | Fully Supported |
+|----------|----------|----------|------------------|
+| RSS      | ✅        | ✅        | ✅               |
+| Atom     | ✅        | ✅        | ✅               |
+| iTunes   | ✅        | ✅        | ✅               |
+| Podcast  | ✅        | ✅        | ✅               |
+| PSC      | ❌        | ✅        | ⚠️ Planned       |
+
+---
+
+## 📊 Platform Support
+
+See [`PlatformCompatibility.md`](docs/PlatformCompatibility.md) for a detailed matrix.
 
 ---
 
@@ -91,8 +103,32 @@ To contribute:
 2. Create a new branch.
 3. Submit a pull request.
 
-This project is released under the [Apache License 2.0](LICENSE).  
-It is free to use, distribute, and modify — whether personally or commercially.
+### ✅ Contribution Standards
+
+- Use clear commit messages (feat:, fix:, chore:)
+- Run all tests before PR
+- Follow existing code formatting and naming
+- PRs should include/update unit tests
+- All public APIs must include DocC comments
+
+### 🧪 GitHub Actions
+
+- `swift.yml` → Build + Test + Code Coverage
+- `sanity-check.yml` → Link validation, DocC generation
+- `release.yml` → Creates GitHub release from semver tag
+- `docc-deploy.yml` → Auto-publishes documentation on GitHub Pages
+
+---
+
+## 🧠 Roadmap
+
+- [x] Full coverage of RSS + Apple + Podcast Namespace
+- [x] GitHub Pages deploy for DocC
+- [x] Code Coverage + CI
+- [ ] Swift Macros to autogenerate `xmlRepresentation`
+- [ ] Support for Podlove Simple Chapters (PSC)
+- [ ] CLI tool for validating feeds
+- [ ] Support for importing existing feeds
 
 ---
 
@@ -101,3 +137,10 @@ It is free to use, distribute, and modify — whether personally or commercially
 - [RSS 2.0 Spec](https://cyber.harvard.edu/rss/rss.html)
 - [Apple Podcasts Spec](https://help.apple.com/itc/podcasts_connect/)
 - [Podcast Namespace](https://github.com/Podcastindex-org/podcast-namespace)
+
+---
+
+## 📄 License
+
+This project is released under the [Apache License 2.0](LICENSE).  
+It is free to use, distribute, and modify — whether personally or commercially.

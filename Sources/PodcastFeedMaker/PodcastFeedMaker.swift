@@ -14,21 +14,29 @@ public protocol XmlRepresentable: Sendable {
 
 /// A utility for creating podcast feeds in XML format.
 ///
-/// `PodcastFeedMaker` wraps a `Feed` object and provides a way to generate
-/// an XML feed compliant with podcast standards.
-public struct PodcastFeedMaker: Hashable, Equatable, Sendable {
+/// `PodcastFeedMaker` is a simple, lightweight wrapper around a `Feed`
+/// that conforms to the `XmlRepresentable` protocol. It generates a complete
+/// RSS feed suitable for Apple Podcasts, Spotify, and platforms that follow
+/// [RSS 2.0](https://validator.w3.org/feed/docs/rss2.html), [PSP-1](https://github.com/Podcast-Standards-Project/PSP-1-Podcast-RSS-Specification),
+/// and the [Podcast Namespace](https://github.com/Podcastindex-org/podcast-namespace).
+///
+/// - Important: The `Feed` instance passed must be properly configured with required tags.
+/// - SeeAlso: `Feed`, `RSSTag.Channel`, `XmlRepresentable`
+public struct PodcastFeedMaker: Sendable {
+
+    /// The underlying `Feed` instance used to generate XML.
     private let feed: Feed
 
-    /// Initializes a new podcast feed maker with the given feed.
+    /// Initializes a new podcast feed maker.
     ///
-    /// - Parameter feed: A `Feed` object representing the podcast feed.
+    /// - Parameter feed: A `Feed` instance representing the complete podcast structure.
     ///
-    /// Example usage:
+    /// ### Example:
     /// ```swift
-    /// let feed = Feed(channel: ...)
-    /// let podcastMaker = PodcastFeedMaker(feed)
+    /// let feed = Feed(channel: myChannel)
+    /// let maker = PodcastFeedMaker(feed)
     /// do {
-    ///     let xml = try podcastMaker.xmlRepresentation()
+    ///     let xml = try maker.xmlRepresentation()
     ///     print(xml)
     /// } catch {
     ///     print("Failed to generate XML: \(error)")
@@ -40,10 +48,11 @@ public struct PodcastFeedMaker: Hashable, Equatable, Sendable {
 }
 
 extension PodcastFeedMaker: XmlRepresentable {
-    /// Generates the XML representation of the podcast feed.
+
+    /// Generates the complete XML string for the podcast RSS feed.
     ///
-    /// - Throws: Propagates any errors from the underlying `Feed` object.
-    /// - Returns: A `String` containing the podcast feed in XML format.
+    /// - Returns: A fully-formed RSS 2.0 feed including all configured namespaces and metadata.
+    /// - Throws: If any of the underlying tags fail to generate XML (e.g., missing required fields).
     public func xmlRepresentation() throws -> String {
         try feed.xmlRepresentation()
     }

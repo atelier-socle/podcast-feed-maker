@@ -6,24 +6,31 @@ struct ItemTests {
     @Test
     func testItemXMLRepresentation() async throws {
         let guid = UUID().uuidString
+
         let item = RSSTag.Item(
-            title: .init(value: "Episode 1"),
-            enclosure: .init(url: URL(string: "https://podcast.io/ep1.m4a")!, length: 1243134, type: .m4a),
-            guid: .init(id: guid),
-            pubDate: .init(value: .now),
-            description: .init(content: "This is the description of the episode"),
-            duration: .init(duration: 60),
-            link: .init(url: URL(string: "https://podcast.io/ep1")!),
-            image: .init(url: URL(string: "https://podcast.io/image.png")!),
-            explicit: .init(value: true),
-            itunesTitle: .init(text: "Episode 1"),
-            episode: .init(value: 1),
-            season: .init(value: 2),
-            episodeType: .init(type: .full),
-            transcript: .init(url: URL(string: "https://podcast.io/transcript.txt")!, type: .vtt),
-            block: .init(value: false),
-            summary: .init(content: "This is the summary of the episode"),
-            chapters: .init(url: URL(string: "https://podcast.io/chapters.json")!, type: .json)
+            title: RSSTag.Title("Episode 1"),
+            enclosure: RSSTag.Enclosure(
+                url: URL(string: "https://podcast.io/ep1.m4a")!,
+                length: 1243134,
+                type: .m4a
+            ),
+            guid: RSSTag.Guid(guid),
+            pubDate: RSSTag.PubDate(.now),
+            duration: Namespace.iTunes.Duration(duration: 60),
+            episode: Namespace.iTunes.Episode(value: 1),
+            episodeType: Namespace.iTunes.EpisodeType(type: .full),
+            summary: Namespace.iTunes.Summary(content: "This is the summary of the episode"),
+            explicit: Namespace.iTunes.Explicit(.clean),
+            image: Namespace.iTunes.Image(url: URL(string: "https://podcast.io/image.png")!),
+            additionalTags: [
+                RSSTag.Link(URL(string: "https://podcast.io/ep1")!),
+                Namespace.iTunes.Season(value: 2),
+                Namespace.iTunes.Title(text: "Episode 1"),
+                Namespace.iTunes.Block(value: false),
+                RSSTag.Description("This is the summary of the episode"),
+                Namespace.Podcast.Chapters(url: URL(string: "https://podcast.io/chapters.json")!, type: .json),
+                Namespace.Podcast.Transcript(url: URL(string: "https://podcast.io/transcript.txt")!, type: .vtt)
+            ]
         )
 
         let xml = try item.xmlRepresentation()

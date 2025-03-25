@@ -1,26 +1,43 @@
 import Foundation
 
 public extension RSSTag {
-    /// The episode content, file size, and file type information.
+
+    /// The `<enclosure>` tag for episode media files in a podcast RSS feed.
     ///
-    /// The `<enclosure>` tag has three attributes: URL, length, and type:
+    /// This tag provides metadata about the audio, video, or PDF content for a specific episode.
     ///
-    /// - **URL**. The URL attribute points to your podcast media file. Specify the full file extension within the URL attribute. This determines whether or not content appears in the podcast directory. Supported file formats include M4A, MP3, MOV, MP4, M4V, and PDF.
-    /// - **Length**. The length attribute is the file size in bytes. You can find this information in the properties of your podcast file (on a Mac, choose File > Get Info and refer to the size field).
-    /// - **Type**. The type attribute provides the correct category for the type of file you are using. The type values for the supported file formats are: audio/x-m4a, audio/mpeg, video/quicktime, video/mp4, video/x-m4v, and application/pdf.
-    /// For example:
+    /// The tag includes 3 required attributes:
+    /// - `url`: The direct link to the media file
+    /// - `length`: The size of the file in bytes
+    /// - `type`: The MIME type of the file
+    ///
+    /// - Important: This tag is **required** by [PSP-1](https://github.com/Podcast-Standards-Project/PSP-1-Podcast-RSS-Specification#item-elements)
+    ///   and [Apple Podcasts](https://help.apple.com/itc/podcasts_connect/#/itc2b3780e76) for each `<item>`.
+    ///
+    /// Example:
     /// ```xml
     /// <enclosure
-    /// url="http://mypodcast.com/episode001.mp3"
-    /// length="5650889"
-    /// type="audio/mpeg
-    ////>
-    ///```
+    ///     url="https://mypodcast.com/episode001.mp3"
+    ///     length="5650889"
+    ///     type="audio/mpeg" />
+    /// ```
     struct Enclosure: Hashable, Equatable, Sendable {
+
+        /// The public URL of the media file.
         public let url: URL
+
+        /// The size of the media file in bytes.
         public let length: Int
+
+        /// The MIME type string for the file.
         public let type: String
-        
+
+        /// Internal initializer allowing full control over `type`.
+        ///
+        /// - Parameters:
+        ///   - url: The URL of the media file.
+        ///   - length: The file size in bytes.
+        ///   - type: The MIME type as a string.
         package init(
             url: URL,
             length: Int,
@@ -30,34 +47,31 @@ public extension RSSTag {
             self.length = length
             self.type = type
         }
-        
+
+        /// Initializes a new `<enclosure>` using a typed MIME value.
+        ///
+        /// - Parameters:
+        ///   - url: The URL to the audio, video, or document file.
+        ///   - length: File size in bytes.
+        ///   - type: MIME type as defined by `EnclosureType`.
         public init(
             url: URL,
             length: Int,
             type: EnclosureType
         ) {
-            self.url = url
-            self.length = length
-            self.type = type.rawValue
+            self.init(url: url, length: length, type: type.rawValue)
         }
     }
 }
 
 public extension RSSTag.Enclosure {
-    /// The enclosure type for content file.
+
+    /// Supported MIME types for enclosures.
     ///
-    /// The type attribute provides the correct category for the type of file you are using.
-    ///
-    /// The type values for the supported file formats are:
-    /// - audio/x-m4a
-    /// - audio/mpeg
-    /// - video/quicktime
-    /// - video/mp4
-    /// - video/x-m4v
-    /// - application/pdf
+    /// Use these values to provide standards-compliant content types.
     enum EnclosureType: String, Hashable, Equatable, Sendable {
         /// Audio m4a file type.
-        case m4a = "audio/m4a" // "audio/x-m4a"
+        case m4a = "audio/m4a"
         /// Audio mpeg file type.
         case mpeg = "audio/mpeg"
         /// Video quicktime file type.
@@ -65,12 +79,14 @@ public extension RSSTag.Enclosure {
         /// Video mp4 file type.
         case mp4 = "video/mp4"
         /// Video m4v file type.
-        case m4v = "video/m4v" // "video/x-m4v"
+        case m4v = "video/m4v"
         /// Application pdf file type.
         case pdf = "application/pdf"
     }
 
+    /// Errors related to invalid enclosure types.
     enum EnclosureError: Swift.Error, LocalizedError {
+        /// Raised when the MIME type is not recognized.
         case invalidType
 
         public var errorDescription: String? {
@@ -83,12 +99,21 @@ public extension RSSTag.Enclosure {
 }
 
 extension RSSTag.Enclosure: XmlRepresentable {
+
+    /// Generates the XML representation of the `<enclosure>` tag.
+    ///
+    /// Validates the URL and ensures the MIME type is known.
+    ///
+    /// - Returns: A self-closing `<enclosure>` tag with all required attributes.
+    /// - Throws: `EnclosureError.invalidType` if the MIME type is not allowed.
+    /// - Throws: Any error from `url.isValid()`.
     public func xmlRepresentation() throws -> String {
         try url.isValid()
 
         guard let enclosureType = EnclosureType(rawValue: type) else {
             throw EnclosureError.invalidType
         }
+
         return """
         \t<enclosure url="\(url.encodeURLQueryAllowed)" length="\(length)" type="\(enclosureType.rawValue)" />
         """

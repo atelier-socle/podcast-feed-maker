@@ -39,8 +39,8 @@ struct HelpersTests {
     @Test
     func testIndentedTagsRepresentation() async throws {
         let tags: [RSSTag.Title] = [
-            .init(value: "Hello"),
-            .init(value: "World")
+            .init("Hello"),
+            .init("World")
         ]
         let indented = try tags.map { try $0.xmlRepresentation() }.indentedTagsRepresentation
         #expect(indented.contains("\t<title>Hello</title>"))
@@ -50,8 +50,8 @@ struct HelpersTests {
     @Test
     func testDoubleIndentedTagsRepresentation() async throws {
         let tags: [RSSTag.Title] = [
-            .init(value: "John"),
-            .init(value: "Tech")
+            .init("John"),
+            .init("Tech")
         ]
         let doubleIndented = try tags.map { try $0.xmlRepresentation() }.doubleIndentedTagsRepresentation
         #expect(doubleIndented.contains("\t\t<title>John</title>"))
