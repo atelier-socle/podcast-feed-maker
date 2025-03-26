@@ -47,7 +47,8 @@ public extension RSSTag.Language {
     ///
     /// This can be used in UIs to show the full language name (e.g. "French (France)").
     var formattedLanguageCode: String? {
-        Locale.autoupdatingCurrent.localizedString(forIdentifier: identifier)
+        Locale(languageComponents: .init(identifier: identifier))
+            .localizedString(forIdentifier: identifier)
     }
 }
 
