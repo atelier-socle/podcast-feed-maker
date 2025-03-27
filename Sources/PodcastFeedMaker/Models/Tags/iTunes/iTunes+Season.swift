@@ -1,3 +1,5 @@
+import Foundation
+
 public extension Namespace.iTunes {
 
     /// The `<itunes:season>` tag from the Apple Podcasts namespace.
@@ -17,10 +19,23 @@ public extension Namespace.iTunes {
         /// The season number (must be ≥ 1).
         public let value: Int
 
+        // Errors related to the `<itunes:season>` tag.
+        public enum SeasonError: Swift.Error, LocalizedError {
+            case invalidValue
+
+            public var errorDescription: String? {
+                "Season value must be a positive integer (1 or higher)."
+            }
+        }
+
         /// Initializes a new `<itunes:season>` tag.
         ///
         /// - Parameter value: The number of the season.
-        public init(value: Int) {
+        /// - Throws: `SeasonError.invalidValue` if the value is less than 1.
+        public init(value: Int) throws {
+            guard value >= 1 else {
+                throw SeasonError.invalidValue
+            }
             self.value = value
         }
     }

@@ -95,7 +95,16 @@ struct HelpersTests {
     func testEncodeURLQueryAllowed() async throws {
         let input = URL(string: "https://swift.org/search?query=école+swift&lang=fr")!
         let encoded = input.encodeURLQueryAllowed
-        #expect(encoded.contains("query=%25C3%25A9cole+swift"))
+        #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
+    }
+
+    @Test
+    func test_encodeURLQueryAllowed_returnsEscapedStringOrFallback() {
+        let url = URL(string: "https://example.com/query?param=ç©🎉")!
+
+        let encoded = url.encodeURLQueryAllowed
+
+        #expect(encoded.starts(with: "https://example.com"))
     }
 }

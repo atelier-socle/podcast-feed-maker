@@ -83,3 +83,70 @@ let item = RSSTag.Item(
     ]
 )
 ```
+
+---
+
+## 4️⃣ Advanced Custom Feed
+
+```swift
+import PodcastFeedMaker
+
+let customTags: [any XmlRepresentable] = [
+    RSSTag.Title("My Podcast Show"),
+    RSSTag.Link(URL(string: "https://podcast.example.com/feed.xml")!),
+    RSSTag.Description("A podcast about stories that matter."),
+    RSSTag.Language(value: "en_US"),
+    Namespace.iTunes.Author(name: "Podcast Author"),
+    Namespace.iTunes.Image(url: URL(string: "https://podcast.example.com/assets/cover.jpg")!),
+    Namespace.iTunes.Explicit(.clean),
+    Namespace.Podcast.Guid(value: UUID().uuidString),
+    Namespace.Atom.Link(url: URL(string: "https://podcast.example.com/feed.xml")!),
+    RSSTag.PubDate(.now),
+    RSSTag.LastBuildDate(.now)
+]
+
+let item = RSSTag.Item(
+    title: .init("Episode 1"),
+    enclosure: .init(
+        url: URL(string: "https://podcast.example.com/episodes/ep1.m4a")!,
+        length: 12345678,
+        type: .m4a
+    ),
+    guid: .init(value: UUID().uuidString),
+    pubDate: .init(.now),
+    description: .init("Episode 1 description", type: .html),
+    itunesTitle: .init(text: "Episode 1 – Special Guest"),
+    itunesImage: .init(url: URL(string: "https://podcast.example.com/assets/ep1.jpg")!),
+    itunesExplicit: .init(.no),
+    itunesDuration: .init(duration: 1482),
+    itunesEpisodeType: .init(type: .full),
+    additionalTags: [
+        Namespace.Podcast.Transcript(
+            url: URL(string: "https://podcast.example.com/episodes/ep1.vtt")!,
+            type: .vtt
+        )
+    ]
+)
+
+let categories = Namespace.iTunes.Category(
+    categories: [
+        .societyAndCulture([.philosophy]),
+        .technology
+    ]
+)
+
+let channel = RSSTag.Channel(
+    tags: customTags,
+    items: [item],
+    categories: categories
+)
+
+let feed = Feed(channel: channel)
+
+do {
+    let xml = try PodcastFeedMaker(feed).xmlRepresentation()
+    print(xml)
+} catch {
+    print("❌ XML generation failed: \(error.localizedDescription)")
+}
+```

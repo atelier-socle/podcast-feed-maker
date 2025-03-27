@@ -34,7 +34,7 @@ extension Namespace.Podcast.Locked: XmlRepresentable {
     /// - Returns: A valid `<podcast:locked>` element with a stringified boolean.
     public func xmlRepresentation() throws -> String {
         """
-        \t<podcast:locked>\(value.stringValue)</podcast:locked>
+        \t<podcast:locked>\(value)</podcast:locked>
         """
     }
 }

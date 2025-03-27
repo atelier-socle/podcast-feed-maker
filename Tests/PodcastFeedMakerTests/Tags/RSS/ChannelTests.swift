@@ -44,6 +44,6 @@ struct ChannelTests {
         #expect(xml.contains("<title>My Show</title>"))
         #expect(xml.contains("<link>https://podcast.io</link>"))
         #expect(xml.contains("<podcast:guid>channel-guide-value</podcast:guid>"))
-        #expect(xml.contains("<podcast:locked>no</podcast:locked>"))
+        #expect(xml.contains("<podcast:locked>false</podcast:locked>"))
     }
 }

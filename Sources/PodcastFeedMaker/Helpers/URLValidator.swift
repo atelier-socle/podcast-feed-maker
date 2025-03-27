@@ -26,6 +26,9 @@ package extension URL {
         /// The encoded URL exceeds the allowed length (255 characters).
         case maxLength
 
+        /// The URL has invalid host.
+        case invalidHost
+
         /// Localized description of each validation error.
         package var errorDescription: String? {
             switch self {
@@ -37,6 +40,8 @@ package extension URL {
                 "URL is `file://`."
             case .maxLength:
                 "URL is too long, max length is 255 characters."
+            case .invalidHost:
+                "Invalid host."
             }
         }
     }
@@ -70,6 +75,10 @@ package extension URL {
             throw URLValidatorError.invalidScheme
         }
 
+        guard let host, !host.isEmpty else {
+            throw URLValidatorError.invalidHost
+        }
+
         guard encodeURLQueryAllowed.count <= 255 else {
             throw URLValidatorError.maxLength
         }
@@ -91,7 +100,14 @@ package extension URL {
     /// // → "https://example.com/audio%20file.mp3"
     /// ```
     var encodeURLQueryAllowed: String {
-        absoluteString
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? absoluteString
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return absoluteString
+        }
+
+        var newComponents = components
+        newComponents.percentEncodedQuery = components.percentEncodedQuery
+
+        return newComponents.string ?? absoluteString
     }
+
 }

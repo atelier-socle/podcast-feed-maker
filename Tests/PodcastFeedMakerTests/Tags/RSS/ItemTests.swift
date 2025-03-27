@@ -24,7 +24,7 @@ struct ItemTests {
             image: Namespace.iTunes.Image(url: URL(string: "https://podcast.io/image.png")!),
             additionalTags: [
                 RSSTag.Link(URL(string: "https://podcast.io/ep1")!),
-                Namespace.iTunes.Season(value: 2),
+                try Namespace.iTunes.Season(value: 2),
                 Namespace.iTunes.Title(text: "Episode 1"),
                 Namespace.iTunes.Block(value: false),
                 RSSTag.Description("This is the summary of the episode"),

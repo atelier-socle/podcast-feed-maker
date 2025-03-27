@@ -209,6 +209,36 @@ public extension RSSTag {
             self.categories = categories
             self.items = items
         }
+
+        /// Initializes a new `Channel` with fully customized tags, items, and iTunes categories.
+        ///
+        /// Use this initializer when you want full control over the tags injected into the `<channel>`
+        /// node, including experimental or future extensions, while keeping the feed compliant with major
+        /// podcast platforms like Apple Podcasts, PodcastIndex, Spotify, etc.
+        ///
+        /// This is especially useful when you are generating feeds dynamically or working with
+        /// advanced namespaces like `podcast:`, `itunes:`, `psc:`, or custom modules.
+        ///
+        /// - Parameters:
+        ///   - tags: An array of `XmlRepresentable` values representing all non-item, non-category channel-level tags.
+        ///           This allows you to inject any tag conforming to the `XmlRepresentable` protocol, such as `RSSTag.Title`, `RSSTag.Link`, `Namespace.Podcast.Guid`, etc.
+        ///   - items: The list of podcast episodes as `[RSSTag.Item]`, each describing a show episode.
+        ///   - categories: One or more iTunes categories used to classify the podcast in podcast directories.
+        ///
+        /// - Important: You are responsible for ensuring all required tags (as per the [PSP-1](https://github.com/Podcast-Standards-Project/PSP-1-Podcast-RSS-Specification),
+        ///   [Apple Podcasts](https://help.apple.com/itc/podcasts_connect/#/itcb54353390), and [Podcast Namespace](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md))
+        ///   are present and valid, including `title`, `link`, `description`, `itunes:author`, `itunes:image`, `language`, and `atom:link`.
+        ///
+        /// - SeeAlso: `RSSTag.Title`, `RSSTag.Link`, `Namespace.iTunes.Author`, `Namespace.Podcast.Guid`, etc.
+        public init(
+            tags: [any XmlRepresentable],
+            items: [RSSTag.Item],
+            categories: Namespace.iTunes.Category
+        ) {
+            self.tags = tags
+            self.items = items
+            self.categories = categories
+        }
     }
 }
 
