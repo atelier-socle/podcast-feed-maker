@@ -26,14 +26,23 @@ public enum ValidationPlatform: String, CaseIterable, Hashable, Equatable, Senda
 }
 
 /// Severity level for validation results.
-public enum ValidationSeverity: String, Hashable, Equatable, Sendable, Codable {
-
-    /// A critical issue that will prevent the feed from being accepted.
-    case error
-
-    /// A non-critical issue that may affect discoverability or display.
-    case warning
+///
+/// Cases are ordered by severity: ``error`` > ``warning`` > ``info``.
+/// Conforms to `Comparable` — `error` is the highest severity.
+public enum ValidationSeverity: Int, Hashable, Equatable, Sendable, Codable, Comparable {
 
     /// An informational note about best practices.
-    case info
+    case info = 0
+
+    /// A non-critical issue that may affect discoverability or display.
+    case warning = 1
+
+    /// A critical issue that will prevent the feed from being accepted.
+    case error = 2
+
+    public static func < (
+        lhs: ValidationSeverity, rhs: ValidationSeverity
+    ) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
 }
