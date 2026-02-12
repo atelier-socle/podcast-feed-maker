@@ -1,14 +1,18 @@
-## 📋 Description
+## Description
 
-<!-- Describe the changes introduced in this PR -->
+<!-- What does this PR do and why? -->
 
-## ✅ Checklist
+## Changes
 
-- [ ] Code builds successfully
-- [ ] Tests pass
-- [ ] Documentation is up to date (DocC / README)
-- [ ] PR is linked to a related issue (if applicable)
+<!-- List the key changes -->
 
-## 📌 Related Links
+-
 
-Issue: #123
+## Checklist
+
+- [ ] Tests added/updated
+- [ ] `swift build` passes
+- [ ] `swift test` passes (0 failures)
+- [ ] `swiftlint lint --strict` (0 violations)
+- [ ] Documentation updated if needed
+- [ ] No breaking changes (or documented in description)

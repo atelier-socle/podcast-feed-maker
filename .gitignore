@@ -1,9 +1,32 @@
-.DS_Store
-/.build
-/Packages
+# === Swift / SPM ===
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj/
 xcuserdata/
 DerivedData/
-.swiftpm/configuration/registries.json
-.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# === macOS ===
+.DS_Store
+**/.DS_Store
+
+# === IDE ===
 .netrc
-/Package.resolved
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# === Code coverage ===
+codecov/
+*.profdata
+*.profraw
+
+# === Archives ===
+*.tar.gz
+*.zip
+
+# === Claude Code (local tooling) ===
+CLAUDE.md
+.claude/
