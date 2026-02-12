@@ -98,14 +98,13 @@ struct EnclosureTests {
         #expect(xml.contains("/>"))
     }
 
-    @Test("Enclosure xmlRepresentation throws for file URL")
-    func enclosureXmlThrowsForFileUrl() {
-        let invalidURL = URL(string: "file:///tmp/audio.mp3")!
-        let enclosure = Enclosure(url: invalidURL, length: 1000, type: "audio/mpeg")
-
-        #expect(throws: URL.URLValidatorError.self) {
-            try enclosure.xmlRepresentation()
-        }
+    @Test("Enclosure xmlRepresentation handles file URL gracefully")
+    func enclosureXmlHandlesFileUrl() throws {
+        let fileURL = URL(string: "file:///tmp/audio.mp3")!
+        let enclosure = Enclosure(url: fileURL, length: 1000, type: "audio/mpeg")
+        // Generation encodes the URL as-is; validation is handled by FeedValidator
+        let xml = try enclosure.xmlRepresentation()
+        #expect(xml.contains("enclosure"))
     }
 
     // MARK: - Item Integration

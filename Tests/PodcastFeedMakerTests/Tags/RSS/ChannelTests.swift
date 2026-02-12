@@ -324,7 +324,7 @@ struct ChannelTests {
         #expect(xml.contains("<itunes:author>John Doe</itunes:author>"))
         #expect(xml.contains("<itunes:block>yes</itunes:block>"))
         #expect(xml.contains("<itunes:complete>yes</itunes:complete>"))
-        #expect(xml.contains("<itunes:explicit>yes</itunes:explicit>"))
+        #expect(xml.contains("<itunes:explicit>true</itunes:explicit>"))
         #expect(xml.contains(#"<itunes:image href="https://example.com/art.jpg" />"#))
         #expect(xml.contains("<itunes:keywords>swift,development</itunes:keywords>"))
         #expect(xml.contains("<itunes:subtitle>A short subtitle</itunes:subtitle>"))
@@ -343,7 +343,7 @@ struct ChannelTests {
         )
 
         let xml = try channel.xmlRepresentation()
-        #expect(xml.contains("<itunes:explicit>no</itunes:explicit>"))
+        #expect(xml.contains("<itunes:explicit>false</itunes:explicit>"))
     }
 
     @Test("Channel XML contains iTunes owner when set")

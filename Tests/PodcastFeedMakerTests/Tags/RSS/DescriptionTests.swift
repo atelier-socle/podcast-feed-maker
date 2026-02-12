@@ -49,8 +49,8 @@ struct DescriptionTests {
         #expect(xml.contains("<description>This is my show</description>"))
     }
 
-    @Test("Channel XML escapes special characters in description")
-    func channelXmlEscapesSpecialCharsInDescription() throws {
+    @Test("Channel XML wraps HTML-containing description in CDATA")
+    func channelXmlWrapsHtmlDescriptionInCDATA() throws {
         let channel = Channel(
             title: "Title",
             link: URL(string: "https://example.com")!,
@@ -58,8 +58,7 @@ struct DescriptionTests {
         )
 
         let xml = try channel.xmlRepresentation()
-        #expect(xml.contains("&lt;b&gt;great&lt;/b&gt;"))
-        #expect(xml.contains("&amp; useful"))
+        #expect(xml.contains("<![CDATA[This is a <b>great</b> & useful podcast]]>"))
     }
 
     // MARK: - Item Description
@@ -97,11 +96,11 @@ struct DescriptionTests {
         #expect(!xml.contains("<description>"))
     }
 
-    @Test("Item XML escapes special characters in description")
-    func itemXmlEscapesSpecialCharsInDescription() throws {
+    @Test("Item XML wraps HTML-containing description in CDATA")
+    func itemXmlWrapsHtmlDescriptionInCDATA() throws {
         let item = Item(description: "Swift & Objective-C <comparison>")
         let xml = try item.xmlRepresentation()
-        #expect(xml.contains("Swift &amp; Objective-C &lt;comparison&gt;"))
+        #expect(xml.contains("<![CDATA[Swift & Objective-C <comparison>]]>"))
     }
 
     // MARK: - Equatable

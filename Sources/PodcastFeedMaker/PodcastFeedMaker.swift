@@ -1,13 +1,10 @@
 /// A utility for creating podcast feeds in XML format.
 ///
 /// `PodcastFeedMaker` is a lightweight wrapper around a ``PodcastFeed``
-/// that conforms to the ``XmlRepresentable`` protocol. It generates a complete
-/// RSS feed suitable for Apple Podcasts, Spotify, and platforms that follow
-/// [RSS 2.0](https://validator.w3.org/feed/docs/rss2.html), [PSP-1](https://github.com/Podcast-Standards-Project/PSP-1-Podcast-RSS-Specification),
-/// and the [Podcast Namespace](https://github.com/Podcastindex-org/podcast-namespace).
+/// that provides both synchronous and streaming XML generation.
 ///
 /// - Important: The ``PodcastFeed`` instance passed must be properly configured with required tags.
-/// - SeeAlso: ``PodcastFeed``, ``Channel``, ``XmlRepresentable``
+/// - SeeAlso: ``PodcastFeed``, ``Channel``, ``FeedGenerator``, ``StreamingFeedGenerator``
 public struct PodcastFeedMaker: Sendable {
 
     /// The underlying ``PodcastFeed`` instance used to generate XML.
@@ -21,17 +18,34 @@ public struct PodcastFeedMaker: Sendable {
     /// ```swift
     /// let feed = PodcastFeed(channel: myChannel)
     /// let maker = PodcastFeedMaker(feed)
-    /// do {
-    ///     let xml = try maker.xmlRepresentation()
-    ///     print(xml)
-    /// } catch {
-    ///     print("Failed to generate XML: \(error)")
-    /// }
+    /// let xml = try maker.generate()
     /// ```
     public init(_ feed: PodcastFeed) {
         self.feed = feed
     }
+
+    /// Generates the complete RSS feed XML string.
+    ///
+    /// - Parameter prettyPrint: Whether to indent the output. Defaults to `true`.
+    /// - Returns: A fully-formed RSS 2.0 feed string.
+    /// - Throws: ``GeneratorError`` if the feed is invalid.
+    public func generate(prettyPrint: Bool = true) throws -> String {
+        try FeedGenerator(prettyPrint: prettyPrint).generate(feed)
+    }
+
+    /// Generates the RSS feed as an async stream of XML chunks.
+    ///
+    /// Suitable for large feeds with many episodes. Yields N+2 chunks
+    /// for a feed with N items.
+    ///
+    /// - Parameter prettyPrint: Whether to indent the output. Defaults to `true`.
+    /// - Returns: An `AsyncThrowingStream` yielding XML string chunks.
+    public func generateStream(prettyPrint: Bool = true) -> AsyncThrowingStream<String, Error> {
+        StreamingFeedGenerator(prettyPrint: prettyPrint).generate(feed)
+    }
 }
+
+// MARK: - XmlRepresentable Conformance
 
 extension PodcastFeedMaker: XmlRepresentable {
 

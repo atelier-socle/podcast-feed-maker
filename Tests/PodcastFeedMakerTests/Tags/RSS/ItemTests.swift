@@ -331,7 +331,7 @@ struct ItemTests {
         #expect(xml.contains("<itunes:duration>3600</itunes:duration>"))
         #expect(xml.contains("<itunes:episode>1</itunes:episode>"))
         #expect(xml.contains("<itunes:episodeType>full</itunes:episodeType>"))
-        #expect(xml.contains("<itunes:explicit>yes</itunes:explicit>"))
+        #expect(xml.contains("<itunes:explicit>true</itunes:explicit>"))
         #expect(xml.contains(#"<itunes:image href="https://example.com/ep1.jpg" />"#))
         #expect(xml.contains("<itunes:keywords>swift,coding</itunes:keywords>"))
         #expect(xml.contains("<itunes:season>2</itunes:season>"))

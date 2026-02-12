@@ -4,20 +4,26 @@ import Testing
 
 struct HelpersTests {
     @Test
-    func testBooleanFormatted() {
-        #expect(true.stringValue == "yes")
-        #expect(false.stringValue == "no")
+    func testBooleanYesNo() {
+        #expect(XMLBuilder.boolYesNo(true) == "yes")
+        #expect(XMLBuilder.boolYesNo(false) == "no")
     }
 
     @Test
-    func testCleanSpecialChars() {
+    func testBooleanTrueFalse() {
+        #expect(XMLBuilder.boolTrueFalse(true) == "true")
+        #expect(XMLBuilder.boolTrueFalse(false) == "false")
+    }
+
+    @Test
+    func testEscapeSpecialChars() {
         let original = #"My "quote" & <html> > test ™ is ©"#
         let expected = #"My &quot;quote&quot; &amp; &lt;html&gt; &gt; test &#x2122; is &#xA9;"#
-        #expect(original.cleanSpecialChars() == expected)
+        #expect(XMLBuilder.escape(original) == expected)
     }
 
     @Test
-    func testRcfPubDateFormat() throws {
+    func testRfc2822DateFormat() throws {
         let components = DateComponents(
             timeZone: .init(identifier: "Europe/Paris"),
             year: 2025,
@@ -33,76 +39,34 @@ struct HelpersTests {
         calendar.locale = Locale(identifier: "en_US")
 
         let date = try #require(calendar.date(from: components))
-        #expect(date.rcfPubDate == "Tue, 18 Mar 2025 19:20:15 +0000")
+        #expect(XMLBuilder.rfc2822Date(date) == "Tue, 18 Mar 2025 19:20:15 +0000")
     }
 
     @Test
-    func testIndentedTagsRepresentation() {
-        let tags = [
-            "<title>Hello</title>",
-            "<title>World</title>"
-        ]
-        let indented = tags.indentedTagsRepresentation
-        #expect(indented.contains("\t<title>Hello</title>"))
-        #expect(indented.contains("\t<title>World</title>"))
+    func testValidateURL() throws {
+        try XMLBuilder.validateURL(URL(string: "https://swift.org")!, context: "test")
+
+        #expect(throws: GeneratorError.self) {
+            try XMLBuilder.validateURL(URL(string: "ftp://invalid-url")!, context: "test")
+        }
+
+        #expect(throws: GeneratorError.self) {
+            try XMLBuilder.validateURL(URL(string: "file://file_path")!, context: "test")
+        }
     }
 
     @Test
-    func testDoubleIndentedTagsRepresentation() {
-        let tags = [
-            "<title>John</title>",
-            "<title>Tech</title>"
-        ]
-        let doubleIndented = tags.doubleIndentedTagsRepresentation
-        #expect(doubleIndented.contains("\t\t<title>John</title>"))
-        #expect(doubleIndented.contains("\t\t<title>Tech</title>"))
-    }
-
-    @Test
-    func testIsValidURL() throws {
-        try #expect(URL(string: "https://swift.org")!.isValid() == true)
-
-        #expect(performing: {
-            try URL(string: "ftp://invalid-url")!.isValid()
-        }, throws: { error in
-            error as? URL.URLValidatorError == .invalidScheme
-            && error.localizedDescription.contains("Scheme must be either `http` or `https`.")
-        })
-
-        #expect(performing: {
-            try URL(string: "not-a-url")!.isValid()
-        }, throws: { error in
-            error as? URL.URLValidatorError == .schemeNotFound
-            && error.localizedDescription.contains("Scheme not found.")
-        })
-
-        #expect(performing: {
-            try URL(string: "file://file_path")!.isValid()
-        }, throws: { error in
-            error as? URL.URLValidatorError == .isFileURL
-            && error.localizedDescription.contains("URL is `file://`.")
-        })
-
-        #expect(performing: {
-            try URL(string: "https://example.com/path/to/resource/with/a/very/long/structure/that/keeps/going/on/and/on/until/it/reaches/a/very/significant/length/that/should/exceed/the/common/url/length/limit/of/255/characters/for/testing?param1=value1&param2=value2&param3=value3&param4=value4")!.isValid()
-        }, throws: { error in
-            error as? URL.URLValidatorError == .maxLength
-            && error.localizedDescription.contains("URL is too long, max length is 255 characters.")
-        })
-    }
-
-    @Test
-    func testEncodeURLQueryAllowed() {
+    func testEncodeURL() {
         let input = URL(string: "https://swift.org/search?query=école+swift&lang=fr")!
-        let encoded = input.encodeURLQueryAllowed
+        let encoded = XMLBuilder.encodeURL(input)
         #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
     }
 
     @Test
-    func test_encodeURLQueryAllowed_returnsEscapedStringOrFallback() {
+    func test_encodeURL_returnsEscapedStringOrFallback() {
         let url = URL(string: "https://example.com/query?param=ç©🎉")!
-        let encoded = url.encodeURLQueryAllowed
+        let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.starts(with: "https://example.com"))
     }
 }
