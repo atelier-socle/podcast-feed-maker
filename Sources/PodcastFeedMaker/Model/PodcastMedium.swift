@@ -15,6 +15,8 @@ import Foundation
 /// - SeeAlso: [Podcast NS — medium](https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#medium)
 public enum PodcastMedium: String, CaseIterable, Hashable, Equatable, Sendable, Codable {
 
+    // MARK: - Core Types
+
     /// A standard podcast feed.
     case podcast
 
@@ -38,4 +40,36 @@ public enum PodcastMedium: String, CaseIterable, Hashable, Equatable, Sendable, 
 
     /// A publisher feed (collection of other feeds).
     case publisher
+
+    /// An educational course feed.
+    case course
+
+    /// A mixed-medium list feed (items reference different medium types).
+    case mixed
+
+    // MARK: - List Variants
+
+    /// A list of podcast feeds.
+    case podcastL
+
+    /// A list of music feeds.
+    case musicL
+
+    /// A list of video feeds.
+    case videoL
+
+    /// A list of film feeds.
+    case filmL
+
+    /// A list of audiobook feeds.
+    case audiobookL
+
+    /// A list of newsletter feeds.
+    case newsletterL
+
+    /// A list of blog feeds.
+    case blogL
+
+    /// A list of course feeds.
+    case courseL
 }

@@ -47,6 +47,8 @@ extension FeedParserDelegate {
             channelDocs = URL(string: text)
         case "ttl":
             channelTTL = Int(text)
+        case "rating":
+            channelRating = text
 
         // iTunes
         case "itunes:author":

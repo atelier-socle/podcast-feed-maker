@@ -64,6 +64,7 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     var channelDocs: URL?
     var channelCloud: RSSCloud?
     var channelTTL: Int?
+    var channelRating: String?
     var channelImage: RSSImage?
     var channelTextInput: RSSTextInput?
     var channelSkipHours: Set<Int> = []

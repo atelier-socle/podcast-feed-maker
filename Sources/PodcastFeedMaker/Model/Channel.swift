@@ -58,6 +58,11 @@ public struct Channel: Sendable, Hashable, Equatable {
     /// Time-to-live: number of minutes the channel can be cached.
     public var ttl: Int?
 
+    /// The PICS rating for the channel.
+    ///
+    /// - SeeAlso: [RSS 2.0 — rating](https://www.rssboard.org/rss-specification#optionalChannelElements)
+    public var rating: String?
+
     /// An image for the channel (RSS 2.0 spec).
     public var image: RSSImage?
 
@@ -206,6 +211,7 @@ public struct Channel: Sendable, Hashable, Equatable {
         docs: URL? = nil,
         cloud: RSSCloud? = nil,
         ttl: Int? = nil,
+        rating: String? = nil,
         image: RSSImage? = nil,
         textInput: RSSTextInput? = nil,
         skipSchedule: SkipSchedule? = nil,
@@ -258,6 +264,7 @@ public struct Channel: Sendable, Hashable, Equatable {
         self.docs = docs
         self.cloud = cloud
         self.ttl = ttl
+        self.rating = rating
         self.image = image
         self.textInput = textInput
         self.skipSchedule = skipSchedule

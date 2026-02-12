@@ -320,6 +320,7 @@ extension FeedParserDelegate {
             docs: channelDocs,
             cloud: channelCloud,
             ttl: channelTTL,
+            rating: channelRating,
             image: channelImage,
             textInput: channelTextInput,
             skipSchedule: skipSchedule,

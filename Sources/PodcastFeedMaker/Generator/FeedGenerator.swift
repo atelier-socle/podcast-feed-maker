@@ -156,6 +156,7 @@ public struct FeedGenerator: Sendable {
         if let docs = channel.docs { lines.append(b.element("docs", content: XMLBuilder.encodeURL(docs))) }
         if let cloud = channel.cloud { lines.append(generateRSSCloud(cloud, builder: b)) }
         if let ttl = channel.ttl { lines.append(b.element("ttl", content: "\(ttl)")) }
+        if let rating = channel.rating { lines.append(b.element("rating", content: rating)) }
         if let image = channel.image { lines.append(contentsOf: generateRSSImage(image, builder: b)) }
         if let textInput = channel.textInput { lines.append(contentsOf: generateRSSTextInput(textInput, builder: b)) }
         if let skipSchedule = channel.skipSchedule { lines.append(contentsOf: generateSkipSchedule(skipSchedule, builder: b)) }

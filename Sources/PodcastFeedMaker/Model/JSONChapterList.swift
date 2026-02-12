@@ -22,6 +22,15 @@ public struct JSONChapterList: Sendable, Hashable, Equatable, Codable {
     /// The JSON Chapters format version (e.g., `"1.2.0"`).
     public var version: String
 
+    /// The title of the podcast episode this chapter list belongs to.
+    public var title: String?
+
+    /// The name of the author of the podcast episode.
+    public var author: String?
+
+    /// The name of the podcast this episode belongs to.
+    public var podcastName: String?
+
     /// The chapter entries.
     public var chapters: [JSONChapter]
 
@@ -29,9 +38,21 @@ public struct JSONChapterList: Sendable, Hashable, Equatable, Codable {
     ///
     /// - Parameters:
     ///   - version: The format version. Defaults to `"1.2.0"`.
+    ///   - title: Optional episode title.
+    ///   - author: Optional episode author.
+    ///   - podcastName: Optional podcast name.
     ///   - chapters: The chapter entries.
-    public init(version: String = "1.2.0", chapters: [JSONChapter] = []) {
+    public init(
+        version: String = "1.2.0",
+        title: String? = nil,
+        author: String? = nil,
+        podcastName: String? = nil,
+        chapters: [JSONChapter] = []
+    ) {
         self.version = version
+        self.title = title
+        self.author = author
+        self.podcastName = podcastName
         self.chapters = chapters
     }
 }
