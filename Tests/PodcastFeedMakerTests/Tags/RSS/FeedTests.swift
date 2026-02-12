@@ -8,8 +8,8 @@ import Testing
 ///
 /// `PodcastFeed` is the root model with `version: String`,
 /// `namespaces: [PodcastNamespace]`, and `channel: Channel?`.
-/// Conforms to `Sendable`, `Hashable`, `Equatable`, and `XmlRepresentable`.
-/// `FeedError.missingChannelTag` is thrown when generating XML without a channel.
+/// Conforms to `Sendable`, `Hashable`, and `Equatable`.
+/// `GeneratorError.missingChannel` is thrown when generating XML without a channel.
 @Suite("PodcastFeed Struct Tests")
 struct FeedTests {
 
@@ -130,11 +130,11 @@ struct FeedTests {
 
     // MARK: - XML Generation
 
-    @Test("PodcastFeed xmlRepresentation generates valid RSS structure")
+    @Test("PodcastFeed generates valid RSS structure")
     func feedXmlRepresentation() throws {
         let channel = makeMinimalChannel()
         let feed = PodcastFeed(channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(xml.contains(#"<?xml version="1.0" encoding="UTF-8"?>"#))
         #expect(xml.contains("<rss"))
@@ -147,11 +147,11 @@ struct FeedTests {
         #expect(xml.contains("</rss>"))
     }
 
-    @Test("PodcastFeed xmlRepresentation includes all standard namespace declarations")
+    @Test("PodcastFeed generates XML with all standard namespace declarations")
     func feedXmlIncludesNamespaces() throws {
         let channel = makeMinimalChannel()
         let feed = PodcastFeed(channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(xml.contains(#"xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd""#))
         #expect(xml.contains(#"xmlns:atom="http://www.w3.org/2005/Atom""#))
@@ -161,11 +161,11 @@ struct FeedTests {
         #expect(xml.contains(#"xmlns:psc="http://podlove.org/simple-chapters""#))
     }
 
-    @Test("PodcastFeed xmlRepresentation with custom namespaces only includes those")
+    @Test("PodcastFeed generates XML with custom namespaces only includes those")
     func feedXmlWithCustomNamespaces() throws {
         let channel = makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(xml.contains(#"xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd""#))
         #expect(!xml.contains("xmlns:atom="))
@@ -175,28 +175,28 @@ struct FeedTests {
         #expect(!xml.contains("xmlns:psc="))
     }
 
-    @Test("PodcastFeed xmlRepresentation with empty namespaces has no xmlns declarations")
+    @Test("PodcastFeed generates XML with empty namespaces has no xmlns declarations")
     func feedXmlWithEmptyNamespaces() throws {
         let channel = makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [], channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(!xml.contains("xmlns:"))
         #expect(xml.contains("<rss"))
         #expect(xml.contains("<channel>"))
     }
 
-    @Test("PodcastFeed xmlRepresentation with podcast-only namespace")
+    @Test("PodcastFeed generates XML with podcast-only namespace")
     func feedXmlWithPodcastOnlyNamespace() throws {
         let channel = makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(xml.contains(#"xmlns:podcast="https://podcastindex.org/namespace/1.0""#))
         #expect(!xml.contains("xmlns:itunes="))
     }
 
-    @Test("PodcastFeed xmlRepresentation includes channel items")
+    @Test("PodcastFeed generates XML with channel items")
     func feedXmlIncludesChannelItems() throws {
         let channel = Channel(
             title: "Test",
@@ -208,7 +208,7 @@ struct FeedTests {
             ]
         )
         let feed = PodcastFeed(channel: channel)
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
 
         #expect(xml.contains("<item>"))
         #expect(xml.contains("<title>Episode 1</title>"))
@@ -218,46 +218,46 @@ struct FeedTests {
 
     // MARK: - Error Handling
 
-    @Test("PodcastFeed xmlRepresentation throws missingChannelTag when channel is nil")
+    @Test("PodcastFeed generate throws missingChannel when channel is nil")
     func feedXmlThrowsMissingChannelTag() {
         let feed = PodcastFeed()
 
-        #expect(throws: PodcastFeed.FeedError.self) {
-            try feed.xmlRepresentation()
+        #expect(throws: GeneratorError.self) {
+            try FeedGenerator().generate(feed)
         }
     }
 
-    @Test("PodcastFeed xmlRepresentation throws when initialized with channel: nil")
+    @Test("PodcastFeed generate throws when initialized with channel: nil")
     func feedXmlThrowsWhenInitializedWithNilChannel() {
         let feed = PodcastFeed(channel: nil)
 
-        #expect(throws: PodcastFeed.FeedError.self) {
-            try feed.xmlRepresentation()
+        #expect(throws: GeneratorError.self) {
+            try FeedGenerator().generate(feed)
         }
     }
 
-    @Test("FeedError.missingChannelTag has correct error description")
+    @Test("GeneratorError.missingChannel has correct error description")
     func feedErrorMissingChannelTagDescription() {
-        let error = PodcastFeed.FeedError.missingChannelTag
-        #expect(error.errorDescription == "Missing channel tag")
+        let error = GeneratorError.missingChannel
+        #expect(error.errorDescription == "Missing channel — a PodcastFeed must have a channel to generate XML.")
     }
 
-    @Test("PodcastFeed xmlRepresentation throws with matching error details")
+    @Test("PodcastFeed generate throws with matching error details")
     func feedXmlThrowsWithMatchingDetails() {
         let feed = PodcastFeed(channel: nil)
 
         #expect(performing: {
-            try feed.xmlRepresentation()
+            try FeedGenerator().generate(feed)
         }, throws: { error in
-            error as? PodcastFeed.FeedError == .missingChannelTag
-                && error.localizedDescription.contains("Missing channel tag")
+            error as? GeneratorError == .missingChannel
+                && error.localizedDescription.contains("Missing channel")
         })
     }
 
     @Test("PodcastFeed with channel does not throw")
     func feedWithChannelDoesNotThrow() throws {
         let feed = PodcastFeed(channel: makeMinimalChannel())
-        let xml = try feed.xmlRepresentation()
+        let xml = try FeedGenerator().generate(feed)
         #expect(!xml.isEmpty)
     }
 

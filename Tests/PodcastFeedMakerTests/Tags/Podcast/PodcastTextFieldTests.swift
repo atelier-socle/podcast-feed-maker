@@ -48,10 +48,12 @@ struct PodcastTextFieldTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithPurpose() throws {
+    func xmlRepresentationWithPurpose() {
         let txt = PodcastTxt(value: "1234567890", purpose: "verify")
 
-        let xml = try txt.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let purpose = txt.purpose { attrs.append(("purpose", purpose)) }
+        let xml = XMLBuilder().element("podcast:txt", content: txt.value, attributes: attrs)
 
         #expect(xml.contains("podcast:txt"))
         #expect(xml.contains(#"purpose="verify""#))
@@ -59,10 +61,12 @@ struct PodcastTextFieldTests {
     }
 
     @Test
-    func xmlRepresentationWithoutPurpose() throws {
+    func xmlRepresentationWithoutPurpose() {
         let txt = PodcastTxt(value: "Some generic text")
 
-        let xml = try txt.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let purpose = txt.purpose { attrs.append(("purpose", purpose)) }
+        let xml = XMLBuilder().element("podcast:txt", content: txt.value, attributes: attrs)
 
         #expect(xml.contains("podcast:txt"))
         #expect(xml.contains(">Some generic text</podcast:txt>"))

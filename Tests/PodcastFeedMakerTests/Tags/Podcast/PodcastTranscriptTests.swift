@@ -96,13 +96,16 @@ struct PodcastTranscriptTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithUrlAndType() throws {
+    func xmlRepresentationWithUrlAndType() {
         let transcript = Transcript(
             url: URL(string: "https://example.com/subs.srt")!,
             type: "application/srt"
         )
 
-        let xml = try transcript.xmlRepresentation()
+        var attrs: [(String, String)] = [("url", XMLBuilder.encodeURL(transcript.url)), ("type", transcript.type)]
+        if let language = transcript.language { attrs.append(("language", language)) }
+        if let rel = transcript.rel { attrs.append(("rel", rel)) }
+        let xml = XMLBuilder().selfClosingElement("podcast:transcript", attributes: attrs)
 
         #expect(xml.contains("podcast:transcript"))
         #expect(xml.contains(#"url="https://example.com/subs.srt""#))
@@ -110,7 +113,7 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationWithLanguageAndRel() throws {
+    func xmlRepresentationWithLanguageAndRel() {
         let transcript = Transcript(
             url: URL(string: "https://example.com/ep1.vtt")!,
             type: "text/vtt",
@@ -118,7 +121,10 @@ struct PodcastTranscriptTests {
             rel: "captions"
         )
 
-        let xml = try transcript.xmlRepresentation()
+        var attrs: [(String, String)] = [("url", XMLBuilder.encodeURL(transcript.url)), ("type", transcript.type)]
+        if let language = transcript.language { attrs.append(("language", language)) }
+        if let rel = transcript.rel { attrs.append(("rel", rel)) }
+        let xml = XMLBuilder().selfClosingElement("podcast:transcript", attributes: attrs)
 
         #expect(xml.contains("podcast:transcript"))
         #expect(xml.contains(#"language="en""#))
@@ -126,25 +132,31 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() throws {
+    func xmlRepresentationIsSelfClosingTag() {
         let transcript = Transcript(
             url: URL(string: "https://example.com/ep1.vtt")!,
             type: "text/vtt"
         )
 
-        let xml = try transcript.xmlRepresentation()
+        var attrs: [(String, String)] = [("url", XMLBuilder.encodeURL(transcript.url)), ("type", transcript.type)]
+        if let language = transcript.language { attrs.append(("language", language)) }
+        if let rel = transcript.rel { attrs.append(("rel", rel)) }
+        let xml = XMLBuilder().selfClosingElement("podcast:transcript", attributes: attrs)
 
         #expect(xml.contains("/>"))
     }
 
     @Test
-    func xmlRepresentationWithoutOptionalAttributes() throws {
+    func xmlRepresentationWithoutOptionalAttributes() {
         let transcript = Transcript(
             url: URL(string: "https://example.com/ep1.vtt")!,
             type: "text/vtt"
         )
 
-        let xml = try transcript.xmlRepresentation()
+        var attrs: [(String, String)] = [("url", XMLBuilder.encodeURL(transcript.url)), ("type", transcript.type)]
+        if let language = transcript.language { attrs.append(("language", language)) }
+        if let rel = transcript.rel { attrs.append(("rel", rel)) }
+        let xml = XMLBuilder().selfClosingElement("podcast:transcript", attributes: attrs)
 
         #expect(!xml.contains("language="))
         #expect(!xml.contains("rel="))

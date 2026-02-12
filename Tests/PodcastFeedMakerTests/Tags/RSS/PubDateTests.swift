@@ -64,7 +64,7 @@ struct PubDateTests {
             pubDate: date
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<pubDate>"))
         #expect(xml.contains("Mon, 24 Mar 2025 18:30:00"))
         #expect(xml.contains("</pubDate>"))
@@ -78,7 +78,7 @@ struct PubDateTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<pubDate>"))
     }
 
@@ -105,7 +105,7 @@ struct PubDateTests {
         let date = formatter.date(from: "2025-03-24 18:30:00")!
 
         let item = Item(pubDate: date)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<pubDate>"))
         #expect(xml.contains("Mon, 24 Mar 2025 18:30:00"))
     }
@@ -113,7 +113,7 @@ struct PubDateTests {
     @Test("Item XML omits pubDate tag when nil")
     func itemXmlOmitsPubDateWhenNil() throws {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<pubDate>"))
     }
 

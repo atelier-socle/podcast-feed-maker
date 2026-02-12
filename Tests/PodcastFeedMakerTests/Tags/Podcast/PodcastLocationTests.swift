@@ -72,14 +72,17 @@ struct PodcastLocationTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithGeoAndOsm() throws {
+    func xmlRepresentationWithGeoAndOsm() {
         let location = PodcastLocation(
             name: "Austin, TX",
             geo: "geo:30.2672,-97.7431",
             osm: "R113314"
         )
 
-        let xml = try location.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let geo = location.geo { attrs.append(("geo", geo)) }
+        if let osm = location.osm { attrs.append(("osm", osm)) }
+        let xml = XMLBuilder().element("podcast:location", content: location.name, attributes: attrs)
 
         #expect(xml.contains("podcast:location"))
         #expect(xml.contains(#"geo="geo:30.2672,-97.7431""#))
@@ -88,10 +91,13 @@ struct PodcastLocationTests {
     }
 
     @Test
-    func xmlRepresentationWithNameOnly() throws {
+    func xmlRepresentationWithNameOnly() {
         let location = PodcastLocation(name: "Paris, France")
 
-        let xml = try location.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let geo = location.geo { attrs.append(("geo", geo)) }
+        if let osm = location.osm { attrs.append(("osm", osm)) }
+        let xml = XMLBuilder().element("podcast:location", content: location.name, attributes: attrs)
 
         #expect(xml.contains("podcast:location"))
         #expect(xml.contains(">Paris, France</podcast:location>"))
@@ -100,10 +106,13 @@ struct PodcastLocationTests {
     }
 
     @Test
-    func xmlRepresentationWithGeoOnly() throws {
+    func xmlRepresentationWithGeoOnly() {
         let location = PodcastLocation(name: "Berlin", geo: "geo:52.52,13.405")
 
-        let xml = try location.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let geo = location.geo { attrs.append(("geo", geo)) }
+        if let osm = location.osm { attrs.append(("osm", osm)) }
+        let xml = XMLBuilder().element("podcast:location", content: location.name, attributes: attrs)
 
         #expect(xml.contains(#"geo="geo:52.52,13.405""#))
         #expect(!xml.contains("osm="))

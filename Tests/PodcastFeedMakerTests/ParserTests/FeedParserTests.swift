@@ -524,7 +524,7 @@ struct FeedParserTests {
         #expect(trailer.length == 5_000_000)
         #expect(trailer.type == "audio/mpeg")
         #expect(trailer.season == 1)
-        #expect(trailer.pubDate != nil)
+        #expect(trailer.pubDate.timeIntervalSince1970 > 0)
     }
 
     // MARK: - Podcast NS 2.0 Item

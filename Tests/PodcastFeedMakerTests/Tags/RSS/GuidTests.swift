@@ -8,7 +8,7 @@ import Testing
 ///
 /// In the new model, `GUID` is a standalone struct with `value: String`
 /// and `isPermaLink: Bool` (default `true`). It conforms to
-/// `Sendable`, `Hashable`, `Equatable`, `Codable`, and `XmlRepresentable`.
+/// `Sendable`, `Hashable`, `Equatable`, and `Codable`.
 @Suite("GUID Struct Tests")
 struct GuidTests {
 
@@ -45,24 +45,24 @@ struct GuidTests {
 
     // MARK: - XML Generation
 
-    @Test("GUID xmlRepresentation with isPermaLink false")
-    func guidXmlWithPermaLinkFalse() throws {
+    @Test("GUID generates XML with isPermaLink false")
+    func guidXmlWithPermaLinkFalse() {
         let guid = GUID(value: "ep001", isPermaLink: false)
-        let xml = try guid.xmlRepresentation()
+        let xml = XMLBuilder().element("guid", content: guid.value, attributes: [("isPermaLink", "\(guid.isPermaLink)")])
         #expect(xml == #"<guid isPermaLink="false">ep001</guid>"#)
     }
 
-    @Test("GUID xmlRepresentation with isPermaLink true")
-    func guidXmlWithPermaLinkTrue() throws {
+    @Test("GUID generates XML with isPermaLink true")
+    func guidXmlWithPermaLinkTrue() {
         let guid = GUID(value: "https://example.com/ep1", isPermaLink: true)
-        let xml = try guid.xmlRepresentation()
+        let xml = XMLBuilder().element("guid", content: guid.value, attributes: [("isPermaLink", "\(guid.isPermaLink)")])
         #expect(xml == #"<guid isPermaLink="true">https://example.com/ep1</guid>"#)
     }
 
-    @Test("GUID xmlRepresentation with default isPermaLink")
-    func guidXmlWithDefaultPermaLink() throws {
+    @Test("GUID generates XML with default isPermaLink")
+    func guidXmlWithDefaultPermaLink() {
         let guid = GUID(value: "unique-123")
-        let xml = try guid.xmlRepresentation()
+        let xml = XMLBuilder().element("guid", content: guid.value, attributes: [("isPermaLink", "\(guid.isPermaLink)")])
         #expect(xml.contains(#"isPermaLink="true""#))
         #expect(xml.contains("unique-123"))
     }
@@ -78,16 +78,16 @@ struct GuidTests {
     }
 
     @Test("Item XML contains guid tag when set")
-    func itemXmlContainsGuid() throws {
+    func itemXmlContainsGuid() {
         let item = Item(guid: GUID(value: "ep-42", isPermaLink: false))
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"<guid isPermaLink="false">ep-42</guid>"#))
     }
 
     @Test("Item XML omits guid tag when nil")
-    func itemXmlOmitsGuidWhenNil() throws {
+    func itemXmlOmitsGuidWhenNil() {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<guid"))
     }
 

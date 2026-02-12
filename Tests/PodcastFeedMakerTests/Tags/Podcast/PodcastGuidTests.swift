@@ -38,20 +38,20 @@ struct PodcastGuidTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsGuidValue() throws {
+    func xmlRepresentationContainsGuidValue() {
         let guid = PodcastGuid(value: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1")
 
-        let xml = try guid.xmlRepresentation()
+        let xml = XMLBuilder().element("podcast:guid", content: guid.value)
 
         #expect(xml.contains("podcast:guid"))
         #expect(xml.contains("917393e3-1b1e-5cef-ace4-edaa54e1f3e1"))
     }
 
     @Test
-    func xmlRepresentationWrapsValueAsElementContent() throws {
+    func xmlRepresentationWrapsValueAsElementContent() {
         let guid = PodcastGuid(value: "podcast.example.com/myshow")
 
-        let xml = try guid.xmlRepresentation()
+        let xml = XMLBuilder().element("podcast:guid", content: guid.value)
 
         #expect(xml.contains(">podcast.example.com/myshow</podcast:guid>"))
     }

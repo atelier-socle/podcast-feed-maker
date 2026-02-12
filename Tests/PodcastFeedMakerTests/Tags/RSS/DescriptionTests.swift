@@ -45,7 +45,7 @@ struct DescriptionTests {
             description: "This is my show"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<description>This is my show</description>"))
     }
 
@@ -57,7 +57,7 @@ struct DescriptionTests {
             description: "This is a <b>great</b> & useful podcast"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<![CDATA[This is a <b>great</b> & useful podcast]]>"))
     }
 
@@ -85,21 +85,21 @@ struct DescriptionTests {
     @Test("Item XML contains description tag when set")
     func itemXmlContainsDescriptionWhenSet() throws {
         let item = Item(description: "Episode summary text")
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<description>Episode summary text</description>"))
     }
 
     @Test("Item XML omits description tag when nil")
     func itemXmlOmitsDescriptionWhenNil() throws {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<description>"))
     }
 
     @Test("Item XML wraps HTML-containing description in CDATA")
     func itemXmlWrapsHtmlDescriptionInCDATA() throws {
         let item = Item(description: "Swift & Objective-C <comparison>")
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<![CDATA[Swift & Objective-C <comparison>]]>"))
     }
 

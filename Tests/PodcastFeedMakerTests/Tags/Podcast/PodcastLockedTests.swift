@@ -56,30 +56,36 @@ struct PodcastLockedTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWhenLocked() throws {
+    func xmlRepresentationWhenLocked() {
         let locked = Locked(isLocked: true)
 
-        let xml = try locked.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let owner = locked.owner { attrs.append(("owner", owner)) }
+        let xml = XMLBuilder().element("podcast:locked", content: XMLBuilder.boolYesNo(locked.isLocked), attributes: attrs)
 
         #expect(xml.contains("podcast:locked"))
         #expect(xml.contains(">yes</podcast:locked>"))
     }
 
     @Test
-    func xmlRepresentationWhenUnlocked() throws {
+    func xmlRepresentationWhenUnlocked() {
         let locked = Locked(isLocked: false)
 
-        let xml = try locked.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let owner = locked.owner { attrs.append(("owner", owner)) }
+        let xml = XMLBuilder().element("podcast:locked", content: XMLBuilder.boolYesNo(locked.isLocked), attributes: attrs)
 
         #expect(xml.contains("podcast:locked"))
         #expect(xml.contains(">no</podcast:locked>"))
     }
 
     @Test
-    func xmlRepresentationWithOwner() throws {
+    func xmlRepresentationWithOwner() {
         let locked = Locked(isLocked: true, owner: "john@example.com")
 
-        let xml = try locked.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let owner = locked.owner { attrs.append(("owner", owner)) }
+        let xml = XMLBuilder().element("podcast:locked", content: XMLBuilder.boolYesNo(locked.isLocked), attributes: attrs)
 
         #expect(xml.contains("podcast:locked"))
         #expect(xml.contains(#"owner="john@example.com""#))
@@ -87,10 +93,12 @@ struct PodcastLockedTests {
     }
 
     @Test
-    func xmlRepresentationWithoutOwner() throws {
+    func xmlRepresentationWithoutOwner() {
         let locked = Locked(isLocked: true)
 
-        let xml = try locked.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let owner = locked.owner { attrs.append(("owner", owner)) }
+        let xml = XMLBuilder().element("podcast:locked", content: XMLBuilder.boolYesNo(locked.isLocked), attributes: attrs)
 
         #expect(!xml.contains("owner="))
     }

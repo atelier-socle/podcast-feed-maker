@@ -96,3 +96,12 @@ public enum PodcastNamespace: Hashable, Equatable, Sendable {
         .itunes, .atom, .podcast, .dublinCore, .content, .podloveSimpleChapters
     ]
 }
+
+// MARK: - Comparable
+
+extension PodcastNamespace: Comparable {
+
+    public static func < (lhs: PodcastNamespace, rhs: PodcastNamespace) -> Bool {
+        lhs.uri < rhs.uri
+    }
+}

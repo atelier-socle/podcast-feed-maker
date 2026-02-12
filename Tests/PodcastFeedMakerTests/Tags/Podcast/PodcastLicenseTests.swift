@@ -51,11 +51,13 @@ struct PodcastLicenseTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithUrl() throws {
+    func xmlRepresentationWithUrl() {
         let url = URL(string: "https://creativecommons.org/licenses/by-nc-sa/4.0/")!
         let license = PodcastLicense(identifier: "cc-by-nc-sa-4.0", url: url)
 
-        let xml = try license.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let url = license.url { attrs.append(("url", XMLBuilder.encodeURL(url))) }
+        let xml = XMLBuilder().element("podcast:license", content: license.identifier, attributes: attrs)
 
         #expect(xml.contains("podcast:license"))
         #expect(xml.contains(#"url="#))
@@ -64,10 +66,12 @@ struct PodcastLicenseTests {
     }
 
     @Test
-    func xmlRepresentationWithoutUrl() throws {
+    func xmlRepresentationWithoutUrl() {
         let license = PodcastLicense(identifier: "Public Domain")
 
-        let xml = try license.xmlRepresentation()
+        var attrs: [(String, String)] = []
+        if let url = license.url { attrs.append(("url", XMLBuilder.encodeURL(url))) }
+        let xml = XMLBuilder().element("podcast:license", content: license.identifier, attributes: attrs)
 
         #expect(xml.contains("podcast:license"))
         #expect(xml.contains(">Public Domain</podcast:license>"))

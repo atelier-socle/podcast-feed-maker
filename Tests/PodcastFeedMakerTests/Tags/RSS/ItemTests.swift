@@ -8,7 +8,7 @@ import Testing
 ///
 /// `Item` represents a single episode in a podcast feed with ~35 typed properties.
 /// All properties are optional or default to empty arrays.
-/// Conforms to `Sendable`, `Hashable`, `Equatable`, and `XmlRepresentable`.
+/// Conforms to `Sendable`, `Hashable`, and `Equatable`.
 @Suite("Item Struct Tests")
 // swiftlint:disable:next type_body_length
 struct ItemTests {
@@ -252,7 +252,7 @@ struct ItemTests {
     @Test("Item XML wraps content in item tags")
     func itemXmlWrapsInItemTags() throws {
         let item = Item(title: "Episode 1")
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(xml.contains("<item>"))
         #expect(xml.contains("</item>"))
@@ -267,7 +267,7 @@ struct ItemTests {
             author: "author@example.com"
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<title>Episode 1</title>"))
         #expect(xml.contains("<link>https://example.com/ep1</link>"))
         #expect(xml.contains("<description>The first episode</description>"))
@@ -283,7 +283,7 @@ struct ItemTests {
         )
 
         let item = Item(enclosure: enclosure)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(xml.contains("<enclosure url="))
         #expect(xml.contains(#"url="https://example.com/ep1.mp3""#))
@@ -295,7 +295,7 @@ struct ItemTests {
     func itemXmlContainsGuid() throws {
         let guid = GUID(value: "ep-001", isPermaLink: false)
         let item = Item(guid: guid)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(xml.contains(#"<guid isPermaLink="false">ep-001</guid>"#))
     }
@@ -304,7 +304,7 @@ struct ItemTests {
     func itemXmlContainsGuidPermaLink() throws {
         let guid = GUID(value: "https://example.com/ep1")
         let item = Item(guid: guid)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(xml.contains(#"<guid isPermaLink="true">https://example.com/ep1</guid>"#))
     }
@@ -326,7 +326,7 @@ struct ItemTests {
             itunesTitle: "Title Override"
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<itunes:author>John Doe</itunes:author>"))
         #expect(xml.contains("<itunes:duration>3600</itunes:duration>"))
         #expect(xml.contains("<itunes:episode>1</itunes:episode>"))
@@ -346,9 +346,9 @@ struct ItemTests {
         let trailerItem = Item(itunesEpisodeType: .trailer)
         let bonusItem = Item(itunesEpisodeType: .bonus)
 
-        let fullXml = try fullItem.xmlRepresentation()
-        let trailerXml = try trailerItem.xmlRepresentation()
-        let bonusXml = try bonusItem.xmlRepresentation()
+        let fullXml = FeedGenerator().generateItem(fullItem, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
+        let trailerXml = FeedGenerator().generateItem(trailerItem, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
+        let bonusXml = FeedGenerator().generateItem(bonusItem, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(fullXml.contains("<itunes:episodeType>full</itunes:episodeType>"))
         #expect(trailerXml.contains("<itunes:episodeType>trailer</itunes:episodeType>"))
@@ -361,7 +361,7 @@ struct ItemTests {
             contentEncoded: ContentEncoded(value: "<p>Show notes</p>")
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<content:encoded><![CDATA[<p>Show notes</p>]]></content:encoded>"))
     }
 
@@ -373,7 +373,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"<podcast:soundbite startTime="0.0" duration="10.0">Best Part</podcast:soundbite>"#))
     }
 
@@ -385,7 +385,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"<podcast:soundbite startTime="73.0" duration="60.0" />"#))
     }
 
@@ -398,7 +398,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"startTime="0.0" duration="10.0">Intro"#))
         #expect(xml.contains(#"startTime="120.0" duration="30.0">Highlight"#))
     }
@@ -416,7 +416,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:transcript"))
         #expect(xml.contains(#"url="https://example.com/ep1.vtt""#))
         #expect(xml.contains(#"type="text/vtt""#))
@@ -435,7 +435,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:transcript"))
         #expect(xml.contains(#"url="https://example.com/ep1.srt""#))
         #expect(xml.contains(#"type="application/srt""#))
@@ -451,7 +451,7 @@ struct ItemTests {
             )
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:chapters"))
         #expect(xml.contains(#"url="https://example.com/ep1/chapters.json""#))
         #expect(xml.contains(#"type="application/json+chapters""#))
@@ -471,7 +471,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:person"))
         #expect(xml.contains(#"role="host""#))
         #expect(xml.contains(#"group="cast""#))
@@ -494,7 +494,7 @@ struct ItemTests {
             ]
         )
 
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:transcript"))
         #expect(xml.contains("<podcast:chapters"))
         #expect(xml.contains("<podcast:soundbite"))
@@ -505,7 +505,7 @@ struct ItemTests {
     @Test("Item XML omits all tags when no properties are set")
     func itemXmlOmitsAllTagsWhenEmpty() throws {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
         #expect(xml.contains("<item>"))
         #expect(xml.contains("</item>"))

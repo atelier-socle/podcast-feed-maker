@@ -46,7 +46,7 @@ struct LinkTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<link>https://podcast.example.com</link>"))
     }
 
@@ -58,7 +58,7 @@ struct LinkTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<link>"))
         #expect(xml.contains("https://example.com/path"))
     }
@@ -89,14 +89,14 @@ struct LinkTests {
     @Test("Item XML contains link tag when set")
     func itemXmlContainsLinkWhenSet() throws {
         let item = Item(link: URL(string: "https://podcast.example.com/ep1")!)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<link>https://podcast.example.com/ep1</link>"))
     }
 
     @Test("Item XML omits link tag when nil")
     func itemXmlOmitsLinkWhenNil() throws {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<link>"))
     }
 

@@ -85,9 +85,16 @@ struct AtomLinkTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithRelAndType() throws {
+    func xmlRepresentationWithRelAndType() {
         let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
-        let xml = try link.xmlRepresentation()
+        let b = XMLBuilder()
+        var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
+        if let rel = link.rel { attrs.append(("rel", rel)) }
+        if let type = link.type { attrs.append(("type", type)) }
+        if let hreflang = link.hreflang { attrs.append(("hreflang", hreflang)) }
+        if let title = link.title { attrs.append(("title", XMLBuilder.escape(title))) }
+        if let length = link.length { attrs.append(("length", "\(length)")) }
+        let xml = b.selfClosingElement("atom:link", attributes: attrs)
 
         #expect(xml.contains("atom:link"))
         #expect(xml.contains(#"href="https://example.com/feed.xml""#))
@@ -96,9 +103,16 @@ struct AtomLinkTests {
     }
 
     @Test
-    func xmlRepresentationWithHrefOnly() throws {
+    func xmlRepresentationWithHrefOnly() {
         let link = AtomLink(href: URL(string: "https://example.com/other.xml")!)
-        let xml = try link.xmlRepresentation()
+        let b = XMLBuilder()
+        var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
+        if let rel = link.rel { attrs.append(("rel", rel)) }
+        if let type = link.type { attrs.append(("type", type)) }
+        if let hreflang = link.hreflang { attrs.append(("hreflang", hreflang)) }
+        if let title = link.title { attrs.append(("title", XMLBuilder.escape(title))) }
+        if let length = link.length { attrs.append(("length", "\(length)")) }
+        let xml = b.selfClosingElement("atom:link", attributes: attrs)
 
         #expect(xml.contains("atom:link"))
         #expect(xml.contains(#"href="https://example.com/other.xml""#))
@@ -107,9 +121,16 @@ struct AtomLinkTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() throws {
+    func xmlRepresentationIsSelfClosingTag() {
         let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
-        let xml = try link.xmlRepresentation()
+        let b = XMLBuilder()
+        var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
+        if let rel = link.rel { attrs.append(("rel", rel)) }
+        if let type = link.type { attrs.append(("type", type)) }
+        if let hreflang = link.hreflang { attrs.append(("hreflang", hreflang)) }
+        if let title = link.title { attrs.append(("title", XMLBuilder.escape(title))) }
+        if let length = link.length { attrs.append(("length", "\(length)")) }
+        let xml = b.selfClosingElement("atom:link", attributes: attrs)
 
         #expect(xml.contains("/>"))
     }

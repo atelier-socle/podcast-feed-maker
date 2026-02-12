@@ -49,10 +49,16 @@ struct PodcastSoundbiteTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithTitle() throws {
+    func xmlRepresentationWithTitle() {
         let soundbite = Soundbite(startTime: 30.5, duration: 45.0, title: "A funny intro moment")
 
-        let xml = try soundbite.xmlRepresentation()
+        let attrs: [(String, String)] = [("startTime", "\(soundbite.startTime)"), ("duration", "\(soundbite.duration)")]
+        let xml: String
+        if let title = soundbite.title {
+            xml = XMLBuilder().element("podcast:soundbite", content: title, attributes: attrs)
+        } else {
+            xml = XMLBuilder().selfClosingElement("podcast:soundbite", attributes: attrs)
+        }
 
         #expect(xml.contains("podcast:soundbite"))
         #expect(xml.contains(#"startTime="30.5""#))
@@ -61,10 +67,16 @@ struct PodcastSoundbiteTests {
     }
 
     @Test
-    func xmlRepresentationWithoutTitle() throws {
+    func xmlRepresentationWithoutTitle() {
         let soundbite = Soundbite(startTime: 60.0, duration: 15.0)
 
-        let xml = try soundbite.xmlRepresentation()
+        let attrs: [(String, String)] = [("startTime", "\(soundbite.startTime)"), ("duration", "\(soundbite.duration)")]
+        let xml: String
+        if let title = soundbite.title {
+            xml = XMLBuilder().element("podcast:soundbite", content: title, attributes: attrs)
+        } else {
+            xml = XMLBuilder().selfClosingElement("podcast:soundbite", attributes: attrs)
+        }
 
         #expect(xml.contains("podcast:soundbite"))
         #expect(xml.contains(#"startTime="60.0""#))

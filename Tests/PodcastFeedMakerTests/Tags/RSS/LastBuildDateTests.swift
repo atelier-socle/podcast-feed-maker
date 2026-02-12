@@ -69,7 +69,7 @@ struct LastBuildDateTests {
             lastBuildDate: date
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<lastBuildDate>Tue, 26 Mar 2024 20:30:00 +0000</lastBuildDate>"))
     }
 
@@ -81,7 +81,7 @@ struct LastBuildDateTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<lastBuildDate>"))
     }
 

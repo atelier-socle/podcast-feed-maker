@@ -19,7 +19,7 @@ struct PodcastFeedMakerTests {
         let feed = PodcastFeed(channel: channel)
         let maker = PodcastFeedMaker(feed)
 
-        let xml = try maker.xmlRepresentation()
+        let xml = try maker.generate()
 
         #expect(xml.contains("<rss version=\"2.0\""))
         #expect(xml.contains("<channel>"))
@@ -34,8 +34,8 @@ struct PodcastFeedMakerTests {
         let feed = PodcastFeed(channel: nil)
         let maker = PodcastFeedMaker(feed)
 
-        #expect(throws: PodcastFeed.FeedError.self) {
-            _ = try maker.xmlRepresentation()
+        #expect(throws: GeneratorError.self) {
+            _ = try maker.generate()
         }
     }
 }

@@ -278,7 +278,7 @@ extension FeedParserDelegate {
                 namespaces.append(.custom(value))
             }
         }
-        feed.namespaces = namespaces
+        feed.namespaces = namespaces.sorted()
     }
 }
 

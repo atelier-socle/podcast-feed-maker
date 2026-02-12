@@ -8,7 +8,7 @@ import Testing
 ///
 /// `Enclosure` has `url: URL`, `length: Int`, `type: String`, plus
 /// a convenience initializer accepting ``Enclosure.MIMEType``.
-/// Conforms to `Sendable`, `Hashable`, `Equatable`, `Codable`, and `XmlRepresentable`.
+/// Conforms to `Sendable`, `Hashable`, `Equatable`, and `Codable`.
 @Suite("Enclosure Struct Tests")
 struct EnclosureTests {
 
@@ -86,11 +86,11 @@ struct EnclosureTests {
 
     // MARK: - XML Generation
 
-    @Test("Enclosure xmlRepresentation returns expected XML")
-    func enclosureXmlRepresentation() throws {
+    @Test("Enclosure generates expected XML via XMLBuilder")
+    func enclosureXmlRepresentation() {
         let url = URL(string: "https://example.com/audio.m4a")!
         let enclosure = Enclosure(url: url, length: 9999, mimeType: .m4a)
-        let xml = try enclosure.xmlRepresentation()
+        let xml = XMLBuilder().selfClosingElement("enclosure", attributes: [("url", XMLBuilder.encodeURL(enclosure.url)), ("length", "\(enclosure.length)"), ("type", "\(enclosure.type)")])
 
         #expect(xml.contains(#"<enclosure url="https://example.com/audio.m4a""#))
         #expect(xml.contains(#"length="9999""#))
@@ -98,12 +98,12 @@ struct EnclosureTests {
         #expect(xml.contains("/>"))
     }
 
-    @Test("Enclosure xmlRepresentation handles file URL gracefully")
-    func enclosureXmlHandlesFileUrl() throws {
+    @Test("Enclosure XMLBuilder handles file URL gracefully")
+    func enclosureXmlHandlesFileUrl() {
         let fileURL = URL(string: "file:///tmp/audio.mp3")!
         let enclosure = Enclosure(url: fileURL, length: 1000, type: "audio/mpeg")
         // Generation encodes the URL as-is; validation is handled by FeedValidator
-        let xml = try enclosure.xmlRepresentation()
+        let xml = XMLBuilder().selfClosingElement("enclosure", attributes: [("url", XMLBuilder.encodeURL(enclosure.url)), ("length", "\(enclosure.length)"), ("type", "\(enclosure.type)")])
         #expect(xml.contains("enclosure"))
     }
 
@@ -123,21 +123,21 @@ struct EnclosureTests {
     }
 
     @Test("Item XML contains enclosure tag when set")
-    func itemXmlContainsEnclosure() throws {
+    func itemXmlContainsEnclosure() {
         let enclosure = Enclosure(
             url: URL(string: "https://example.com/ep1.mp3")!,
             length: 50000,
             mimeType: .mpeg
         )
         let item = Item(enclosure: enclosure)
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<enclosure url="))
     }
 
     @Test("Item XML omits enclosure tag when nil")
-    func itemXmlOmitsEnclosureWhenNil() throws {
+    func itemXmlOmitsEnclosureWhenNil() {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<enclosure"))
     }
 

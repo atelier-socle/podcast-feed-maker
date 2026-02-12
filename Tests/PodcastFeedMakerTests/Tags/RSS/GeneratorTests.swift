@@ -58,7 +58,7 @@ struct GeneratorTests {
             generator: "PodcastFeedMaker 1.0"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<generator>PodcastFeedMaker 1.0</generator>"))
     }
 
@@ -70,7 +70,7 @@ struct GeneratorTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<generator>"))
     }
 
@@ -83,7 +83,7 @@ struct GeneratorTests {
             generator: "My & Co <2025>"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("My &amp; Co &lt;2025&gt;"))
     }
 

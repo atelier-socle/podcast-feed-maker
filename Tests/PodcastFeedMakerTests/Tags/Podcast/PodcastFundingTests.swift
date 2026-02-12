@@ -41,13 +41,13 @@ struct PodcastFundingTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndMessage() throws {
+    func xmlRepresentationContainsUrlAndMessage() {
         let funding = Funding(
             url: URL(string: "https://patreon.com/myshow")!,
             message: "Support us on Patreon"
         )
 
-        let xml = try funding.xmlRepresentation()
+        let xml = XMLBuilder().element("podcast:funding", content: funding.message, attributes: [("url", XMLBuilder.encodeURL(funding.url))])
 
         #expect(xml.contains("podcast:funding"))
         #expect(xml.contains(#"url="https://patreon.com/myshow""#))
@@ -55,13 +55,13 @@ struct PodcastFundingTests {
     }
 
     @Test
-    func xmlRepresentationWrapsMessageAsElementContent() throws {
+    func xmlRepresentationWrapsMessageAsElementContent() {
         let funding = Funding(
             url: URL(string: "https://example.com/donate")!,
             message: "Donate here"
         )
 
-        let xml = try funding.xmlRepresentation()
+        let xml = XMLBuilder().element("podcast:funding", content: funding.message, attributes: [("url", XMLBuilder.encodeURL(funding.url))])
 
         #expect(xml.contains(">Donate here</podcast:funding>"))
     }

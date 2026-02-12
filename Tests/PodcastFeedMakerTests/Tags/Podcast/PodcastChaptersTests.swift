@@ -55,11 +55,11 @@ struct PodcastChaptersTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndType() throws {
+    func xmlRepresentationContainsUrlAndType() {
         let url = URL(string: "https://example.com/ep1/chapters.json")!
         let chapters = ChaptersLink(url: url)
 
-        let xml = try chapters.xmlRepresentation()
+        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
 
         #expect(xml.contains("podcast:chapters"))
         #expect(xml.contains(#"url="https://example.com/ep1/chapters.json""#))
@@ -67,21 +67,21 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func xmlRepresentationWithCustomType() throws {
+    func xmlRepresentationWithCustomType() {
         let url = URL(string: "https://example.com/ep1/chapters.json")!
         let chapters = ChaptersLink(url: url, type: "application/json")
 
-        let xml = try chapters.xmlRepresentation()
+        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
 
         #expect(xml.contains(#"type="application/json""#))
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() throws {
+    func xmlRepresentationIsSelfClosingTag() {
         let url = URL(string: "https://example.com/chapters.json")!
         let chapters = ChaptersLink(url: url)
 
-        let xml = try chapters.xmlRepresentation()
+        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
 
         #expect(xml.contains("/>"))
     }

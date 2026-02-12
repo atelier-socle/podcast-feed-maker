@@ -44,16 +44,3 @@ public struct PodcastFeedMaker: Sendable {
         StreamingFeedGenerator(prettyPrint: prettyPrint).generate(feed)
     }
 }
-
-// MARK: - XmlRepresentable Conformance
-
-extension PodcastFeedMaker: XmlRepresentable {
-
-    /// Generates the complete XML string for the podcast RSS feed.
-    ///
-    /// - Returns: A fully-formed RSS 2.0 feed including all configured namespaces and metadata.
-    /// - Throws: If any of the underlying tags fail to generate XML (e.g., missing required fields).
-    public func xmlRepresentation() throws -> String {
-        try feed.xmlRepresentation()
-    }
-}

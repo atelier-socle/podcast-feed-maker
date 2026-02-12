@@ -45,7 +45,7 @@ struct TitleTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<title>Episode 1: Getting Started</title>"))
     }
 
@@ -57,7 +57,7 @@ struct TitleTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<title>Swift &amp; XML &lt;Guide&gt;</title>"))
     }
 
@@ -85,14 +85,14 @@ struct TitleTests {
     @Test("Item XML contains title tag when set")
     func itemXmlContainsTitleWhenSet() throws {
         let item = Item(title: "Episode 1")
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<title>Episode 1</title>"))
     }
 
     @Test("Item XML omits title tag when nil")
     func itemXmlOmitsTitleWhenNil() throws {
         let item = Item()
-        let xml = try item.xmlRepresentation()
+        let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<title>"))
     }
 

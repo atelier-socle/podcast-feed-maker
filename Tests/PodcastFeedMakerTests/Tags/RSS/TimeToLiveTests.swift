@@ -59,7 +59,7 @@ struct TimeToLiveTests {
             ttl: 60
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<ttl>60</ttl>"))
     }
 
@@ -71,7 +71,7 @@ struct TimeToLiveTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<ttl>"))
     }
 
@@ -85,7 +85,7 @@ struct TimeToLiveTests {
                 ttl: minutes
             )
 
-            let xml = try channel.xmlRepresentation()
+            let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
             #expect(xml.contains("<ttl>\(minutes)</ttl>"))
         }
     }

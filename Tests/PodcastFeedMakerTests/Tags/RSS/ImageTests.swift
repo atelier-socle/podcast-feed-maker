@@ -8,7 +8,7 @@ import Testing
 ///
 /// `RSSImage` has required `url: URL`, `title: String`, `link: URL`,
 /// and optional `width`, `height`, `imageDescription`.
-/// Conforms to `Sendable`, `Hashable`, `Equatable`, `Codable`, and `XmlRepresentable`.
+/// Conforms to `Sendable`, `Hashable`, `Equatable`, and `Codable`.
 @Suite("RSSImage Struct Tests")
 struct ImageTests {
 
@@ -69,15 +69,26 @@ struct ImageTests {
 
     // MARK: - XML Generation
 
-    @Test("RSSImage xmlRepresentation contains expected elements")
-    func rssImageXmlRepresentation() throws {
+    @Test("RSSImage generates XML with expected elements via XMLBuilder")
+    func rssImageXmlRepresentation() {
         let image = RSSImage(
             url: URL(string: "https://example.com/logo.png")!,
             title: "Podcast Logo",
             link: URL(string: "https://example.com")!
         )
 
-        let xml = try image.xmlRepresentation()
+        let b = XMLBuilder()
+        let b1 = b.indented()
+        var lines: [String] = []
+        lines.append(b.openTag("image"))
+        lines.append(b1.element("url", content: XMLBuilder.encodeURL(image.url)))
+        lines.append(b1.element("title", content: image.title))
+        lines.append(b1.element("link", content: XMLBuilder.encodeURL(image.link)))
+        if let width = image.width { lines.append(b1.element("width", content: "\(width)")) }
+        if let height = image.height { lines.append(b1.element("height", content: "\(height)")) }
+        if let imageDescription = image.imageDescription { lines.append(b1.element("description", content: imageDescription)) }
+        lines.append(b.closeTag("image"))
+        let xml = lines.joined(separator: "\n")
         #expect(xml.contains("<image>"))
         #expect(xml.contains("<url>https://example.com/logo.png</url>"))
         #expect(xml.contains("<title>Podcast Logo</title>"))
@@ -85,15 +96,26 @@ struct ImageTests {
         #expect(xml.contains("</image>"))
     }
 
-    @Test("RSSImage xmlRepresentation escapes special characters in title")
-    func rssImageXmlEscapesTitle() throws {
+    @Test("RSSImage generates XML escaping special characters in title")
+    func rssImageXmlEscapesTitle() {
         let image = RSSImage(
             url: URL(string: "https://example.com/logo.png")!,
             title: "Show & Tell <Podcast>",
             link: URL(string: "https://example.com")!
         )
 
-        let xml = try image.xmlRepresentation()
+        let b = XMLBuilder()
+        let b1 = b.indented()
+        var lines: [String] = []
+        lines.append(b.openTag("image"))
+        lines.append(b1.element("url", content: XMLBuilder.encodeURL(image.url)))
+        lines.append(b1.element("title", content: image.title))
+        lines.append(b1.element("link", content: XMLBuilder.encodeURL(image.link)))
+        if let width = image.width { lines.append(b1.element("width", content: "\(width)")) }
+        if let height = image.height { lines.append(b1.element("height", content: "\(height)")) }
+        if let imageDescription = image.imageDescription { lines.append(b1.element("description", content: imageDescription)) }
+        lines.append(b.closeTag("image"))
+        let xml = lines.joined(separator: "\n")
         #expect(xml.contains("Show &amp; Tell &lt;Podcast&gt;"))
     }
 
@@ -131,7 +153,7 @@ struct ImageTests {
             image: image
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<image>"))
         #expect(xml.contains("<url>https://example.com/logo.png</url>"))
     }
@@ -144,7 +166,7 @@ struct ImageTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<image>"))
     }
 

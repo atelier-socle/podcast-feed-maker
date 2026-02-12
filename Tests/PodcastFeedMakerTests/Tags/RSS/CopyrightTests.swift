@@ -58,7 +58,7 @@ struct CopyrightTests {
             copyright: "2025 Atelier Socle"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<copyright>2025 Atelier Socle</copyright>"))
     }
 
@@ -70,7 +70,7 @@ struct CopyrightTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<copyright>"))
     }
 
@@ -83,7 +83,7 @@ struct CopyrightTests {
             copyright: "\u{00A9} 2025 Atelier Socle"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<copyright>&#xA9; 2025 Atelier Socle</copyright>"))
     }
 
@@ -96,7 +96,7 @@ struct CopyrightTests {
             copyright: "My & Co <2025>"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("My &amp; Co &lt;2025&gt;"))
     }
 

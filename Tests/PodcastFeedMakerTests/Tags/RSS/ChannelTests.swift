@@ -9,7 +9,7 @@ import Testing
 /// `Channel` is the main feed-level container with ~50 typed properties.
 /// Required fields: `title: String`, `link: URL`, `description: String`.
 /// All other fields default to `nil` or empty arrays.
-/// Conforms to `Sendable`, `Hashable`, `Equatable`, and `XmlRepresentable`.
+/// Conforms to `Sendable`, `Hashable`, and `Equatable`.
 @Suite("Channel Struct Tests")
 struct ChannelTests {
 
@@ -274,7 +274,7 @@ struct ChannelTests {
     @Test("Channel XML contains required RSS tags")
     func channelXmlContainsRequiredTags() throws {
         let channel = makeMinimalChannel()
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
 
         #expect(xml.contains("<channel>"))
         #expect(xml.contains("<title>My Podcast</title>"))
@@ -295,7 +295,7 @@ struct ChannelTests {
             ttl: 60
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<language>en-us</language>"))
         #expect(xml.contains("<copyright>2025 Example</copyright>"))
         #expect(xml.contains("<generator>PodcastFeedMaker</generator>"))
@@ -320,7 +320,7 @@ struct ChannelTests {
             itunesType: .serial
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<itunes:author>John Doe</itunes:author>"))
         #expect(xml.contains("<itunes:block>yes</itunes:block>"))
         #expect(xml.contains("<itunes:complete>yes</itunes:complete>"))
@@ -342,7 +342,7 @@ struct ChannelTests {
             itunesExplicit: false
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<itunes:explicit>false</itunes:explicit>"))
     }
 
@@ -355,7 +355,7 @@ struct ChannelTests {
             itunesOwner: ITunesOwner(name: "Jane Doe", email: "jane@example.com")
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<itunes:owner>"))
         #expect(xml.contains("<itunes:name>Jane Doe</itunes:name>"))
         #expect(xml.contains("<itunes:email>jane@example.com</itunes:email>"))
@@ -372,7 +372,7 @@ struct ChannelTests {
             locked: Locked(isLocked: false)
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<podcast:guid>channel-guid-value</podcast:guid>"))
         #expect(xml.contains("<podcast:locked>no</podcast:locked>"))
     }
@@ -386,7 +386,7 @@ struct ChannelTests {
             locked: Locked(isLocked: true, owner: "john@example.com")
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains(#"<podcast:locked owner="john@example.com">yes</podcast:locked>"#))
     }
 
@@ -401,7 +401,7 @@ struct ChannelTests {
             ]
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains(#"<podcast:funding url="https://example.com/donate">Support us</podcast:funding>"#))
     }
 
@@ -417,7 +417,7 @@ struct ChannelTests {
             ]
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<item>"))
         #expect(xml.contains("<title>Episode 1</title>"))
         #expect(xml.contains("<title>Episode 2</title>"))
@@ -427,7 +427,7 @@ struct ChannelTests {
     @Test("Channel XML omits optional tags when nil")
     func channelXmlOmitsNilOptionalTags() throws {
         let channel = makeMinimalChannel()
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
 
         #expect(!xml.contains("<language>"))
         #expect(!xml.contains("<copyright>"))
@@ -458,7 +458,7 @@ struct ChannelTests {
             ]
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains(#"<atom:link href="https://example.com/feed.xml""#))
         #expect(xml.contains(#"rel="self""#))
     }

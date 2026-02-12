@@ -73,7 +73,7 @@ struct LanguageTests {
             language: "en-us"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<language>en-us</language>"))
     }
 
@@ -85,7 +85,7 @@ struct LanguageTests {
             description: "Description"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(!xml.contains("<language>"))
     }
 
@@ -98,7 +98,7 @@ struct LanguageTests {
             language: "fr"
         )
 
-        let xml = try channel.xmlRepresentation()
+        let xml = try FeedGenerator().generate(PodcastFeed(channel: channel))
         #expect(xml.contains("<language>fr</language>"))
     }
 

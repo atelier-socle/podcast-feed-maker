@@ -7,7 +7,7 @@ struct PodcastFeedFileTests {
     @Test
     func test_writeFeedToTemporaryFile_andDeleteAfter() throws {
         let maker = PodcastFeedMaker(MockFeed.applePodcasts)
-        let xml = try maker.xmlRepresentation()
+        let xml = try maker.generate()
 
         let fileManager = FileManager.default
         let tempDir = fileManager.temporaryDirectory
@@ -27,7 +27,7 @@ struct PodcastFeedFileTests {
     @Test
     func test_writeAndCleanTemporaryFeedFile() throws {
         let maker = PodcastFeedMaker(MockFeed.applePodcasts)
-        let xml = try maker.xmlRepresentation()
+        let xml = try maker.generate()
 
         let tempDir = FileManager.default.temporaryDirectory
         let fileURL = tempDir.appendingPathComponent("temp-feed-\(UUID().uuidString).xml")
