@@ -724,6 +724,29 @@ struct FeedParserTests {
         #expect(result.feed.channel != nil)
     }
 
+    @Test("ParseWithDiagnostics from Data works")
+    func diagnosticsFromData() throws {
+        let data = minimalXML.data(using: .utf8)!
+        let result = try parser.parseWithDiagnostics(data: data)
+        #expect(result.feed.channel?.title == "Minimal Podcast")
+    }
+
+    @Test("Parse XML with parse error still succeeds if channel found")
+    func parseWithRecoverableError() throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+              </channel>
+            </rss>
+            """
+        let feed = try parser.parse(xml)
+        #expect(feed.channel?.title == "Test")
+    }
+
     // MARK: - Helpers
 
     private var minimalXML: String {

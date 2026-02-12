@@ -142,4 +142,50 @@ struct AmazonValidationTests {
         let report = validator.validate(feed, for: .amazon)
         #expect(!report.isValid)
     }
+
+    // MARK: - Missing Recommended
+
+    @Test("Missing itunes:category is warning")
+    func missingCategoryWarning() {
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "desc",
+            items: [validItem()],
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/art.jpg")!
+        )
+        let feed = PodcastFeed(channel: channel)
+        let report = validator.validate(feed, for: .amazon)
+        #expect(report.warnings.contains {
+            $0.field == "channel.itunesCategories"
+        })
+    }
+
+    @Test("Missing itunes:explicit is warning")
+    func missingExplicitWarning() {
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "desc",
+            items: [validItem()],
+            itunesCategories: [ITunesCategory(text: "Tech")],
+            itunesImage: URL(string: "https://example.com/art.jpg")!
+        )
+        let feed = PodcastFeed(channel: channel)
+        let report = validator.validate(feed, for: .amazon)
+        #expect(report.warnings.contains {
+            $0.field == "channel.itunesExplicit"
+        })
+    }
+
+    @Test("Item without enclosure is error")
+    func itemNoEnclosure() {
+        let item = Item(title: "Episode")
+        let feed = amazonFeed(items: [item])
+        let report = validator.validate(feed, for: .amazon)
+        #expect(report.errors.contains {
+            $0.field == "channel.items[0].enclosure"
+        })
+    }
 }

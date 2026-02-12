@@ -235,4 +235,45 @@ struct PSP1ValidationTests {
         let report = validator.validate(feed, for: .psp1)
         #expect(!report.isValid)
     }
+
+    // MARK: - Item-Level Whitespace
+
+    @Test("Item title with leading whitespace is warning")
+    func itemTitleWhitespace() {
+        let item = Item(
+            title: " Episode Title",
+            enclosure: Enclosure(
+                url: URL(string: "https://example.com/ep.mp3")!,
+                length: 1024, type: "audio/mpeg"
+            ),
+            guid: GUID(value: "ep-1", isPermaLink: false)
+        )
+        let feed = psp1Feed(items: [item])
+        let report = validator.validate(feed, for: .psp1)
+        #expect(report.warnings.contains {
+            $0.field == "channel.items[0].title"
+                && $0.message.contains("whitespace")
+        })
+    }
+
+    // MARK: - Item-Level Title Length
+
+    @Test("Item title over 255 chars is warning")
+    func itemLongTitle() {
+        let longTitle = String(repeating: "x", count: 300)
+        let item = Item(
+            title: longTitle,
+            enclosure: Enclosure(
+                url: URL(string: "https://example.com/ep.mp3")!,
+                length: 1024, type: "audio/mpeg"
+            ),
+            guid: GUID(value: "ep-1", isPermaLink: false)
+        )
+        let feed = psp1Feed(items: [item])
+        let report = validator.validate(feed, for: .psp1)
+        #expect(report.warnings.contains {
+            $0.field == "channel.items[0].title"
+                && $0.message.contains("255")
+        })
+    }
 }

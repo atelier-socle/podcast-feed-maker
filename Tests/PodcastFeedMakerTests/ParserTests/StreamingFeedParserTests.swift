@@ -97,6 +97,52 @@ struct StreamingFeedParserTests {
         #expect(first.transcripts.count == 2)
     }
 
+    @Test("Throws for invalid XML in stream")
+    func streamInvalidXML() async {
+        let parser = StreamingFeedParser()
+        let stream = parser.parseItems(from: "<<<not xml>>>")
+        do {
+            for try await _ in stream {
+                Issue.record("Expected error to be thrown")
+            }
+            Issue.record("Expected error to be thrown")
+        } catch {
+            #expect(error is ParserError)
+        }
+    }
+
+    @Test("Streams from Data with items")
+    func streamFromDataWithItems() async throws {
+        let xml = try maximalFixture()
+        let data = xml.data(using: .utf8) ?? Data()
+        let parser = StreamingFeedParser()
+        let stream = parser.parseItems(from: data)
+        var count = 0
+        for try await _ in stream {
+            count += 1
+        }
+        #expect(count == 2)
+    }
+
+    @Test("Streams from Data with missing channel throws")
+    func streamFromDataMissingChannel() async {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"></rss>
+            """
+        let data = xml.data(using: .utf8) ?? Data()
+        let parser = StreamingFeedParser()
+        let stream = parser.parseItems(from: data)
+        do {
+            for try await _ in stream {
+                Issue.record("Expected error")
+            }
+            Issue.record("Expected error")
+        } catch {
+            #expect(error is ParserError)
+        }
+    }
+
     // MARK: - Helpers
 
     private var minimalXML: String {

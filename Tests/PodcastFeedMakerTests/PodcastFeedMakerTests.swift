@@ -38,4 +38,37 @@ struct PodcastFeedMakerTests {
             _ = try maker.generate()
         }
     }
+
+    @Test("generateStream yields chunks")
+    func generateStreamYieldsChunks() async throws {
+        let channel = Channel(
+            title: "Stream Test",
+            link: URL(string: "https://example.com")!,
+            description: "Testing stream"
+        )
+        let feed = PodcastFeed(channel: channel)
+        let maker = PodcastFeedMaker(feed)
+        var chunks: [String] = []
+        for try await chunk in maker.generateStream() {
+            chunks.append(chunk)
+        }
+        #expect(chunks.count == 2)
+        #expect(chunks.first?.contains("<channel>") == true)
+    }
+
+    @Test("generateStream with prettyPrint false")
+    func generateStreamMinified() async throws {
+        let channel = Channel(
+            title: "Stream Test",
+            link: URL(string: "https://example.com")!,
+            description: "Testing stream"
+        )
+        let feed = PodcastFeed(channel: channel)
+        let maker = PodcastFeedMaker(feed)
+        var chunks: [String] = []
+        for try await chunk in maker.generateStream(prettyPrint: false) {
+            chunks.append(chunk)
+        }
+        #expect(chunks.count == 2)
+    }
 }

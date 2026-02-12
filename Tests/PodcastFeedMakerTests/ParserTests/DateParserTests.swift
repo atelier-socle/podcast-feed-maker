@@ -165,6 +165,112 @@ struct DateParserTests {
         #expect(date != nil)
     }
 
+    @Test("Parses ISO 8601 with negative offset")
+    func iso8601NegativeOffset() {
+        let date = DateParser.parse("2026-02-12T20:00:00-05:00")
+        #expect(date != nil)
+        let components = calendar.dateComponents(
+            [.hour], from: date ?? Date()
+        )
+        #expect(components.hour == 1) // -05:00 → 20:00 + 5 = 01:00 next day UTC
+    }
+
+    @Test("Parses ISO 8601 with offset without colon")
+    func iso8601OffsetNoColon() {
+        let date = DateParser.parse("2026-02-12T20:00:00+0100")
+        #expect(date != nil)
+        let components = calendar.dateComponents(
+            [.hour], from: date ?? Date()
+        )
+        #expect(components.hour == 19) // +0100 → 20:00 - 1 = 19:00 UTC
+    }
+
+    @Test("Parses long month format without comma")
+    func longMonthFormatNoComma() {
+        let date = DateParser.parse("March 1 2026")
+        #expect(date != nil)
+        let components = calendar.dateComponents(
+            [.year, .month, .day], from: date ?? Date()
+        )
+        #expect(components.year == 2026)
+        #expect(components.month == 3)
+    }
+
+    @Test("RFC 2822 with 2-digit year in past")
+    func rfc2822TwoDigitYearPast() {
+        let date = DateParser.parseRFC2822("12 Feb 99 14:30:00 GMT")
+        #expect(date != nil)
+        let components = calendar.dateComponents(
+            [.year], from: date ?? Date()
+        )
+        #expect(components.year == 1999)
+    }
+
+    @Test("RFC 2822 without seconds")
+    func rfc2822NoSeconds() {
+        let date = DateParser.parseRFC2822("12 Feb 2026 14:30 +0000")
+        #expect(date != nil)
+        let components = calendar.dateComponents(
+            [.hour, .minute], from: date ?? Date()
+        )
+        #expect(components.hour == 14)
+        #expect(components.minute == 30)
+    }
+
+    @Test("RFC 2822 returns nil for invalid month")
+    func rfc2822InvalidMonth() {
+        let date = DateParser.parseRFC2822("12 Xyz 2026 14:30:00 +0000")
+        #expect(date == nil)
+    }
+
+    @Test("RFC 2822 returns nil for too few parts")
+    func rfc2822TooFewParts() {
+        let date = DateParser.parseRFC2822("12 Feb")
+        #expect(date == nil)
+    }
+
+    @Test("RFC 2822 returns nil for invalid day")
+    func rfc2822InvalidDay() {
+        let date = DateParser.parseRFC2822("XX Feb 2026 14:30:00 +0000")
+        #expect(date == nil)
+    }
+
+    @Test("RFC 2822 returns nil for invalid year")
+    func rfc2822InvalidYear() {
+        let date = DateParser.parseRFC2822("12 Feb XXXX 14:30:00 +0000")
+        #expect(date == nil)
+    }
+
+    @Test("RFC 2822 returns nil for invalid time")
+    func rfc2822InvalidTime() {
+        let date = DateParser.parseRFC2822("12 Feb 2026 X +0000")
+        #expect(date == nil)
+    }
+
+    @Test("RFC 2822 without timezone defaults to UTC")
+    func rfc2822NoTimezone() {
+        let date = DateParser.parseRFC2822("12 Feb 2026 14:30:00")
+        #expect(date != nil)
+    }
+
+    @Test("ISO 8601 returns nil for no dash")
+    func iso8601NoDash() {
+        let date = DateParser.parseISO8601("20260212")
+        #expect(date == nil)
+    }
+
+    @Test("ISO 8601 returns nil for too short")
+    func iso8601TooShort() {
+        let date = DateParser.parseISO8601("2026-02")
+        #expect(date == nil)
+    }
+
+    @Test("Slash format returns nil for wrong count")
+    func slashFormatWrongCount() {
+        let date = DateParser.parseCommonFormats("2026/02")
+        #expect(date == nil)
+    }
+
     // MARK: - Helpers
 
     private var calendar: Calendar {
