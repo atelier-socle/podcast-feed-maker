@@ -4,44 +4,117 @@ import Testing
 
 struct PodcastLocationTests {
 
+    // MARK: - Initialization
+
     @Test
-    func test_init_setsPropertiesCorrectly() {
-        let location = Namespace.Podcast.Location(
-            place: "Paris, France",
-            latitude: 48.8566,
-            longitude: 2.3522
+    func initWithAllParameters() {
+        let location = PodcastLocation(
+            name: "Austin, TX",
+            geo: "geo:30.2672,-97.7431",
+            osm: "R113314"
         )
 
-        #expect(location.place == "Paris, France")
-        #expect(location.latitude == 48.8566)
-        #expect(location.longitude == 2.3522)
+        #expect(location.name == "Austin, TX")
+        #expect(location.geo == "geo:30.2672,-97.7431")
+        #expect(location.osm == "R113314")
     }
 
     @Test
-    func test_xmlRepresentation_returnsExpectedXML() throws {
-        let tag = Namespace.Podcast.Location(
-            place: "Paris, France",
-            latitude: 48.8566,
-            longitude: 2.3522
-        )
+    func initWithNameOnly() {
+        let location = PodcastLocation(name: "Paris, France")
 
-        let expected = """
-        \t<podcast:location geo="geo:48.8566,2.3522">Paris, France</podcast:location>
-        """
-
-        #expect(try tag.xmlRepresentation() == expected)
+        #expect(location.name == "Paris, France")
+        #expect(location.geo == nil)
+        #expect(location.osm == nil)
     }
 
     @Test
-    func test_equatableAndHashable() {
-        let a = Namespace.Podcast.Location(place: "NYC", latitude: 40.7128, longitude: -74.0060)
-        let b = Namespace.Podcast.Location(place: "NYC", latitude: 40.7128, longitude: -74.0060)
-        let c = Namespace.Podcast.Location(place: "Berlin", latitude: 52.52, longitude: 13.405)
+    func initWithNameAndGeo() {
+        let location = PodcastLocation(name: "Berlin", geo: "geo:52.52,13.405")
+
+        #expect(location.name == "Berlin")
+        #expect(location.geo == "geo:52.52,13.405")
+        #expect(location.osm == nil)
+    }
+
+    @Test
+    func initWithNameAndOsm() {
+        let location = PodcastLocation(name: "London", osm: "R65606")
+
+        #expect(location.name == "London")
+        #expect(location.geo == nil)
+        #expect(location.osm == "R65606")
+    }
+
+    // MARK: - Equatable & Hashable
+
+    @Test
+    func equatableConformance() {
+        let a = PodcastLocation(name: "NYC", geo: "geo:40.7128,-74.0060")
+        let b = PodcastLocation(name: "NYC", geo: "geo:40.7128,-74.0060")
+        let c = PodcastLocation(name: "Berlin", geo: "geo:52.52,13.405")
 
         #expect(a == b)
         #expect(a != c)
+    }
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
+    @Test
+    func hashableConformance() {
+        let a = PodcastLocation(name: "NYC", geo: "geo:40.7128,-74.0060")
+        let b = PodcastLocation(name: "NYC", geo: "geo:40.7128,-74.0060")
+        let c = PodcastLocation(name: "Berlin", geo: "geo:52.52,13.405")
+
+        let set: Set = [a, b, c]
+        #expect(set.count == 2)
+        #expect(set.contains(a))
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationWithGeoAndOsm() throws {
+        let location = PodcastLocation(
+            name: "Austin, TX",
+            geo: "geo:30.2672,-97.7431",
+            osm: "R113314"
+        )
+
+        let xml = try location.xmlRepresentation()
+
+        #expect(xml.contains("podcast:location"))
+        #expect(xml.contains(#"geo="geo:30.2672,-97.7431""#))
+        #expect(xml.contains(#"osm="R113314""#))
+        #expect(xml.contains(">Austin, TX</podcast:location>"))
+    }
+
+    @Test
+    func xmlRepresentationWithNameOnly() throws {
+        let location = PodcastLocation(name: "Paris, France")
+
+        let xml = try location.xmlRepresentation()
+
+        #expect(xml.contains("podcast:location"))
+        #expect(xml.contains(">Paris, France</podcast:location>"))
+        #expect(!xml.contains("geo="))
+        #expect(!xml.contains("osm="))
+    }
+
+    @Test
+    func xmlRepresentationWithGeoOnly() throws {
+        let location = PodcastLocation(name: "Berlin", geo: "geo:52.52,13.405")
+
+        let xml = try location.xmlRepresentation()
+
+        #expect(xml.contains(#"geo="geo:52.52,13.405""#))
+        #expect(!xml.contains("osm="))
+        #expect(xml.contains(">Berlin</podcast:location>"))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(PodcastLocation.self)
     }
 }

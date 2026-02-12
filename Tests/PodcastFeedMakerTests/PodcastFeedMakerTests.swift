@@ -6,28 +6,17 @@ struct PodcastFeedMakerTests {
 
     @Test
     func test_xmlRepresentation_generatesValidFeed() throws {
-        let title = RSSTag.Title("My Podcast")
-        let link = RSSTag.Link(URL(string: "https://example.com")!)
-        let description = RSSTag.Description("Welcome to the show!")
-        let author = Namespace.iTunes.Author(name: "Jane Doe")
-        let explicit = Namespace.iTunes.Explicit(.no)
-        let image = Namespace.iTunes.Image(url: URL(string: "https://example.com/image.jpg")!)
-        let categories: Set<Namespace.iTunes.iTunesMainCategory> = [
-            .technology
-        ]
-
-        let channel = RSSTag.Channel(
-            title: title,
-            link: link,
-            description: description,
-            author: author,
-            explicit: explicit,
-            image: image,
-            categories: .init(categories: categories),
-            items: []
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Welcome to the show!",
+            itunesAuthor: "Jane Doe",
+            itunesCategories: [ITunesCategory(.technology)],
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/image.jpg")!
         )
 
-        let feed = Feed(channel: channel)
+        let feed = PodcastFeed(channel: channel)
         let maker = PodcastFeedMaker(feed)
 
         let xml = try maker.xmlRepresentation()
@@ -41,45 +30,12 @@ struct PodcastFeedMakerTests {
     }
 
     @Test
-    func test_xmlRepresentation_throwsIfFeedIsInvalid() {
-        let title = RSSTag.Title("My Podcast")
-        let invalidLink = RSSTag.Link(URL(string: "http://")!)
-        let description = RSSTag.Description("This is broken")
-        let author = Namespace.iTunes.Author(name: "Jane Doe")
-        let explicit = Namespace.iTunes.Explicit(.no)
-        let image = Namespace.iTunes.Image(url: URL(string: "https://example.com/image.jpg")!)
-        let categories: Set<Namespace.iTunes.iTunesMainCategory> = [
-            .technology
-        ]
-
-        let channel = RSSTag.Channel(
-            title: title,
-            link: invalidLink,
-            description: description,
-            author: author,
-            explicit: explicit,
-            image: image,
-            categories: .init(categories: categories),
-            items: []
-        )
-
-        let feed = Feed(channel: channel)
+    func test_xmlRepresentation_throwsIfChannelIsNil() {
+        let feed = PodcastFeed(channel: nil)
         let maker = PodcastFeedMaker(feed)
 
-        #expect(throws: URL.URLValidatorError.self) {
+        #expect(throws: PodcastFeed.FeedError.self) {
             _ = try maker.xmlRepresentation()
         }
     }
-
-//    @Test
-//    func textExample() async throws {
-//        let isoLanguageCodes = Locale.LanguageCode.isoLanguageCodes
-//        print("isoLanguageCodes", isoLanguageCodes)
-//        let ids = Locale.availableIdentifiers
-//        print("ids", ids)
-//        for id in ids {
-//            let value = Locale.autoupdatingCurrent.localizedString(forIdentifier: id)
-//            print("id: \(id), lang/region: \(String(describing: value))")
-//        }
-//    }
 }

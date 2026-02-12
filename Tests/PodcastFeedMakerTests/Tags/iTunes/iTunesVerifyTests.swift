@@ -4,42 +4,107 @@ import Testing
 
 struct iTunesVerifyTests {
 
+    // MARK: - Channel
+
     @Test
-    func test_init_defaultIsFalse() {
-        let verify = Namespace.iTunes.Verify()
-        #expect(verify.value == false)
+    func test_channel_itunesVerify_true() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesVerify: true
+        )
+        #expect(channel.itunesVerify == true)
     }
 
     @Test
-    func test_init_setsValue() {
-        let verify = Namespace.iTunes.Verify(value: true)
-        #expect(verify.value == true)
+    func test_channel_itunesVerify_false() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesVerify: false
+        )
+        #expect(channel.itunesVerify == false)
     }
 
     @Test
-    func test_xmlRepresentation_true() throws {
-        let tag = Namespace.iTunes.Verify(value: true)
-        let xml = try tag.xmlRepresentation()
-        #expect(xml == "\t<itunes:applepodcastsverify>true</itunes:applepodcastsverify>")
+    func test_channel_itunesVerify_defaultsToNil() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesVerify == nil)
+    }
+
+    // MARK: - Equatable
+
+    @Test
+    func test_channel_equatable_sameVerify() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: true
+        )
+        #expect(channelA == channelB)
     }
 
     @Test
-    func test_xmlRepresentation_false() throws {
-        let tag = Namespace.iTunes.Verify(value: false)
-        let xml = try tag.xmlRepresentation()
-        #expect(xml == "\t<itunes:applepodcastsverify>false</itunes:applepodcastsverify>")
+    func test_channel_equatable_differentVerify() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: false
+        )
+        #expect(channelA != channelB)
     }
 
+    // MARK: - Hashable
+
     @Test
-    func test_equatable_and_hashable() {
-        let a = Namespace.iTunes.Verify(value: true)
-        let b = Namespace.iTunes.Verify(value: true)
-        let c = Namespace.iTunes.Verify(value: false)
+    func test_channel_hashable() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: false
+        )
+        let channelC = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesVerify: true
+        )
+        let set: Set = [channelA, channelB, channelC]
+        #expect(set.count == 2)
+    }
 
-        #expect(a == b)
-        #expect(a != c)
+    // MARK: - Sendable
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
+    @Test
+    func test_sendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Channel.self)
     }
 }

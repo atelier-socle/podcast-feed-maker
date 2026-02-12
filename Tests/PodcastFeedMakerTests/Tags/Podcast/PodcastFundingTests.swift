@@ -4,39 +4,73 @@ import Testing
 
 struct PodcastFundingTests {
 
+    // MARK: - Initialization
+
     @Test
-    func test_init_setsPropertiesCorrectly() {
+    func initSetsPropertiesCorrectly() {
         let url = URL(string: "https://patreon.com/myshow")!
-        let form = "Support us on Patreon"
-        let funding = Namespace.Podcast.Funding(url, form: form)
+        let funding = Funding(url: url, message: "Support us on Patreon")
 
         #expect(funding.url == url)
-        #expect(funding.form == form)
+        #expect(funding.message == "Support us on Patreon")
     }
 
-    @Test
-    func test_xmlRepresentation_outputsCorrectXML() throws {
-        let funding = Namespace.Podcast.Funding(
-            URL(string: "https://patreon.com/myshow")!,
-            form: "Support us on Patreon"
-        )
-
-        let expected = "\t<podcast:funding url=\"https://patreon.com/myshow\">Support us on Patreon</podcast:funding>"
-        let xml = try funding.xmlRepresentation()
-
-        #expect(xml == expected)
-    }
+    // MARK: - Equatable & Hashable
 
     @Test
-    func test_equatable_and_hashable() {
-        let a = Namespace.Podcast.Funding(URL(string: "https://a.com")!, form: "A")
-        let b = Namespace.Podcast.Funding(URL(string: "https://a.com")!, form: "A")
-        let c = Namespace.Podcast.Funding(URL(string: "https://b.com")!, form: "B")
+    func equatableConformance() {
+        let a = Funding(url: URL(string: "https://a.com")!, message: "A")
+        let b = Funding(url: URL(string: "https://a.com")!, message: "A")
+        let c = Funding(url: URL(string: "https://b.com")!, message: "B")
 
         #expect(a == b)
         #expect(a != c)
+    }
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
+    @Test
+    func hashableConformance() {
+        let a = Funding(url: URL(string: "https://a.com")!, message: "A")
+        let b = Funding(url: URL(string: "https://a.com")!, message: "A")
+        let c = Funding(url: URL(string: "https://b.com")!, message: "B")
+
+        let set: Set = [a, b, c]
+        #expect(set.count == 2)
+        #expect(set.contains(a))
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationContainsUrlAndMessage() throws {
+        let funding = Funding(
+            url: URL(string: "https://patreon.com/myshow")!,
+            message: "Support us on Patreon"
+        )
+
+        let xml = try funding.xmlRepresentation()
+
+        #expect(xml.contains("podcast:funding"))
+        #expect(xml.contains(#"url="https://patreon.com/myshow""#))
+        #expect(xml.contains("Support us on Patreon"))
+    }
+
+    @Test
+    func xmlRepresentationWrapsMessageAsElementContent() throws {
+        let funding = Funding(
+            url: URL(string: "https://example.com/donate")!,
+            message: "Donate here"
+        )
+
+        let xml = try funding.xmlRepresentation()
+
+        #expect(xml.contains(">Donate here</podcast:funding>"))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(Funding.self)
     }
 }

@@ -4,55 +4,121 @@ import Testing
 
 struct AtomLinkTests {
 
-    @Test
-    func test_init_setsURLCorrectly() {
-        let url = URL(string: "https://example.com/feed.rss")!
-        let link = Namespace.Atom.Link(url: url)
+    // MARK: - Initialization
 
-        #expect(link.url == url)
+    @Test
+    func initWithAllParameters() {
+        let href = URL(string: "https://example.com/feed.xml")!
+        let link = AtomLink(
+            href: href,
+            rel: "self",
+            type: "application/rss+xml",
+            hreflang: "en",
+            title: "My Feed",
+            length: 1024
+        )
+
+        #expect(link.href == href)
+        #expect(link.rel == "self")
+        #expect(link.type == "application/rss+xml")
+        #expect(link.hreflang == "en")
+        #expect(link.title == "My Feed")
+        #expect(link.length == 1024)
     }
 
     @Test
-    func test_xmlRepresentation_success() throws {
-        let url = URL(string: "https://example.com/feed.rss")!
-        let link = Namespace.Atom.Link(url: url)
+    func initWithHrefOnly() {
+        let href = URL(string: "https://example.com/feed.xml")!
+        let link = AtomLink(href: href)
 
-        let xml = try link.xmlRepresentation()
-
-        #expect(xml == "\t<atom:link href=\"https://example.com/feed.rss\" rel=\"self\" type=\"application/rss+xml\" />")
+        #expect(link.href == href)
+        #expect(link.rel == nil)
+        #expect(link.type == nil)
+        #expect(link.hreflang == nil)
+        #expect(link.title == nil)
+        #expect(link.length == nil)
     }
 
+    // MARK: - Self Link Factory
+
     @Test
-    func test_xmlRepresentation_throwsOnInvalidURL() {
-        // Simulate a file:// URL (which is invalid per the internal URL validator)
-        let url = URL(fileURLWithPath: "/invalid/path")
+    func selfLinkFactorySetsSelfRelAndRssType() {
+        let href = URL(string: "https://example.com/feed.xml")!
+        let link = AtomLink.selfLink(href: href)
 
-        let link = Namespace.Atom.Link(url: url)
-
-        #expect(throws: URL.URLValidatorError.isFileURL) {
-            try link.xmlRepresentation()
-        }
+        #expect(link.href == href)
+        #expect(link.rel == "self")
+        #expect(link.type == "application/rss+xml")
+        #expect(link.hreflang == nil)
+        #expect(link.title == nil)
+        #expect(link.length == nil)
     }
 
+    // MARK: - Equatable & Hashable
+
     @Test
-    func test_EquatableAndHashableConformance() {
+    func equatableConformance() {
         let url1 = URL(string: "https://example.com/a.xml")!
         let url2 = URL(string: "https://example.com/b.xml")!
 
-        let link1 = Namespace.Atom.Link(url: url1)
-        let link2 = Namespace.Atom.Link(url: url1)
-        let link3 = Namespace.Atom.Link(url: url2)
+        let link1 = AtomLink(href: url1, rel: "self", type: "application/rss+xml")
+        let link2 = AtomLink(href: url1, rel: "self", type: "application/rss+xml")
+        let link3 = AtomLink(href: url2, rel: "alternate")
 
         #expect(link1 == link2)
         #expect(link1 != link3)
+    }
+
+    @Test
+    func hashableConformance() {
+        let url1 = URL(string: "https://example.com/a.xml")!
+        let url2 = URL(string: "https://example.com/b.xml")!
+
+        let link1 = AtomLink(href: url1, rel: "self")
+        let link2 = AtomLink(href: url1, rel: "self")
+        let link3 = AtomLink(href: url2, rel: "alternate")
 
         let set: Set = [link1, link2, link3]
         #expect(set.count == 2)
     }
 
+    // MARK: - XML Representation
+
     @Test
-    func test_SendableConformance() {
+    func xmlRepresentationWithRelAndType() throws {
+        let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
+        let xml = try link.xmlRepresentation()
+
+        #expect(xml.contains("atom:link"))
+        #expect(xml.contains(#"href="https://example.com/feed.xml""#))
+        #expect(xml.contains(#"rel="self""#))
+        #expect(xml.contains(#"type="application/rss+xml""#))
+    }
+
+    @Test
+    func xmlRepresentationWithHrefOnly() throws {
+        let link = AtomLink(href: URL(string: "https://example.com/other.xml")!)
+        let xml = try link.xmlRepresentation()
+
+        #expect(xml.contains("atom:link"))
+        #expect(xml.contains(#"href="https://example.com/other.xml""#))
+        #expect(!xml.contains("rel="))
+        #expect(!xml.contains("type="))
+    }
+
+    @Test
+    func xmlRepresentationIsSelfClosingTag() throws {
+        let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
+        let xml = try link.xmlRepresentation()
+
+        #expect(xml.contains("/>"))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
         func requiresSendable<T: Sendable>(_: T.Type) {}
-        requiresSendable(Namespace.Atom.Link.self)
+        requiresSendable(AtomLink.self)
     }
 }

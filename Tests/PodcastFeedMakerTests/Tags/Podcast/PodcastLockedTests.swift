@@ -4,39 +4,102 @@ import Testing
 
 struct PodcastLockedTests {
 
+    // MARK: - Initialization
+
     @Test
-    func test_xmlRepresentation_shouldReturnTrue() throws {
-        let tag = Namespace.Podcast.Locked(value: true)
-        let expected = "\t<podcast:locked>true</podcast:locked>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func initWithIsLockedOnly() {
+        let locked = Locked(isLocked: true)
+
+        #expect(locked.isLocked == true)
+        #expect(locked.owner == nil)
     }
 
     @Test
-    func test_xmlRepresentation_shouldReturnFalse() throws {
-        let tag = Namespace.Podcast.Locked(value: false)
-        let expected = "\t<podcast:locked>false</podcast:locked>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func initWithIsLockedAndOwner() {
+        let locked = Locked(isLocked: true, owner: "john@example.com")
+
+        #expect(locked.isLocked == true)
+        #expect(locked.owner == "john@example.com")
     }
 
     @Test
-    func test_lockedEquatable() {
-        let a = Namespace.Podcast.Locked(value: true)
-        let b = Namespace.Podcast.Locked(value: true)
-        let c = Namespace.Podcast.Locked(value: false)
+    func initWithUnlockedState() {
+        let locked = Locked(isLocked: false)
+
+        #expect(locked.isLocked == false)
+        #expect(locked.owner == nil)
+    }
+
+    // MARK: - Equatable & Hashable
+
+    @Test
+    func equatableConformance() {
+        let a = Locked(isLocked: true, owner: "a@example.com")
+        let b = Locked(isLocked: true, owner: "a@example.com")
+        let c = Locked(isLocked: false)
 
         #expect(a == b)
         #expect(a != c)
     }
 
     @Test
-    func test_lockedHashable() {
-        let lockedTrue = Namespace.Podcast.Locked(value: true)
-        let lockedFalse = Namespace.Podcast.Locked(value: false)
+    func hashableConformance() {
+        let lockedTrue = Locked(isLocked: true)
+        let lockedFalse = Locked(isLocked: false)
 
         let set: Set = [lockedTrue, lockedFalse]
-        #expect(set.contains(.init(value: true)))
-        #expect(set.contains(.init(value: false)))
+        #expect(set.count == 2)
+        #expect(set.contains(Locked(isLocked: true)))
+        #expect(set.contains(Locked(isLocked: false)))
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationWhenLocked() throws {
+        let locked = Locked(isLocked: true)
+
+        let xml = try locked.xmlRepresentation()
+
+        #expect(xml.contains("podcast:locked"))
+        #expect(xml.contains(">yes</podcast:locked>"))
+    }
+
+    @Test
+    func xmlRepresentationWhenUnlocked() throws {
+        let locked = Locked(isLocked: false)
+
+        let xml = try locked.xmlRepresentation()
+
+        #expect(xml.contains("podcast:locked"))
+        #expect(xml.contains(">no</podcast:locked>"))
+    }
+
+    @Test
+    func xmlRepresentationWithOwner() throws {
+        let locked = Locked(isLocked: true, owner: "john@example.com")
+
+        let xml = try locked.xmlRepresentation()
+
+        #expect(xml.contains("podcast:locked"))
+        #expect(xml.contains(#"owner="john@example.com""#))
+        #expect(xml.contains(">yes</podcast:locked>"))
+    }
+
+    @Test
+    func xmlRepresentationWithoutOwner() throws {
+        let locked = Locked(isLocked: true)
+
+        let xml = try locked.xmlRepresentation()
+
+        #expect(!xml.contains("owner="))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(Locked.self)
     }
 }

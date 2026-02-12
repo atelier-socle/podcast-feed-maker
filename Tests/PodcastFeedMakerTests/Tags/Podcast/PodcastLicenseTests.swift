@@ -4,47 +4,81 @@ import Testing
 
 struct PodcastLicenseTests {
 
-    @Test
-    func test_init_setsPropertiesCorrectly() {
-        let url = URL(string: "https://creativecommons.org/licenses/by-nc-sa/4.0/")
-        let tag = Namespace.Podcast.License(url, form: "CC BY-NC-SA 4.0")
+    // MARK: - Initialization
 
-        #expect(tag.url == url)
-        #expect(tag.form == "CC BY-NC-SA 4.0")
+    @Test
+    func initWithIdentifierAndUrl() {
+        let url = URL(string: "https://creativecommons.org/licenses/by/4.0/")!
+        let license = PodcastLicense(identifier: "cc-by-4.0", url: url)
+
+        #expect(license.identifier == "cc-by-4.0")
+        #expect(license.url == url)
     }
 
     @Test
-    func test_xmlRepresentation_withURL() throws {
-        let url = URL(string: "https://creativecommons.org/licenses/by-nc-sa/4.0/")!
-        let tag = Namespace.Podcast.License(url, form: "CC BY-NC-SA 4.0")
+    func initWithIdentifierOnly() {
+        let license = PodcastLicense(identifier: "Public Domain")
 
-        let expected = """
-        \t<podcast:license url="\(url.encodeURLQueryAllowed)">CC BY-NC-SA 4.0</podcast:license>
-        """
-
-        #expect(try tag.xmlRepresentation() == expected)
+        #expect(license.identifier == "Public Domain")
+        #expect(license.url == nil)
     }
 
-    @Test
-    func test_xmlRepresentation_withoutURL() throws {
-        let tag = Namespace.Podcast.License(nil, form: "Public Domain")
-
-        let expected = "\t<podcast:license>Public Domain</podcast:license>"
-
-        #expect(try tag.xmlRepresentation() == expected)
-    }
+    // MARK: - Equatable & Hashable
 
     @Test
-    func test_equatableAndHashable() {
+    func equatableConformance() {
         let url = URL(string: "https://example.com/license")!
-        let a = Namespace.Podcast.License(url, form: "License A")
-        let b = Namespace.Podcast.License(url, form: "License A")
-        let c = Namespace.Podcast.License(nil, form: "License B")
+        let a = PodcastLicense(identifier: "cc-by-4.0", url: url)
+        let b = PodcastLicense(identifier: "cc-by-4.0", url: url)
+        let c = PodcastLicense(identifier: "Public Domain")
 
         #expect(a == b)
         #expect(a != c)
+    }
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
+    @Test
+    func hashableConformance() {
+        let url = URL(string: "https://example.com/license")!
+        let a = PodcastLicense(identifier: "cc-by-4.0", url: url)
+        let b = PodcastLicense(identifier: "cc-by-4.0", url: url)
+        let c = PodcastLicense(identifier: "Public Domain")
+
+        let set: Set = [a, b, c]
+        #expect(set.count == 2)
+        #expect(set.contains(a))
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationWithUrl() throws {
+        let url = URL(string: "https://creativecommons.org/licenses/by-nc-sa/4.0/")!
+        let license = PodcastLicense(identifier: "cc-by-nc-sa-4.0", url: url)
+
+        let xml = try license.xmlRepresentation()
+
+        #expect(xml.contains("podcast:license"))
+        #expect(xml.contains(#"url="#))
+        #expect(xml.contains("creativecommons.org"))
+        #expect(xml.contains(">cc-by-nc-sa-4.0</podcast:license>"))
+    }
+
+    @Test
+    func xmlRepresentationWithoutUrl() throws {
+        let license = PodcastLicense(identifier: "Public Domain")
+
+        let xml = try license.xmlRepresentation()
+
+        #expect(xml.contains("podcast:license"))
+        #expect(xml.contains(">Public Domain</podcast:license>"))
+        #expect(!xml.contains("url="))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(PodcastLicense.self)
     }
 }

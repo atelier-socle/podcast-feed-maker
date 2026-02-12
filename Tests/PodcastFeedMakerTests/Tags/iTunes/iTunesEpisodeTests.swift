@@ -4,43 +4,64 @@ import Testing
 
 struct iTunesEpisodeTests {
 
+    // MARK: - Item
+
     @Test
-    func test_xmlRepresentation_withPositiveValue() throws {
-        let tag = Namespace.iTunes.Episode(value: 3)
-        let xml = try tag.xmlRepresentation()
-        #expect(xml == "\t<itunes:episode>3</itunes:episode>")
+    func test_item_itunesEpisode_withPositiveValue() {
+        let item = Item(itunesEpisode: 3)
+        #expect(item.itunesEpisode == 3)
     }
 
     @Test
-    func test_xmlRepresentation_withZeroValue() throws {
-        let tag = Namespace.iTunes.Episode(value: 0)
-        let xml = try tag.xmlRepresentation()
-        #expect(xml == "\t<itunes:episode>0</itunes:episode>")
+    func test_item_itunesEpisode_withZero() {
+        let item = Item(itunesEpisode: 0)
+        #expect(item.itunesEpisode == 0)
     }
 
     @Test
-    func test_xmlRepresentation_withLargeValue() throws {
-        let tag = Namespace.iTunes.Episode(value: 999_999)
-        let xml = try tag.xmlRepresentation()
-        #expect(xml == "\t<itunes:episode>999999</itunes:episode>")
+    func test_item_itunesEpisode_withLargeValue() {
+        let item = Item(itunesEpisode: 999_999)
+        #expect(item.itunesEpisode == 999_999)
     }
 
     @Test
-    func test_equatableAndHashable() {
-        let a = Namespace.iTunes.Episode(value: 1)
-        let b = Namespace.iTunes.Episode(value: 1)
-        let c = Namespace.iTunes.Episode(value: 2)
+    func test_item_itunesEpisode_defaultsToNil() {
+        let item = Item()
+        #expect(item.itunesEpisode == nil)
+    }
 
-        #expect(a == b)
-        #expect(a != c)
+    // MARK: - Equatable
 
-        let set: Set = [a, b, c]
+    @Test
+    func test_item_equatable_sameEpisode() {
+        let itemA = Item(itunesEpisode: 1)
+        let itemB = Item(itunesEpisode: 1)
+        #expect(itemA == itemB)
+    }
+
+    @Test
+    func test_item_equatable_differentEpisode() {
+        let itemA = Item(itunesEpisode: 1)
+        let itemB = Item(itunesEpisode: 2)
+        #expect(itemA != itemB)
+    }
+
+    // MARK: - Hashable
+
+    @Test
+    func test_item_hashable() {
+        let itemA = Item(itunesEpisode: 1)
+        let itemB = Item(itunesEpisode: 1)
+        let itemC = Item(itunesEpisode: 2)
+        let set: Set = [itemA, itemB, itemC]
         #expect(set.count == 2)
     }
+
+    // MARK: - Sendable
 
     @Test
     func test_sendableConformance() {
         func assertSendable<T: Sendable>(_: T.Type) {}
-        assertSendable(Namespace.iTunes.Episode.self)
+        assertSendable(Item.self)
     }
 }

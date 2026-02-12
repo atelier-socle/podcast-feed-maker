@@ -1,15 +1,20 @@
 import Foundation
 
 /// A flexible feed validator that supports strict and lenient validation modes.
+///
+/// Validates a ``PodcastFeed`` against the requirements of multiple podcast platforms.
+///
+/// - SeeAlso: ``ValidationPlatform``, ``PodcastFeed``
 public struct FeedValidator: Sendable {
-    
+
     /// Validates the structure of a podcast feed and returns issues.
+    ///
     /// - Parameters:
-    ///   - feed: The `Feed` instance to validate.
+    ///   - feed: The ``PodcastFeed`` instance to validate.
     ///   - platforms: List of platforms to validate against.
-    /// - Returns: An array of `ValidationIssue` describing any problems.
+    /// - Returns: An array of ``ValidationIssue`` describing any problems.
     public static func validate(
-        _ feed: Feed,
+        _ feed: PodcastFeed,
         for platforms: [PodcastPlatform] = PodcastPlatform.allCases
     ) -> [ValidationIssue] {
         var issues: [ValidationIssue] = []
@@ -23,105 +28,168 @@ public struct FeedValidator: Sendable {
                 issues += validateSpotify(feed)
             case .amazon:
                 issues += validateAmazon(feed)
-            case .google:
-                issues += validateGoogle(feed)
+            case .psp1:
+                issues += validatePSP1(feed)
             }
         }
         return issues
     }
-    
+
     /// Validates and throws an error if any issue is found.
+    ///
+    /// - Parameters:
+    ///   - feed: The ``PodcastFeed`` instance to validate.
+    ///   - platforms: List of platforms to validate against.
+    /// - Returns: `true` if no issues found.
+    /// - Throws: ``ValidationError/issuesFound(_:)`` if validation fails.
     @discardableResult
     public static func strictValidate(
-        _ feed: Feed,
+        _ feed: PodcastFeed,
         for platforms: [PodcastPlatform] = PodcastPlatform.allCases
     ) throws -> Bool {
         let issues = validate(feed, for: platforms)
-        if let _ = issues.first {
+        if !issues.isEmpty {
             throw ValidationError.issuesFound(issues)
         }
         return true
     }
-    
-    private static func validateApple(_ feed: Feed) -> [ValidationIssue] {
+
+    // MARK: - Apple Podcasts
+
+    private static func validateApple(_ feed: PodcastFeed) -> [ValidationIssue] {
         guard let channel = feed.channel else {
             return [.init(tag: "channel", message: "Missing <channel> element", platform: .apple)]
         }
 
-        let required: [(String, Bool)] = [
-            ("title", channel.hasValidTag("title")),
-            ("link", channel.hasValidTag("link")),
-            ("description", channel.hasValidTag("description")),
-            ("itunes:author", channel.hasValidTag("itunes:author")),
-            ("itunes:owner", channel.hasValidTag("itunes:owner")),
-            ("itunes:image", channel.hasValidTag("itunes:image")),
-            ("itunes:explicit", channel.hasValidTag("itunes:explicit")),
-            ("item", channel.hasValidTag("item"))
+        var issues: [ValidationIssue] = []
+
+        let requiredChecks: [(String, Bool)] = [
+            ("title", !channel.title.isEmpty),
+            ("description", !channel.description.isEmpty),
+            ("itunes:author", channel.itunesAuthor != nil),
+            ("itunes:owner", channel.itunesOwner != nil),
+            ("itunes:image", channel.itunesImage != nil),
+            ("itunes:explicit", channel.itunesExplicit != nil),
+            ("item", !channel.items.isEmpty)
         ]
 
-        var issues: [ValidationIssue] = []
-        for (tag, isValid) in required where !isValid {
+        for (tag, isValid) in requiredChecks where !isValid {
             issues.append(.init(tag: tag, message: "Required by Apple Podcasts", platform: .apple))
         }
 
         for (idx, item) in channel.items.enumerated() {
-            if !item.hasValidTag("title") {
-                issues.append(.init(tag: "item[\(idx)]/title", message: "Each <item> must contain an <title> (Apple)", platform: .apple))
+            if item.title == nil {
+                issues.append(.init(
+                    tag: "item[\(idx)]/title",
+                    message: "Each <item> must contain a <title> (Apple)",
+                    platform: .apple
+                ))
             }
-            if !item.hasValidTag("enclosure") {
-                issues.append(.init(tag: "item[\(idx)]/enclosure", message: "Each <item> must contain an <enclosure> (Apple)", platform: .apple))
+            if item.enclosure == nil {
+                issues.append(.init(
+                    tag: "item[\(idx)]/enclosure",
+                    message: "Each <item> must contain an <enclosure> (Apple)",
+                    platform: .apple
+                ))
             }
-            if !item.hasValidTag("guid") {
-                issues.append(.init(tag: "item[\(idx)]/guid", message: "Each <item> must contain an <guid> (Apple)", platform: .apple))
+            if item.guid == nil {
+                issues.append(.init(
+                    tag: "item[\(idx)]/guid",
+                    message: "Each <item> must contain a <guid> (Apple)",
+                    platform: .apple
+                ))
             }
-            if !item.hasValidTag("pubDate") {
-                issues.append(.init(tag: "item[\(idx)]/pubDate", message: "Each <item> must contain an <pubDate> (Apple)", platform: .apple))
-            }            
+            if item.pubDate == nil {
+                issues.append(.init(
+                    tag: "item[\(idx)]/pubDate",
+                    message: "Each <item> must contain a <pubDate> (Apple)",
+                    platform: .apple
+                ))
+            }
         }
 
         return issues
     }
 
-    private static func validatePodcastIndex(_ feed: Feed) -> [ValidationIssue] {
+    // MARK: - Podcast Index
+
+    private static func validatePodcastIndex(_ feed: PodcastFeed) -> [ValidationIssue] {
         guard let channel = feed.channel else {
             return [.init(tag: "channel", message: "Missing <channel> element", platform: .podcastIndex)]
         }
 
-        return ["podcast:guid", "atom:link"].compactMap {
-            channel.hasValidTag($0) ? nil : ValidationIssue(tag: $0, message: "Required by PodcastIndex", platform: .podcastIndex)
+        var issues: [ValidationIssue] = []
+        if channel.podcastGuid == nil {
+            issues.append(.init(tag: "podcast:guid", message: "Required by PodcastIndex", platform: .podcastIndex))
         }
+        if channel.atomLinks.isEmpty {
+            issues.append(.init(tag: "atom:link", message: "Required by PodcastIndex", platform: .podcastIndex))
+        }
+        return issues
     }
 
-    private static func validateSpotify(_ feed: Feed) -> [ValidationIssue] {
+    // MARK: - Spotify
+
+    private static func validateSpotify(_ feed: PodcastFeed) -> [ValidationIssue] {
         guard let channel = feed.channel else {
             return [.init(tag: "channel", message: "Missing <channel> element", platform: .spotify)]
         }
 
-        return ["title", "link", "description", "language", "itunes:image", "itunes:explicit"].compactMap {
-            channel.hasValidTag($0) ? nil : ValidationIssue(tag: $0, message: "Required by Spotify", platform: .spotify)
+        let requiredChecks: [(String, Bool)] = [
+            ("title", !channel.title.isEmpty),
+            ("description", !channel.description.isEmpty),
+            ("language", channel.language != nil),
+            ("itunes:image", channel.itunesImage != nil),
+            ("itunes:explicit", channel.itunesExplicit != nil)
+        ]
+
+        return requiredChecks.compactMap { tag, isValid in
+            isValid ? nil : ValidationIssue(tag: tag, message: "Required by Spotify", platform: .spotify)
         }
     }
 
-    private static func validateAmazon(_ feed: Feed) -> [ValidationIssue] {
+    // MARK: - Amazon Music
+
+    private static func validateAmazon(_ feed: PodcastFeed) -> [ValidationIssue] {
         guard let channel = feed.channel else {
             return [.init(tag: "channel", message: "Missing <channel> element", platform: .amazon)]
         }
 
-        return ["title", "link", "description", "language", "itunes:owner"].compactMap {
-            channel.hasValidTag($0) ? nil : ValidationIssue(tag: $0, message: "Required by Amazon", platform: .amazon)
+        let requiredChecks: [(String, Bool)] = [
+            ("title", !channel.title.isEmpty),
+            ("description", !channel.description.isEmpty),
+            ("language", channel.language != nil),
+            ("itunes:owner", channel.itunesOwner != nil)
+        ]
+
+        return requiredChecks.compactMap { tag, isValid in
+            isValid ? nil : ValidationIssue(tag: tag, message: "Required by Amazon", platform: .amazon)
         }
     }
 
-    private static func validateGoogle(_ feed: Feed) -> [ValidationIssue] {
+    // MARK: - PSP-1
+
+    private static func validatePSP1(_ feed: PodcastFeed) -> [ValidationIssue] {
         guard let channel = feed.channel else {
-            return [.init(tag: "channel", message: "Missing <channel> element", platform: .google)]
+            return [.init(tag: "channel", message: "Missing <channel> element", platform: .psp1)]
         }
 
-        return ["title", "link", "description"].compactMap {
-            channel.hasValidTag($0) ? nil : ValidationIssue(tag: $0, message: "Required by Google Podcasts", platform: .google)
+        var issues: [ValidationIssue] = []
+        if channel.podcastGuid == nil {
+            issues.append(.init(tag: "podcast:guid", message: "Required by PSP-1", platform: .psp1))
         }
+        if channel.locked == nil {
+            issues.append(.init(tag: "podcast:locked", message: "Required by PSP-1", platform: .psp1))
+        }
+        if channel.atomLinks.isEmpty || !channel.atomLinks.contains(where: { $0.rel == "self" }) {
+            issues.append(.init(tag: "atom:link[rel=self]", message: "Required by PSP-1", platform: .psp1))
+        }
+        return issues
     }
 
+    // MARK: - Error Types
+
+    /// Errors thrown by strict validation.
     public enum ValidationError: Swift.Error, LocalizedError, Equatable, Sendable {
         case issuesFound([ValidationIssue])
 
@@ -135,7 +203,11 @@ public struct FeedValidator: Sendable {
 
     /// Supported podcast validation platforms.
     public enum PodcastPlatform: String, CaseIterable, Sendable {
-        case apple, podcastIndex, spotify, amazon, google
+        case apple
+        case podcastIndex
+        case spotify
+        case amazon
+        case psp1
     }
 
     /// Describes a validation issue found in a feed.
@@ -149,17 +221,5 @@ public struct FeedValidator: Sendable {
             self.message = message
             self.platform = platform
         }
-    }
-}
-
-private extension RSSTag.Channel {
-    func hasValidTag(_ name: String) -> Bool {
-        (try? self.xmlRepresentation().contains("<\(name)")) == true
-    }
-}
-
-private extension RSSTag.Item {
-    func hasValidTag(_ name: String) -> Bool {
-        (try? self.xmlRepresentation().contains("<\(name)")) == true
     }
 }

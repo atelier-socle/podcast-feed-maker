@@ -4,49 +4,70 @@ import Testing
 
 struct iTunesSeasonTests {
 
+    // MARK: - Item
+
     @Test
-    func test_xmlRepresentation_shouldGenerateCorrectXML() throws {
-        let tag = try Namespace.iTunes.Season(value: 2)
-        let expected = "\t<itunes:season>2</itunes:season>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_item_itunesSeason_shouldStoreValue() {
+        let item = Item(itunesSeason: 2)
+        #expect(item.itunesSeason == 2)
     }
 
     @Test
-    func test_xmlRepresentation_withSeasonOne() throws {
-        let tag = try Namespace.iTunes.Season(value: 1)
-        let expected = "\t<itunes:season>1</itunes:season>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_item_itunesSeason_withSeasonOne() {
+        let item = Item(itunesSeason: 1)
+        #expect(item.itunesSeason == 1)
     }
 
     @Test
-    func test_struct_conformsToProtocols() throws {
-        let tag1 = try Namespace.iTunes.Season(value: 1)
-        let tag2 = try Namespace.iTunes.Season(value: 1)
-        let tag3 = try Namespace.iTunes.Season(value: 3)
-
-        #expect(tag1 == tag2)
-        #expect(tag1 != tag3)
-
-        let set: Set<Namespace.iTunes.Season> = [tag1, tag3]
-        #expect(set.contains(tag2))
+    func test_item_itunesSeason_withZero() {
+        let item = Item(itunesSeason: 0)
+        #expect(item.itunesSeason == 0)
     }
 
     @Test
-    func test_init_throwsIfValueIsLessThan1() {
-        #expect(throws: Namespace.iTunes.Season.SeasonError.invalidValue) {
-            _ = try Namespace.iTunes.Season(value: 0)
-        }
+    func test_item_itunesSeason_withLargeValue() {
+        let item = Item(itunesSeason: 100)
+        #expect(item.itunesSeason == 100)
+    }
 
-        #expect(throws: Namespace.iTunes.Season.SeasonError.invalidValue) {
-            _ = try Namespace.iTunes.Season(value: -5)
-        }
+    @Test
+    func test_item_itunesSeason_defaultsToNil() {
+        let item = Item()
+        #expect(item.itunesSeason == nil)
+    }
 
-        #expect(performing: {
-            try Namespace.iTunes.Season(value: -5)
-        }, throws: { error in
-            (error as? Namespace.iTunes.Season.SeasonError)?.localizedDescription == Namespace.iTunes.Season.SeasonError.invalidValue.localizedDescription
-        })
+    // MARK: - Equatable
+
+    @Test
+    func test_item_equatable_sameSeason() {
+        let itemA = Item(itunesSeason: 1)
+        let itemB = Item(itunesSeason: 1)
+        #expect(itemA == itemB)
+    }
+
+    @Test
+    func test_item_equatable_differentSeason() {
+        let itemA = Item(itunesSeason: 1)
+        let itemB = Item(itunesSeason: 3)
+        #expect(itemA != itemB)
+    }
+
+    // MARK: - Hashable
+
+    @Test
+    func test_item_hashable() {
+        let itemA = Item(itunesSeason: 1)
+        let itemB = Item(itunesSeason: 1)
+        let itemC = Item(itunesSeason: 3)
+        let set: Set = [itemA, itemB, itemC]
+        #expect(set.count == 2)
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func test_sendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Item.self)
     }
 }

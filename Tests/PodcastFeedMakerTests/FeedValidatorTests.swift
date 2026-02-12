@@ -5,22 +5,15 @@ import Testing
 struct FeedValidatorTests {
 
     @Test
-    func testAppleValidationFailsWhenMissingRequiredTags() async throws {
-        let feed = Feed(channel: .init(
-            title: .init("My Podcast"),
-            link: .init(.init(string: "https://example.com")!),
-            description: .init("This is a description"),
-            author: .init(name: "John Doe"),
-            explicit: .init(.clean),
-            image: .init(url: .init(string: "https://example.com/image.png")!),
-            categories: .init(categories: []),
-            items: [],
-            language: nil,
-            summary: nil,
-            owner: nil,
-            type: nil,
-            atomSelfLink: nil,
-            additionalTags: []
+    func testAppleValidationFailsWhenMissingRequiredTags() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "This is a description",
+            itunesAuthor: "John Doe",
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/image.png")!
+            // Missing: itunesOwner, items
         ))
 
         let issues = FeedValidator.validate(feed, for: [.apple])
@@ -29,24 +22,13 @@ struct FeedValidatorTests {
     }
 
     @Test
-    func testPodcastIndexValidationSucceedsWhenTagsPresent() async throws {
-        let feed = Feed(channel: .init(
-            title: .init("Podcast"),
-            link: .init(URL(string: "https://podcast.exemple.com")!),
-            description: .init("desc"),
-            author: .init(name: "John"),
-            explicit: .init(.no),
-            image: .init(url: URL(string: "https://podcast.exemple.com/image.jpg")!),
-            categories: .init(categories: []),
-            items: [],
-            language: nil,
-            summary: nil,
-            owner: nil,
-            type: nil,
-            atomSelfLink: .init(url: URL(string: "https://podcast.exemple.com")!),
-            additionalTags: [
-                Namespace.Podcast.Guid(value: "some-guid")
-            ]
+    func testPodcastIndexValidationSucceedsWhenTagsPresent() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Podcast",
+            link: URL(string: "https://podcast.exemple.com")!,
+            description: "desc",
+            atomLinks: [.selfLink(href: URL(string: "https://podcast.exemple.com")!)],
+            podcastGuid: PodcastGuid(value: "some-guid")
         ))
 
         let issues = FeedValidator.validate(feed, for: [.podcastIndex])
@@ -54,56 +36,41 @@ struct FeedValidatorTests {
     }
 
     @Test
-    func testValidationFailsOnMissingRequiredChannelTags() async throws {
-        let channel = RSSTag.Channel(tags: [], items: [], categories: .init(categories: []))
-        let feed = Feed(channel: channel)
-        let issues = FeedValidator.validate(feed, for: [.google])
+    func testPodcastIndexValidationFailsWhenGuidMissing() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Podcast",
+            link: URL(string: "https://podcast.exemple.com")!,
+            description: "desc"
+        ))
+
+        let issues = FeedValidator.validate(feed, for: [.podcastIndex])
         #expect(!issues.isEmpty)
-        #expect(issues.contains(where: { $0.tag == "title" }))
-        #expect(issues.contains(where: { $0.tag == "link" }))
-        #expect(issues.contains(where: { $0.tag == "description" }))
+        #expect(issues.contains { $0.tag == "podcast:guid" })
     }
 
     @Test
-    func testValidationFailsOnMissingItems() async throws {
-        let feed = Feed(channel: .init(
-            title: .init("Show"),
-            link: .init(URL(string: "https://example.com")!),
-            description: .init("desc"),
-            author: .init(name: "John"),
-            explicit: .init(.no),
-            image: .init(url: URL(string: "https://podcast.exemple.com/image.jpg")!),
-            categories: .init(categories: []),
-            items: [],
-            language: nil,
-            summary: nil,
-            owner: nil,
-            type: nil,
-            atomSelfLink: .init(url: URL(string: "https://podcast.exemple.com")!),
-            additionalTags: []
+    func testValidationFailsOnMissingItems() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Show",
+            link: URL(string: "https://example.com")!,
+            description: "desc",
+            itunesAuthor: "John",
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://podcast.exemple.com/image.jpg")!,
+            itunesOwner: ITunesOwner(name: "John", email: "john@example.com"),
+            atomLinks: [.selfLink(href: URL(string: "https://podcast.exemple.com")!)]
         ))
 
         let issues = FeedValidator.validate(feed, for: [.apple])
-        #expect(issues.contains(where: { $0.tag == "item" }))
+        #expect(issues.contains { $0.tag == "item" })
     }
 
     @Test
-    func testStrictValidationFailsOnMissingTags() async throws {
-        let feed = Feed(channel: .init(
-            title: .init("Show"),
-            link: .init(URL(string: "https://example.com")!),
-            description: .init("desc"),
-            author: .init(name: "John"),
-            explicit: .init(.no),
-            image: .init(url: URL(string: "https://podcast.exemple.com/image.jpg")!),
-            categories: .init(categories: []),
-            items: [],
-            language: nil,
-            summary: nil,
-            owner: nil,
-            type: nil,
-            atomSelfLink: .init(url: URL(string: "https://podcast.exemple.com")!),
-            additionalTags: []
+    func testStrictValidationThrowsOnIssues() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Show",
+            link: URL(string: "https://example.com")!,
+            description: "desc"
         ))
 
         #expect(throws: FeedValidator.ValidationError.self) {
@@ -112,40 +79,26 @@ struct FeedValidatorTests {
     }
 
     @Test
-    func testStrictValidationFailsOnMissingChannelTag() async throws {
-        let feed = Feed(channel: nil)
+    func testStrictValidationFailsOnMissingChannel() {
+        let feed = PodcastFeed(channel: nil)
 
         #expect(throws: FeedValidator.ValidationError.self) {
             try FeedValidator.strictValidate(feed)
         }
-        
-        #expect(performing: {
-            try FeedValidator.strictValidate(feed)
-        }, throws: { error in
-            let expected = (error as? FeedValidator.ValidationError)
-            return expected?.errorDescription?.isEmpty == false && expected?.localizedDescription.isEmpty == false
-        })
+
+        let issues = FeedValidator.validate(feed)
+        #expect(!issues.isEmpty)
+        #expect(issues.contains { $0.tag == "channel" })
     }
 
     @Test
-    func testStrictValidationSucceedsWhenTagsPresent() async throws {
-        let feed = Feed(channel: .init(
-            title: .init("Podcast"),
-            link: .init(URL(string: "https://podcast.exemple.com")!),
-            description: .init("desc"),
-            author: .init(name: "John"),
-            explicit: .init(.no),
-            image: .init(url: URL(string: "https://podcast.exemple.com/image.jpg")!),
-            categories: .init(categories: []),
-            items: [],
-            language: nil,
-            summary: nil,
-            owner: nil,
-            type: nil,
-            atomSelfLink: .init(url: URL(string: "https://podcast.exemple.com")!),
-            additionalTags: [
-                Namespace.Podcast.Guid(value: "some-guid")
-            ]
+    func testStrictValidationSucceedsForPodcastIndex() throws {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Podcast",
+            link: URL(string: "https://podcast.exemple.com")!,
+            description: "desc",
+            atomLinks: [.selfLink(href: URL(string: "https://podcast.exemple.com")!)],
+            podcastGuid: PodcastGuid(value: "some-guid")
         ))
 
         let issues = FeedValidator.validate(feed, for: [.podcastIndex])
@@ -154,35 +107,69 @@ struct FeedValidatorTests {
     }
 
     @Test
-    func testAppleValidationFailsWhenMissingItemRequiredTags() async throws {
-        let items: [RSSTag.Item] = [
-            .init(tags: [Namespace.iTunes.Episode.init(value: 0)]),
-            .init(tags: [Namespace.iTunes.Episode.init(value: 1)])
+    func testAppleValidationFailsWhenItemsMissingRequiredTags() {
+        let items: [Item] = [
+            Item(itunesEpisode: 0),
+            Item(itunesEpisode: 1)
         ]
 
-        let feed = Feed(channel: .init(
-            title: .init("My Podcast"),
-            link: .init(.init(string: "https://example.com")!),
-            description: .init("This is a description"),
-            author: .init(name: "John Doe"),
-            explicit: .init(.clean),
-            image: .init(url: .init(string: "https://example.com/image.png")!),
-            categories: .init(categories: []),
+        let feed = PodcastFeed(channel: Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "This is a description",
             items: items,
-            language: nil,
-            summary: nil,
-            owner: .init(name: "john doe", mail: "john@example.com"),
-            type: nil,
-            atomSelfLink: nil,
-            additionalTags: []
+            itunesAuthor: "John Doe",
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/image.png")!,
+            itunesOwner: ITunesOwner(name: "john doe", email: "john@example.com")
         ))
 
         let issues = FeedValidator.validate(feed, for: [.apple])
 
         #expect(!issues.isEmpty)
-        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/title" || $0.tag == "item[1]/title" ) })
-        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/enclosure" || $0.tag == "item[1]/enclosure" ) })
-        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/guid" || $0.tag == "item[1]/guid" ) })
-        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/pubDate" || $0.tag == "item[1]/pubDate" ) })
+        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/title" || $0.tag == "item[1]/title") })
+        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/enclosure" || $0.tag == "item[1]/enclosure") })
+        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/guid" || $0.tag == "item[1]/guid") })
+        #expect(issues.contains { $0.platform == .apple && ($0.tag == "item[0]/pubDate" || $0.tag == "item[1]/pubDate") })
+    }
+
+    @Test
+    func testPSP1ValidationChecks() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "desc",
+            atomLinks: [.selfLink(href: URL(string: "https://example.com/feed.xml")!)],
+            podcastGuid: PodcastGuid(value: "guid-123"),
+            locked: Locked(isLocked: false)
+        ))
+
+        let issues = FeedValidator.validate(feed, for: [.psp1])
+        #expect(issues.isEmpty)
+    }
+
+    @Test
+    func testPSP1ValidationFailsWhenMissing() {
+        let feed = PodcastFeed(channel: Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "desc"
+        ))
+
+        let issues = FeedValidator.validate(feed, for: [.psp1])
+        #expect(!issues.isEmpty)
+        #expect(issues.contains { $0.tag == "podcast:guid" })
+        #expect(issues.contains { $0.tag == "podcast:locked" })
+        #expect(issues.contains { $0.tag == "atom:link[rel=self]" })
+    }
+
+    @Test
+    func testValidationErrorDescription() {
+        let issues = [
+            FeedValidator.ValidationIssue(tag: "title", message: "Required", platform: .apple)
+        ]
+        let error = FeedValidator.ValidationError.issuesFound(issues)
+        #expect(error.errorDescription?.contains("apple") == true)
+        #expect(error.errorDescription?.contains("title") == true)
     }
 }

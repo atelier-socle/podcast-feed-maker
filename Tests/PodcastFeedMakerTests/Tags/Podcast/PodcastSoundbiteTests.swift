@@ -2,57 +2,81 @@ import Foundation
 @testable import PodcastFeedMaker
 import Testing
 
-struct SoundbiteTests {
-    
+struct PodcastSoundbiteTests {
+
+    // MARK: - Initialization
+
     @Test
-    func test_xmlRepresentation_withPlaceholder() throws {
-        let tag = Namespace.Podcast.Soundbite(
-            startTime: 30.5,
-            duration: 45.0,
-            placeholder: "A funny intro moment"
-        )
-        
-        let expected = """
-        \t<podcast:soundbite startTime="30.5" duration="45.0">A funny intro moment</podcast:soundbite>
-        """
-        
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func initWithAllParameters() {
+        let soundbite = Soundbite(startTime: 30.5, duration: 45.0, title: "Best moment")
+
+        #expect(soundbite.startTime == 30.5)
+        #expect(soundbite.duration == 45.0)
+        #expect(soundbite.title == "Best moment")
     }
 
     @Test
-    func test_xmlRepresentation_withoutPlaceholder() throws {
-        let tag = Namespace.Podcast.Soundbite(
-            startTime: 60.0,
-            duration: 15.0,
-            placeholder: nil
-        )
-        
-        let expected = """
-        \t<podcast:soundbite startTime="60.0" duration="15.0" />
-        """
-        
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func initWithoutTitle() {
+        let soundbite = Soundbite(startTime: 60.0, duration: 15.0)
+
+        #expect(soundbite.startTime == 60.0)
+        #expect(soundbite.duration == 15.0)
+        #expect(soundbite.title == nil)
+    }
+
+    // MARK: - Equatable & Hashable
+
+    @Test
+    func equatableConformance() {
+        let a = Soundbite(startTime: 10.0, duration: 5.0, title: "Preview A")
+        let b = Soundbite(startTime: 10.0, duration: 5.0, title: "Preview A")
+        let c = Soundbite(startTime: 15.0, duration: 10.0)
+
+        #expect(a == b)
+        #expect(a != c)
     }
 
     @Test
-    func test_equatable_conformance() {
-        let tag1 = Namespace.Podcast.Soundbite(startTime: 10.0, duration: 5.0, placeholder: "Preview A")
-        let tag2 = Namespace.Podcast.Soundbite(startTime: 10.0, duration: 5.0, placeholder: "Preview A")
-        let tag3 = Namespace.Podcast.Soundbite(startTime: 15.0, duration: 10.0, placeholder: nil)
+    func hashableConformance() {
+        let a = Soundbite(startTime: 1.0, duration: 2.0, title: "A")
+        let b = Soundbite(startTime: 1.0, duration: 2.0, title: "A")
+        let c = Soundbite(startTime: 3.0, duration: 2.0)
 
-        #expect(tag1 == tag2)
-        #expect(tag1 != tag3)
-    }
-
-    @Test
-    func test_hashable_conformance() {
-        let tag1 = Namespace.Podcast.Soundbite(startTime: 1.0, duration: 2.0, placeholder: "A")
-        let tag2 = Namespace.Podcast.Soundbite(startTime: 1.0, duration: 2.0, placeholder: "A")
-        let tag3 = Namespace.Podcast.Soundbite(startTime: 3.0, duration: 2.0, placeholder: nil)
-
-        let set: Set = [tag1, tag2, tag3]
+        let set: Set = [a, b, c]
         #expect(set.count == 2)
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationWithTitle() throws {
+        let soundbite = Soundbite(startTime: 30.5, duration: 45.0, title: "A funny intro moment")
+
+        let xml = try soundbite.xmlRepresentation()
+
+        #expect(xml.contains("podcast:soundbite"))
+        #expect(xml.contains(#"startTime="30.5""#))
+        #expect(xml.contains(#"duration="45.0""#))
+        #expect(xml.contains(">A funny intro moment</podcast:soundbite>"))
+    }
+
+    @Test
+    func xmlRepresentationWithoutTitle() throws {
+        let soundbite = Soundbite(startTime: 60.0, duration: 15.0)
+
+        let xml = try soundbite.xmlRepresentation()
+
+        #expect(xml.contains("podcast:soundbite"))
+        #expect(xml.contains(#"startTime="60.0""#))
+        #expect(xml.contains(#"duration="15.0""#))
+        #expect(xml.contains("/>"))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(Soundbite.self)
     }
 }

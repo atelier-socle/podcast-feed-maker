@@ -2,30 +2,119 @@ import Foundation
 @testable import PodcastFeedMaker
 import Testing
 
+// MARK: - TimeToLiveTests
+
+/// Tests for the `ttl` property on ``Channel``.
+///
+/// In the new model, `Channel.ttl` is an optional `Int?`
+/// representing time-to-live in minutes.
+@Suite("RSS TimeToLive Property Tests")
 struct TimeToLiveTests {
 
-    @Test
-    func test_xmlRepresentation_shouldReturnCorrectTag() throws {
-        let tag = RSSTag.TimeToLive(60)
-        let result = try tag.xmlRepresentation()
-        let expected = "\t<ttl>60</ttl>"
-        #expect(result == expected)
+    // MARK: - Initialization
+
+    @Test("Channel ttl defaults to nil")
+    func channelTtlDefaultsToNil() {
+        let channel = Channel(
+            title: "Title",
+            link: URL(string: "https://example.com")!,
+            description: "Description"
+        )
+
+        #expect(channel.ttl == nil)
     }
 
-    @Test
-    func test_equatable_conformance() {
-        let tag1 = RSSTag.TimeToLive(30)
-        let tag2 = RSSTag.TimeToLive(30)
-        let tag3 = RSSTag.TimeToLive(90)
+    @Test("Channel ttl can be set at initialization")
+    func channelTtlCanBeSet() {
+        let channel = Channel(
+            title: "Title",
+            link: URL(string: "https://example.com")!,
+            description: "Description",
+            ttl: 60
+        )
 
-        #expect(tag1 == tag2)
-        #expect(tag1 != tag3)
+        #expect(channel.ttl == 60)
     }
 
-    @Test
-    func test_hashable_conformance() {
-        let tag = RSSTag.TimeToLive(15)
-        let set: Set = [tag]
-        #expect(set.contains(RSSTag.TimeToLive(15)))
+    @Test("Channel ttl is mutable")
+    func channelTtlIsMutable() {
+        var channel = Channel(
+            title: "Title",
+            link: URL(string: "https://example.com")!,
+            description: "Description"
+        )
+
+        channel.ttl = 30
+        #expect(channel.ttl == 30)
+    }
+
+    // MARK: - XML Generation
+
+    @Test("Channel XML contains ttl tag when set")
+    func channelXmlContainsTtl() throws {
+        let channel = Channel(
+            title: "Title",
+            link: URL(string: "https://example.com")!,
+            description: "Description",
+            ttl: 60
+        )
+
+        let xml = try channel.xmlRepresentation()
+        #expect(xml.contains("<ttl>60</ttl>"))
+    }
+
+    @Test("Channel XML omits ttl tag when nil")
+    func channelXmlOmitsTtlWhenNil() throws {
+        let channel = Channel(
+            title: "Title",
+            link: URL(string: "https://example.com")!,
+            description: "Description"
+        )
+
+        let xml = try channel.xmlRepresentation()
+        #expect(!xml.contains("<ttl>"))
+    }
+
+    @Test("Channel XML renders various ttl values correctly")
+    func channelXmlRendersVariousTtlValues() throws {
+        for minutes in [15, 30, 60, 120, 1440] {
+            let channel = Channel(
+                title: "Title",
+                link: URL(string: "https://example.com")!,
+                description: "Description",
+                ttl: minutes
+            )
+
+            let xml = try channel.xmlRepresentation()
+            #expect(xml.contains("<ttl>\(minutes)</ttl>"))
+        }
+    }
+
+    // MARK: - Equatable
+
+    @Test("Channels with same ttl are equal")
+    func channelsWithSameTtlAreEqual() {
+        let url = URL(string: "https://example.com")!
+        let channel1 = Channel(title: "T", link: url, description: "D", ttl: 30)
+        let channel2 = Channel(title: "T", link: url, description: "D", ttl: 30)
+        #expect(channel1 == channel2)
+    }
+
+    @Test("Channels with different ttl values are not equal")
+    func channelsWithDifferentTtlAreNotEqual() {
+        let url = URL(string: "https://example.com")!
+        let channel1 = Channel(title: "T", link: url, description: "D", ttl: 30)
+        let channel2 = Channel(title: "T", link: url, description: "D", ttl: 90)
+        #expect(channel1 != channel2)
+    }
+
+    // MARK: - Hashable
+
+    @Test("Channel ttl contributes to hash value")
+    func channelTtlHashable() {
+        let url = URL(string: "https://example.com")!
+        let channel = Channel(title: "T", link: url, description: "D", ttl: 15)
+        let set: Set = [channel]
+        #expect(set.contains(Channel(title: "T", link: url, description: "D", ttl: 15)))
     }
 }

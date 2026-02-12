@@ -4,116 +4,511 @@ import Testing
 
 struct iTunesCategoryTests {
 
+    // MARK: - Category Enum
+
     @Test
-    func test_categoryInitializationAndXmlRepresentation() throws {
-        let category = Namespace.iTunes.Category(
-            categories: [.music([.musicCommentary])]
+    func test_category_allCases_contains19Categories() {
+        #expect(ITunesCategory.Category.allCases.count == 19)
+    }
+
+    @Test
+    func test_category_rawValues() {
+        #expect(ITunesCategory.Category.arts.rawValue == "Arts")
+        #expect(ITunesCategory.Category.business.rawValue == "Business")
+        #expect(ITunesCategory.Category.comedy.rawValue == "Comedy")
+        #expect(ITunesCategory.Category.education.rawValue == "Education")
+        #expect(ITunesCategory.Category.fiction.rawValue == "Fiction")
+        #expect(ITunesCategory.Category.government.rawValue == "Government")
+        #expect(ITunesCategory.Category.healthAndFitness.rawValue == "Health & Fitness")
+        #expect(ITunesCategory.Category.history.rawValue == "History")
+        #expect(ITunesCategory.Category.kidsAndFamily.rawValue == "Kids & Family")
+        #expect(ITunesCategory.Category.leisure.rawValue == "Leisure")
+        #expect(ITunesCategory.Category.music.rawValue == "Music")
+        #expect(ITunesCategory.Category.news.rawValue == "News")
+        #expect(ITunesCategory.Category.religionAndSpirituality.rawValue == "Religion & Spirituality")
+        #expect(ITunesCategory.Category.science.rawValue == "Science")
+        #expect(ITunesCategory.Category.societyAndCulture.rawValue == "Society & Culture")
+        #expect(ITunesCategory.Category.sports.rawValue == "Sports")
+        #expect(ITunesCategory.Category.technology.rawValue == "Technology")
+        #expect(ITunesCategory.Category.trueCrime.rawValue == "True Crime")
+        #expect(ITunesCategory.Category.tvAndFilm.rawValue == "TV & Film")
+    }
+
+    // MARK: - Subcategory Enum Cases
+
+    @Test
+    func test_artsSubcategory_allCases() {
+        #expect(ITunesCategory.ArtsSubcategory.allCases.count == 6)
+        #expect(ITunesCategory.ArtsSubcategory.books.rawValue == "Books")
+        #expect(ITunesCategory.ArtsSubcategory.design.rawValue == "Design")
+        #expect(ITunesCategory.ArtsSubcategory.fashionAndBeauty.rawValue == "Fashion & Beauty")
+        #expect(ITunesCategory.ArtsSubcategory.food.rawValue == "Food")
+        #expect(ITunesCategory.ArtsSubcategory.performingArts.rawValue == "Performing Arts")
+        #expect(ITunesCategory.ArtsSubcategory.visualArts.rawValue == "Visual Arts")
+    }
+
+    @Test
+    func test_businessSubcategory_allCases() {
+        #expect(ITunesCategory.BusinessSubcategory.allCases.count == 6)
+        #expect(ITunesCategory.BusinessSubcategory.careers.rawValue == "Careers")
+        #expect(ITunesCategory.BusinessSubcategory.entrepreneurship.rawValue == "Entrepreneurship")
+        #expect(ITunesCategory.BusinessSubcategory.investing.rawValue == "Investing")
+        #expect(ITunesCategory.BusinessSubcategory.management.rawValue == "Management")
+        #expect(ITunesCategory.BusinessSubcategory.marketing.rawValue == "Marketing")
+        #expect(ITunesCategory.BusinessSubcategory.nonProfit.rawValue == "Non-Profit")
+    }
+
+    @Test
+    func test_comedySubcategory_allCases() {
+        #expect(ITunesCategory.ComedySubcategory.allCases.count == 3)
+        #expect(ITunesCategory.ComedySubcategory.comedyInterviews.rawValue == "Comedy Interviews")
+        #expect(ITunesCategory.ComedySubcategory.improv.rawValue == "Improv")
+        #expect(ITunesCategory.ComedySubcategory.standUp.rawValue == "Stand-Up")
+    }
+
+    @Test
+    func test_educationSubcategory_allCases() {
+        #expect(ITunesCategory.EducationSubcategory.allCases.count == 4)
+        #expect(ITunesCategory.EducationSubcategory.courses.rawValue == "Courses")
+        #expect(ITunesCategory.EducationSubcategory.howTo.rawValue == "How To")
+        #expect(ITunesCategory.EducationSubcategory.languageLearning.rawValue == "Language Learning")
+        #expect(ITunesCategory.EducationSubcategory.selfImprovement.rawValue == "Self-Improvement")
+    }
+
+    @Test
+    func test_fictionSubcategory_allCases() {
+        #expect(ITunesCategory.FictionSubcategory.allCases.count == 3)
+        #expect(ITunesCategory.FictionSubcategory.comedyFiction.rawValue == "Comedy Fiction")
+        #expect(ITunesCategory.FictionSubcategory.drama.rawValue == "Drama")
+        #expect(ITunesCategory.FictionSubcategory.scienceFiction.rawValue == "Science Fiction")
+    }
+
+    @Test
+    func test_healthAndFitnessSubcategory_allCases() {
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.allCases.count == 6)
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.alternativeHealth.rawValue == "Alternative Health")
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.fitness.rawValue == "Fitness")
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.medicine.rawValue == "Medicine")
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.mentalHealth.rawValue == "Mental Health")
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.nutrition.rawValue == "Nutrition")
+        #expect(ITunesCategory.HealthAndFitnessSubcategory.sexuality.rawValue == "Sexuality")
+    }
+
+    @Test
+    func test_kidsAndFamilySubcategory_allCases() {
+        #expect(ITunesCategory.KidsAndFamilySubcategory.allCases.count == 4)
+        #expect(ITunesCategory.KidsAndFamilySubcategory.educationForKids.rawValue == "Education for Kids")
+        #expect(ITunesCategory.KidsAndFamilySubcategory.parenting.rawValue == "Parenting")
+        #expect(ITunesCategory.KidsAndFamilySubcategory.petsAndAnimals.rawValue == "Pets & Animals")
+        #expect(ITunesCategory.KidsAndFamilySubcategory.storiesForKids.rawValue == "Stories for Kids")
+    }
+
+    @Test
+    func test_leisureSubcategory_allCases() {
+        #expect(ITunesCategory.LeisureSubcategory.allCases.count == 8)
+        #expect(ITunesCategory.LeisureSubcategory.animationAndManga.rawValue == "Animation & Manga")
+        #expect(ITunesCategory.LeisureSubcategory.automotive.rawValue == "Automotive")
+        #expect(ITunesCategory.LeisureSubcategory.aviation.rawValue == "Aviation")
+        #expect(ITunesCategory.LeisureSubcategory.crafts.rawValue == "Crafts")
+        #expect(ITunesCategory.LeisureSubcategory.games.rawValue == "Games")
+        #expect(ITunesCategory.LeisureSubcategory.hobbies.rawValue == "Hobbies")
+        #expect(ITunesCategory.LeisureSubcategory.homeAndGarden.rawValue == "Home & Garden")
+        #expect(ITunesCategory.LeisureSubcategory.videoGames.rawValue == "Video Games")
+    }
+
+    @Test
+    func test_musicSubcategory_allCases() {
+        #expect(ITunesCategory.MusicSubcategory.allCases.count == 3)
+        #expect(ITunesCategory.MusicSubcategory.musicCommentary.rawValue == "Music Commentary")
+        #expect(ITunesCategory.MusicSubcategory.musicHistory.rawValue == "Music History")
+        #expect(ITunesCategory.MusicSubcategory.musicInterviews.rawValue == "Music Interviews")
+    }
+
+    @Test
+    func test_newsSubcategory_allCases() {
+        #expect(ITunesCategory.NewsSubcategory.allCases.count == 7)
+        #expect(ITunesCategory.NewsSubcategory.businessNews.rawValue == "Business News")
+        #expect(ITunesCategory.NewsSubcategory.dailyNews.rawValue == "Daily News")
+        #expect(ITunesCategory.NewsSubcategory.entertainmentNews.rawValue == "Entertainment News")
+        #expect(ITunesCategory.NewsSubcategory.newsCommentary.rawValue == "News Commentary")
+        #expect(ITunesCategory.NewsSubcategory.politics.rawValue == "Politics")
+        #expect(ITunesCategory.NewsSubcategory.sportsNews.rawValue == "Sports News")
+        #expect(ITunesCategory.NewsSubcategory.techNews.rawValue == "Tech News")
+    }
+
+    @Test
+    func test_religionAndSpiritualitySubcategory_allCases() {
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.allCases.count == 7)
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.buddhism.rawValue == "Buddhism")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.christianity.rawValue == "Christianity")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.hinduism.rawValue == "Hinduism")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.islam.rawValue == "Islam")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.judaism.rawValue == "Judaism")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.religion.rawValue == "Religion")
+        #expect(ITunesCategory.ReligionAndSpiritualitySubcategory.spirituality.rawValue == "Spirituality")
+    }
+
+    @Test
+    func test_scienceSubcategory_allCases() {
+        #expect(ITunesCategory.ScienceSubcategory.allCases.count == 9)
+        #expect(ITunesCategory.ScienceSubcategory.astronomy.rawValue == "Astronomy")
+        #expect(ITunesCategory.ScienceSubcategory.chemistry.rawValue == "Chemistry")
+        #expect(ITunesCategory.ScienceSubcategory.earthSciences.rawValue == "Earth Sciences")
+        #expect(ITunesCategory.ScienceSubcategory.lifeSciences.rawValue == "Life Sciences")
+        #expect(ITunesCategory.ScienceSubcategory.mathematics.rawValue == "Mathematics")
+        #expect(ITunesCategory.ScienceSubcategory.naturalSciences.rawValue == "Natural Sciences")
+        #expect(ITunesCategory.ScienceSubcategory.nature.rawValue == "Nature")
+        #expect(ITunesCategory.ScienceSubcategory.physics.rawValue == "Physics")
+        #expect(ITunesCategory.ScienceSubcategory.socialSciences.rawValue == "Social Sciences")
+    }
+
+    @Test
+    func test_societyAndCultureSubcategory_allCases() {
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.allCases.count == 5)
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.documentary.rawValue == "Documentary")
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.personalJournals.rawValue == "Personal Journals")
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.philosophy.rawValue == "Philosophy")
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.placesAndTravel.rawValue == "Places & Travel")
+        #expect(ITunesCategory.SocietyAndCultureSubcategory.relationships.rawValue == "Relationships")
+    }
+
+    @Test
+    func test_sportsSubcategory_allCases() {
+        #expect(ITunesCategory.SportsSubcategory.allCases.count == 15)
+        #expect(ITunesCategory.SportsSubcategory.baseball.rawValue == "Baseball")
+        #expect(ITunesCategory.SportsSubcategory.basketball.rawValue == "Basketball")
+        #expect(ITunesCategory.SportsSubcategory.cricket.rawValue == "Cricket")
+        #expect(ITunesCategory.SportsSubcategory.fantasySports.rawValue == "Fantasy Sports")
+        #expect(ITunesCategory.SportsSubcategory.football.rawValue == "Football")
+        #expect(ITunesCategory.SportsSubcategory.golf.rawValue == "Golf")
+        #expect(ITunesCategory.SportsSubcategory.hockey.rawValue == "Hockey")
+        #expect(ITunesCategory.SportsSubcategory.rugby.rawValue == "Rugby")
+        #expect(ITunesCategory.SportsSubcategory.running.rawValue == "Running")
+        #expect(ITunesCategory.SportsSubcategory.soccer.rawValue == "Soccer")
+        #expect(ITunesCategory.SportsSubcategory.swimming.rawValue == "Swimming")
+        #expect(ITunesCategory.SportsSubcategory.tennis.rawValue == "Tennis")
+        #expect(ITunesCategory.SportsSubcategory.volleyball.rawValue == "Volleyball")
+        #expect(ITunesCategory.SportsSubcategory.wilderness.rawValue == "Wilderness")
+        #expect(ITunesCategory.SportsSubcategory.wrestling.rawValue == "Wrestling")
+    }
+
+    @Test
+    func test_tvAndFilmSubcategory_allCases() {
+        #expect(ITunesCategory.TvAndFilmSubcategory.allCases.count == 5)
+        #expect(ITunesCategory.TvAndFilmSubcategory.afterShows.rawValue == "After Shows")
+        #expect(ITunesCategory.TvAndFilmSubcategory.filmHistory.rawValue == "Film History")
+        #expect(ITunesCategory.TvAndFilmSubcategory.filmInterviews.rawValue == "Film Interviews")
+        #expect(ITunesCategory.TvAndFilmSubcategory.filmReviews.rawValue == "Film Reviews")
+        #expect(ITunesCategory.TvAndFilmSubcategory.tvReviews.rawValue == "TV Reviews")
+    }
+
+    // MARK: - String-Based Init
+
+    @Test
+    func test_init_withRawString() {
+        let category = ITunesCategory(text: "Technology")
+        #expect(category.text == "Technology")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_init_withRawStringAndSubcategories() {
+        let sub = ITunesCategory(text: "Podcasting")
+        let category = ITunesCategory(text: "Technology", subcategories: [sub])
+        #expect(category.text == "Technology")
+        #expect(category.subcategories.count == 1)
+        #expect(category.subcategories.first?.text == "Podcasting")
+    }
+
+    @Test
+    func test_init_withCategoryEnum() {
+        let category = ITunesCategory(.technology)
+        #expect(category.text == "Technology")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    // MARK: - Static Factory Methods
+
+    @Test
+    func test_factory_artsWithSubcategory() {
+        let category = ITunesCategory.arts(.books)
+        #expect(category.text == "Arts")
+        #expect(category.subcategories.count == 1)
+        #expect(category.subcategories.first?.text == "Books")
+    }
+
+    @Test
+    func test_factory_artsWithoutSubcategory() {
+        let category = ITunesCategory.arts()
+        #expect(category.text == "Arts")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_factory_businessWithSubcategory() {
+        let category = ITunesCategory.business(.marketing)
+        #expect(category.text == "Business")
+        #expect(category.subcategories.first?.text == "Marketing")
+    }
+
+    @Test
+    func test_factory_comedyWithSubcategory() {
+        let category = ITunesCategory.comedy(.improv)
+        #expect(category.text == "Comedy")
+        #expect(category.subcategories.first?.text == "Improv")
+    }
+
+    @Test
+    func test_factory_educationWithSubcategory() {
+        let category = ITunesCategory.education(.courses)
+        #expect(category.text == "Education")
+        #expect(category.subcategories.first?.text == "Courses")
+    }
+
+    @Test
+    func test_factory_fictionWithSubcategory() {
+        let category = ITunesCategory.fiction(.drama)
+        #expect(category.text == "Fiction")
+        #expect(category.subcategories.first?.text == "Drama")
+    }
+
+    @Test
+    func test_factory_government() {
+        let category = ITunesCategory.government
+        #expect(category.text == "Government")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_factory_healthAndFitnessWithSubcategory() {
+        let category = ITunesCategory.healthAndFitness(.fitness)
+        #expect(category.text == "Health & Fitness")
+        #expect(category.subcategories.first?.text == "Fitness")
+    }
+
+    @Test
+    func test_factory_history() {
+        let category = ITunesCategory.history
+        #expect(category.text == "History")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_factory_kidsAndFamilyWithSubcategory() {
+        let category = ITunesCategory.kidsAndFamily(.parenting)
+        #expect(category.text == "Kids & Family")
+        #expect(category.subcategories.first?.text == "Parenting")
+    }
+
+    @Test
+    func test_factory_leisureWithSubcategory() {
+        let category = ITunesCategory.leisure(.games)
+        #expect(category.text == "Leisure")
+        #expect(category.subcategories.first?.text == "Games")
+    }
+
+    @Test
+    func test_factory_musicWithSubcategory() {
+        let category = ITunesCategory.music(.musicCommentary)
+        #expect(category.text == "Music")
+        #expect(category.subcategories.first?.text == "Music Commentary")
+    }
+
+    @Test
+    func test_factory_newsWithSubcategory() {
+        let category = ITunesCategory.news(.techNews)
+        #expect(category.text == "News")
+        #expect(category.subcategories.first?.text == "Tech News")
+    }
+
+    @Test
+    func test_factory_religionAndSpiritualityWithSubcategory() {
+        let category = ITunesCategory.religionAndSpirituality(.christianity)
+        #expect(category.text == "Religion & Spirituality")
+        #expect(category.subcategories.first?.text == "Christianity")
+    }
+
+    @Test
+    func test_factory_scienceWithSubcategory() {
+        let category = ITunesCategory.science(.physics)
+        #expect(category.text == "Science")
+        #expect(category.subcategories.first?.text == "Physics")
+    }
+
+    @Test
+    func test_factory_societyAndCultureWithSubcategory() {
+        let category = ITunesCategory.societyAndCulture(.documentary)
+        #expect(category.text == "Society & Culture")
+        #expect(category.subcategories.first?.text == "Documentary")
+    }
+
+    @Test
+    func test_factory_sportsWithSubcategory() {
+        let category = ITunesCategory.sports(.soccer)
+        #expect(category.text == "Sports")
+        #expect(category.subcategories.first?.text == "Soccer")
+    }
+
+    @Test
+    func test_factory_technology() {
+        let category = ITunesCategory.technology
+        #expect(category.text == "Technology")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_factory_trueCrime() {
+        let category = ITunesCategory.trueCrime
+        #expect(category.text == "True Crime")
+        #expect(category.subcategories.isEmpty)
+    }
+
+    @Test
+    func test_factory_tvAndFilmWithSubcategory() {
+        let category = ITunesCategory.tvAndFilm(.tvReviews)
+        #expect(category.text == "TV & Film")
+        #expect(category.subcategories.first?.text == "TV Reviews")
+    }
+
+    // MARK: - Valid Subcategories
+
+    @Test
+    func test_validSubcategories_forArts() {
+        let subs = ITunesCategory.validSubcategories(for: .arts)
+        #expect(subs.count == 6)
+        #expect(subs.contains("Books"))
+        #expect(subs.contains("Visual Arts"))
+    }
+
+    @Test
+    func test_validSubcategories_forTechnology() {
+        let subs = ITunesCategory.validSubcategories(for: .technology)
+        #expect(subs.isEmpty)
+    }
+
+    @Test
+    func test_validSubcategories_forGovernment() {
+        let subs = ITunesCategory.validSubcategories(for: .government)
+        #expect(subs.isEmpty)
+    }
+
+    @Test
+    func test_validSubcategories_forHistory() {
+        let subs = ITunesCategory.validSubcategories(for: .history)
+        #expect(subs.isEmpty)
+    }
+
+    @Test
+    func test_validSubcategories_forTrueCrime() {
+        let subs = ITunesCategory.validSubcategories(for: .trueCrime)
+        #expect(subs.isEmpty)
+    }
+
+    @Test
+    func test_validSubcategories_forNews() {
+        let subs = ITunesCategory.validSubcategories(for: .news)
+        #expect(subs.count == 7)
+        #expect(subs.contains("Tech News"))
+        #expect(subs.contains("Politics"))
+    }
+
+    @Test
+    func test_validSubcategories_forSports() {
+        let subs = ITunesCategory.validSubcategories(for: .sports)
+        #expect(subs.count == 15)
+        #expect(subs.contains("Soccer"))
+        #expect(subs.contains("Wrestling"))
+    }
+
+    @Test
+    func test_validSubcategories_forScience() {
+        let subs = ITunesCategory.validSubcategories(for: .science)
+        #expect(subs.count == 9)
+        #expect(subs.contains("Astronomy"))
+        #expect(subs.contains("Physics"))
+    }
+
+    // MARK: - Channel Integration
+
+    @Test
+    func test_channel_itunesCategories_storesCategories() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesCategories: [
+                .arts(.books),
+                .technology
+            ]
         )
-
-        let xml = try category.xmlRepresentation()
-        #expect(xml.contains(#"<itunes:category text="Music"><itunes:category text="Music Commentary" /></itunes:category>"#))
+        #expect(channel.itunesCategories.count == 2)
+        #expect(channel.itunesCategories[0].text == "Arts")
+        #expect(channel.itunesCategories[0].subcategories.first?.text == "Books")
+        #expect(channel.itunesCategories[1].text == "Technology")
+        #expect(channel.itunesCategories[1].subcategories.isEmpty)
     }
 
     @Test
-    func test_category_withoutSubcategories() throws {
-        let category = Namespace.iTunes.Category(categories: [.technology])
-        let xml = try category.xmlRepresentation()
-
-        #expect(xml.contains(#"<itunes:category text="Technology">"#))
+    func test_channel_itunesCategories_defaultsToEmpty() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesCategories.isEmpty)
     }
 
-    @Test func testCategories() async throws {
-        let categories: [Namespace.iTunes.iTunesMainCategory] = [.arts([.books]), .business([.nonProfit])]
-        let xml = try categories.map {
-            try $0.xmlRepresentation()
-        }
-        let result = xml.indentedTagsRepresentation
-        let expected = "\t\t<itunes:category text=\"Arts\"><itunes:category text=\"Books\" /></itunes:category>\n\t\t<itunes:category text=\"Business\"><itunes:category text=\"Non-Profit\" /></itunes:category>"
-        #expect(result.count == expected.count)
-        #expect(result == expected)
-    }
+    // MARK: - Equatable and Hashable
 
-    @Test func testAllCategories() async throws {
-        let categories = Namespace.iTunes.iTunesMainCategory.allCases
-        let xml = try categories.map {
-            try $0.xmlRepresentation()
-        }
-
-        let result = xml.indentedTagsRepresentation
-        let expected = 4508
-
-        #expect(result.count == expected)
-
-        for category in categories {
-            try #expect(result.contains(category.xmlRepresentation()))
-        }
+    @Test
+    func test_equatable_sameCategory() {
+        let catA = ITunesCategory.arts(.books)
+        let catB = ITunesCategory.arts(.books)
+        #expect(catA == catB)
     }
 
     @Test
-    func test_iTunesMainCategory_allCases_containsExpectedNumber() {
-        #expect(Namespace.iTunes.iTunesMainCategory.allCases.count == 19) // Ensure spec parity
+    func test_equatable_differentCategory() {
+        let catA = ITunesCategory.arts(.books)
+        let catB = ITunesCategory.arts(.design)
+        #expect(catA != catB)
     }
 
     @Test
-    func test_mainCategory_textEncoding() {
-        let mapping: [(Namespace.iTunes.iTunesMainCategory, String)] = [
-            (.arts([]), "Arts"),
-            (.music([]), "Music"),
-            (.healthAndFitness([]), "Health &amp; Fitness"),
-            (.kidsAndFamily([]), "Kids &amp; Family"),
-            (.societyAndCulture([]), "Society &amp; Culture"),
-            (.technology, "Technology"),
-            (.trueCrime, "True Crime"),
-        ]
-
-        for (category, expectedText) in mapping {
-            #expect(category.text == expectedText)
-        }
+    func test_equatable_differentMainCategory() {
+        let catA = ITunesCategory.arts()
+        let catB = ITunesCategory.technology
+        #expect(catA != catB)
     }
 
     @Test
-    func test_mainCategory_subcategoriesXml() throws {
-        let category = Namespace.iTunes.iTunesMainCategory.news([.techNews])
-        let xml = try category.xmlRepresentation()
-
-        #expect(xml.contains(#"<itunes:category text="Tech News" />"#))
-    }
-
-    @Test
-    func test_subcategory_xmlRepresentation() throws {
-        let subcategories: [any XmlRepresentable] = [
-            Namespace.iTunes.iTunesMainCategory.MusicCategory.musicCommentary,
-            Namespace.iTunes.iTunesMainCategory.ArtsCategory.books,
-            Namespace.iTunes.iTunesMainCategory.BusinessCategory.marketing,
-            Namespace.iTunes.iTunesMainCategory.ComedyCategory.improv,
-            Namespace.iTunes.iTunesMainCategory.ReligionAndSpiritualityCategory.christianity,
-            Namespace.iTunes.iTunesMainCategory.ScienceCategory.physics,
-            Namespace.iTunes.iTunesMainCategory.TvAndFilmCategory.tvReviews
-        ]
-
-        for tag in subcategories {
-            let xml = try tag.xmlRepresentation()
-            #expect(xml.contains("<itunes:category text="))
-        }
-    }
-
-    @Test
-    func test_hashableAndEquatableForCategory() {
-        let cat1 = Namespace.iTunes.Category(categories: [.music([.musicHistory])])
-        let cat2 = Namespace.iTunes.Category(categories: [.music([.musicHistory])])
-        let cat3 = Namespace.iTunes.Category(categories: [.music([.musicCommentary])])
-
-        #expect(cat1 == cat2)
-        #expect(cat1 != cat3)
-
-        let set: Set = [cat1, cat2, cat3]
+    func test_hashable() {
+        let catA = ITunesCategory.arts(.books)
+        let catB = ITunesCategory.arts(.books)
+        let catC = ITunesCategory.technology
+        let set: Set = [catA, catB, catC]
         #expect(set.count == 2)
     }
+
+    // MARK: - Sendable and Codable
 
     @Test
     func test_sendableConformance() {
         func assertSendable<T: Sendable>(_: T.Type) {}
-        assertSendable(Namespace.iTunes.Category.self)
-        assertSendable(Namespace.iTunes.iTunesMainCategory.self)
+        assertSendable(ITunesCategory.self)
+        assertSendable(ITunesCategory.Category.self)
+        assertSendable(ITunesCategory.ArtsSubcategory.self)
+        assertSendable(ITunesCategory.BusinessSubcategory.self)
+        assertSendable(ITunesCategory.SportsSubcategory.self)
+    }
+
+    @Test
+    func test_codableConformance() throws {
+        let category = ITunesCategory.arts(.books)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(category)
+        let decoder = JSONDecoder()
+        let decoded = try decoder.decode(ITunesCategory.self, from: data)
+        #expect(decoded == category)
     }
 }

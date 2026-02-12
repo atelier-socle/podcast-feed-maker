@@ -4,36 +4,107 @@ import Testing
 
 struct iTunesCompleteTests {
 
+    // MARK: - Channel
+
     @Test
-    func test_xmlRepresentation_true() throws {
-        let complete = Namespace.iTunes.Complete(value: true)
-        let xml = try complete.xmlRepresentation()
-        #expect(xml == "\t<itunes:complete>true</itunes:complete>")
+    func test_channel_itunesComplete_true() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesComplete: true
+        )
+        #expect(channel.itunesComplete == true)
     }
 
     @Test
-    func test_xmlRepresentation_false() throws {
-        let complete = Namespace.iTunes.Complete(value: false)
-        let xml = try complete.xmlRepresentation()
-        #expect(xml == "\t<itunes:complete>false</itunes:complete>")
+    func test_channel_itunesComplete_false() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesComplete: false
+        )
+        #expect(channel.itunesComplete == false)
     }
 
     @Test
-    func test_equatableAndHashable() {
-        let a = Namespace.iTunes.Complete(value: true)
-        let b = Namespace.iTunes.Complete(value: true)
-        let c = Namespace.iTunes.Complete(value: false)
+    func test_channel_itunesComplete_defaultsToNil() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesComplete == nil)
+    }
 
-        #expect(a == b)
-        #expect(a != c)
+    // MARK: - Equatable
 
-        let set: Set = [a, b, c]
+    @Test
+    func test_channel_equatable_sameComplete() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: true
+        )
+        #expect(channelA == channelB)
+    }
+
+    @Test
+    func test_channel_equatable_differentComplete() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: false
+        )
+        #expect(channelA != channelB)
+    }
+
+    // MARK: - Hashable
+
+    @Test
+    func test_channel_hashable() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: true
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: true
+        )
+        let channelC = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesComplete: false
+        )
+        let set: Set = [channelA, channelB, channelC]
         #expect(set.count == 2)
     }
+
+    // MARK: - Sendable
 
     @Test
     func test_sendableConformance() {
         func assertSendable<T: Sendable>(_: T.Type) {}
-        assertSendable(Namespace.iTunes.Complete.self)
+        assertSendable(Channel.self)
     }
 }

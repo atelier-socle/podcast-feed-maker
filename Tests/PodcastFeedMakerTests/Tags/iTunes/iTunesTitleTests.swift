@@ -4,41 +4,158 @@ import Testing
 
 struct iTunesTitleTests {
 
+    // MARK: - Channel
+
     @Test
-    func test_xmlRepresentation_shouldEscapeSpecialCharacters() throws {
-        let tag = Namespace.iTunes.Title(text: #"Swift & Friends “Live” ©"#)
-        let expected = "\t<itunes:title>Swift &amp; Friends &quot;Live&quot; &#xA9;</itunes:title>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesTitle_shouldStoreValue() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesTitle: "This is my show title"
+        )
+        #expect(channel.itunesTitle == "This is my show title")
     }
 
     @Test
-    func test_xmlRepresentation_withPlainText() throws {
-        let tag = Namespace.iTunes.Title(text: "This is my episode title")
-        let expected = "\t<itunes:title>This is my episode title</itunes:title>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesTitle_defaultsToNil() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesTitle == nil)
     }
 
     @Test
-    func test_xmlRepresentation_withEmptyText() throws {
-        let tag = Namespace.iTunes.Title(text: "")
-        let expected = "\t<itunes:title></itunes:title>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesTitle_withEmptyString() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesTitle: ""
+        )
+        #expect(channel.itunesTitle == "")
     }
 
     @Test
-    func test_equatable_and_hashable() {
-        let a = Namespace.iTunes.Title(text: "Title")
-        let b = Namespace.iTunes.Title(text: "Title")
-        let c = Namespace.iTunes.Title(text: "Another")
+    func test_channel_itunesTitle_withSpecialCharacters() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesTitle: #"Swift & Friends "Live""#
+        )
+        #expect(channel.itunesTitle == #"Swift & Friends "Live""#)
+    }
 
-        #expect(a == b)
-        #expect(a != c)
+    // MARK: - Item
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
-        #expect(set.contains(c))
+    @Test
+    func test_item_itunesTitle_shouldStoreValue() {
+        let item = Item(itunesTitle: "This is my episode title")
+        #expect(item.itunesTitle == "This is my episode title")
+    }
+
+    @Test
+    func test_item_itunesTitle_defaultsToNil() {
+        let item = Item()
+        #expect(item.itunesTitle == nil)
+    }
+
+    @Test
+    func test_item_itunesTitle_withEmptyString() {
+        let item = Item(itunesTitle: "")
+        #expect(item.itunesTitle == "")
+    }
+
+    // MARK: - Equatable
+
+    @Test
+    func test_channel_equatable_sameTitle() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Title"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Title"
+        )
+        #expect(channelA == channelB)
+    }
+
+    @Test
+    func test_channel_equatable_differentTitle() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Title"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Another"
+        )
+        #expect(channelA != channelB)
+    }
+
+    @Test
+    func test_item_equatable_sameTitle() {
+        let itemA = Item(itunesTitle: "Title")
+        let itemB = Item(itunesTitle: "Title")
+        #expect(itemA == itemB)
+    }
+
+    @Test
+    func test_item_equatable_differentTitle() {
+        let itemA = Item(itunesTitle: "Title")
+        let itemB = Item(itunesTitle: "Another")
+        #expect(itemA != itemB)
+    }
+
+    // MARK: - Hashable
+
+    @Test
+    func test_channel_hashable() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Title"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Title"
+        )
+        let channelC = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesTitle: "Another"
+        )
+        let set: Set = [channelA, channelB, channelC]
+        #expect(set.count == 2)
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func test_channelSendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Channel.self)
+    }
+
+    @Test
+    func test_itemSendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Item.self)
     }
 }

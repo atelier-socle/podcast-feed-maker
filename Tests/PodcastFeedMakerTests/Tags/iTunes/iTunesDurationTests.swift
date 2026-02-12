@@ -4,36 +4,71 @@ import Testing
 
 struct iTunesDurationTests {
 
+    // MARK: - Item
+
     @Test
-    func test_xmlRepresentation_withTypicalDuration() throws {
-        let duration = Namespace.iTunes.Duration(duration: 3681)
-        let xml = try duration.xmlRepresentation()
-        #expect(xml == "\t<itunes:duration>3681</itunes:duration>")
+    func test_item_itunesDuration_withTypicalValue() {
+        let item = Item(itunesDuration: 3681)
+        #expect(item.itunesDuration == 3681)
     }
 
     @Test
-    func test_xmlRepresentation_withZeroDuration() throws {
-        let duration = Namespace.iTunes.Duration(duration: 0)
-        let xml = try duration.xmlRepresentation()
-        #expect(xml == "\t<itunes:duration>0</itunes:duration>")
+    func test_item_itunesDuration_withZero() {
+        let item = Item(itunesDuration: 0)
+        #expect(item.itunesDuration == 0)
     }
 
     @Test
-    func test_equatableAndHashable() {
-        let a = Namespace.iTunes.Duration(duration: 42)
-        let b = Namespace.iTunes.Duration(duration: 42)
-        let c = Namespace.iTunes.Duration(duration: 99)
+    func test_item_itunesDuration_withLargeValue() {
+        let item = Item(itunesDuration: 999_999)
+        #expect(item.itunesDuration == 999_999)
+    }
 
-        #expect(a == b)
-        #expect(a != c)
+    @Test
+    func test_item_itunesDuration_defaultsToNil() {
+        let item = Item()
+        #expect(item.itunesDuration == nil)
+    }
 
-        let set: Set = [a, b, c]
+    @Test
+    func test_item_itunesDuration_isInt() {
+        let item = Item(itunesDuration: 42)
+        let duration: Int? = item.itunesDuration
+        #expect(duration == 42)
+    }
+
+    // MARK: - Equatable
+
+    @Test
+    func test_item_equatable_sameDuration() {
+        let itemA = Item(itunesDuration: 42)
+        let itemB = Item(itunesDuration: 42)
+        #expect(itemA == itemB)
+    }
+
+    @Test
+    func test_item_equatable_differentDuration() {
+        let itemA = Item(itunesDuration: 42)
+        let itemB = Item(itunesDuration: 99)
+        #expect(itemA != itemB)
+    }
+
+    // MARK: - Hashable
+
+    @Test
+    func test_item_hashable() {
+        let itemA = Item(itunesDuration: 42)
+        let itemB = Item(itunesDuration: 42)
+        let itemC = Item(itunesDuration: 99)
+        let set: Set = [itemA, itemB, itemC]
         #expect(set.count == 2)
     }
+
+    // MARK: - Sendable
 
     @Test
     func test_sendableConformance() {
         func assertSendable<T: Sendable>(_: T.Type) {}
-        assertSendable(Namespace.iTunes.Duration.self)
+        assertSendable(Item.self)
     }
 }

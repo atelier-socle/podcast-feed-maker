@@ -1,39 +1,25 @@
-/// A protocol defining the ability to convert an object to an XML representation.
-///
-/// Types conforming to `XmlRepresentable` must implement the `xmlRepresentation()` method,
-/// which returns the XML content as a `String`.
-///
-/// This protocol is useful for generating XML feeds, such as podcast feeds.
-public protocol XmlRepresentable: Sendable {
-    /// Returns the XML representation of the conforming object.
-    ///
-    /// - Throws: An error if the XML generation fails.
-    /// - Returns: A `String` containing the XML representation.
-    func xmlRepresentation() throws -> String
-}
-
 /// A utility for creating podcast feeds in XML format.
 ///
-/// `PodcastFeedMaker` is a simple, lightweight wrapper around a `Feed`
-/// that conforms to the `XmlRepresentable` protocol. It generates a complete
+/// `PodcastFeedMaker` is a lightweight wrapper around a ``PodcastFeed``
+/// that conforms to the ``XmlRepresentable`` protocol. It generates a complete
 /// RSS feed suitable for Apple Podcasts, Spotify, and platforms that follow
 /// [RSS 2.0](https://validator.w3.org/feed/docs/rss2.html), [PSP-1](https://github.com/Podcast-Standards-Project/PSP-1-Podcast-RSS-Specification),
 /// and the [Podcast Namespace](https://github.com/Podcastindex-org/podcast-namespace).
 ///
-/// - Important: The `Feed` instance passed must be properly configured with required tags.
-/// - SeeAlso: `Feed`, `RSSTag.Channel`, `XmlRepresentable`
+/// - Important: The ``PodcastFeed`` instance passed must be properly configured with required tags.
+/// - SeeAlso: ``PodcastFeed``, ``Channel``, ``XmlRepresentable``
 public struct PodcastFeedMaker: Sendable {
 
-    /// The underlying `Feed` instance used to generate XML.
-    private let feed: Feed
+    /// The underlying ``PodcastFeed`` instance used to generate XML.
+    private let feed: PodcastFeed
 
     /// Initializes a new podcast feed maker.
     ///
-    /// - Parameter feed: A `Feed` instance representing the complete podcast structure.
+    /// - Parameter feed: A ``PodcastFeed`` instance representing the complete podcast structure.
     ///
     /// ### Example:
     /// ```swift
-    /// let feed = Feed(channel: myChannel)
+    /// let feed = PodcastFeed(channel: myChannel)
     /// let maker = PodcastFeedMaker(feed)
     /// do {
     ///     let xml = try maker.xmlRepresentation()
@@ -42,7 +28,7 @@ public struct PodcastFeedMaker: Sendable {
     ///     print("Failed to generate XML: \(error)")
     /// }
     /// ```
-    public init(_ feed: Feed) {
+    public init(_ feed: PodcastFeed) {
         self.feed = feed
     }
 }

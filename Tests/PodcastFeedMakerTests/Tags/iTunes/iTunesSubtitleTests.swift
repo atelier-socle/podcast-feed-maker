@@ -2,51 +2,132 @@ import Foundation
 @testable import PodcastFeedMaker
 import Testing
 
-struct SubtitleTests {
+struct iTunesSubtitleTests {
+
+    // MARK: - Channel
 
     @Test
-    func test_xmlRepresentation_shouldGenerateCorrectTag() throws {
-        let tag = Namespace.iTunes.Subtitle(text: "Welcome to the show")
-        let expected = "\t<itunes:subtitle>Welcome to the show</itunes:subtitle>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesSubtitle_shouldStoreValue() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesSubtitle: "Welcome to the show"
+        )
+        #expect(channel.itunesSubtitle == "Welcome to the show")
     }
 
     @Test
-    func test_xmlRepresentation_shouldEscapeSpecialCharacters() throws {
-        let tag = Namespace.iTunes.Subtitle(text: #"Latest updates & highlights © 2025"#)
-        let expected = "\t<itunes:subtitle>Latest updates &amp; highlights &#xA9; 2025</itunes:subtitle>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesSubtitle_defaultsToNil() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesSubtitle == nil)
     }
 
     @Test
-    func test_subtitle_acceptsEmptyString() throws {
-        let tag = Namespace.iTunes.Subtitle(text: "")
-        let expected = "\t<itunes:subtitle></itunes:subtitle>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+    func test_channel_itunesSubtitle_withEmptyString() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesSubtitle: ""
+        )
+        #expect(channel.itunesSubtitle == "")
     }
 
     @Test
-    func test_subtitle_acceptsExactly255Characters() throws {
+    func test_channel_itunesSubtitle_withSpecialCharacters() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesSubtitle: "Latest updates & highlights"
+        )
+        #expect(channel.itunesSubtitle == "Latest updates & highlights")
+    }
+
+    @Test
+    func test_channel_itunesSubtitle_with255Characters() {
         let text = String(repeating: "a", count: 255)
-        let tag = Namespace.iTunes.Subtitle(text: text)
-        let expected = "\t<itunes:subtitle>\(text)</itunes:subtitle>"
-        let result = try tag.xmlRepresentation()
-        #expect(result == expected)
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesSubtitle: text
+        )
+        #expect(channel.itunesSubtitle?.count == 255)
+    }
+
+    // MARK: - Equatable
+
+    @Test
+    func test_channel_equatable_sameSubtitle() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "A"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "A"
+        )
+        #expect(channelA == channelB)
     }
 
     @Test
-    func test_subtitle_conformsToProtocols() throws {
-        let tag1 = Namespace.iTunes.Subtitle(text: "A")
-        let tag2 = Namespace.iTunes.Subtitle(text: "A")
-        let tag3 = Namespace.iTunes.Subtitle(text: "B")
+    func test_channel_equatable_differentSubtitle() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "A"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "B"
+        )
+        #expect(channelA != channelB)
+    }
 
-        #expect(tag1 == tag2)
-        #expect(tag1 != tag3)
+    // MARK: - Hashable
 
-        let set: Set = [tag1, tag3]
-        #expect(set.contains(tag2))
+    @Test
+    func test_channel_hashable() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "A"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "B"
+        )
+        let channelC = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesSubtitle: "A"
+        )
+        let set: Set = [channelA, channelB, channelC]
+        #expect(set.count == 2)
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func test_sendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Channel.self)
     }
 }

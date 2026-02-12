@@ -4,52 +4,93 @@ import Testing
 
 struct PodcastChaptersTests {
 
+    // MARK: - Initialization
+
     @Test
-    func test_init_withChaptersType_setsCorrectType() {
+    func initWithDefaultType() {
         let url = URL(string: "https://example.com/chapters.json")!
-        let chapters = Namespace.Podcast.Chapters(url: url, type: .json)
+        let chapters = ChaptersLink(url: url)
+
+        #expect(chapters.url == url)
+        #expect(chapters.type == "application/json+chapters")
+    }
+
+    @Test
+    func initWithCustomType() {
+        let url = URL(string: "https://example.com/chapters.json")!
+        let chapters = ChaptersLink(url: url, type: "application/json")
 
         #expect(chapters.url == url)
         #expect(chapters.type == "application/json")
     }
 
+    // MARK: - Equatable & Hashable
+
     @Test
-    func test_xmlRepresentation_generatesExpectedXML() throws {
-        let url = URL(string: "https://example.com/chapters.json")!
-        let chapters = Namespace.Podcast.Chapters(url: url, type: .json)
+    func equatableConformance() {
+        let url1 = URL(string: "https://example.com/chapters1.json")!
+        let url2 = URL(string: "https://example.com/chapters2.json")!
+
+        let a = ChaptersLink(url: url1)
+        let b = ChaptersLink(url: url1)
+        let c = ChaptersLink(url: url2)
+
+        #expect(a == b)
+        #expect(a != c)
+    }
+
+    @Test
+    func hashableConformance() {
+        let url1 = URL(string: "https://example.com/chapters1.json")!
+        let url2 = URL(string: "https://example.com/chapters2.json")!
+
+        let a = ChaptersLink(url: url1)
+        let b = ChaptersLink(url: url1)
+        let c = ChaptersLink(url: url2)
+
+        let set: Set = [a, b, c]
+        #expect(set.count == 2)
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationContainsUrlAndType() throws {
+        let url = URL(string: "https://example.com/ep1/chapters.json")!
+        let chapters = ChaptersLink(url: url)
 
         let xml = try chapters.xmlRepresentation()
-        #expect(xml.contains(#"<podcast:chapters url="https://example.com/chapters.json" type="application/json">"#))
+
+        #expect(xml.contains("podcast:chapters"))
+        #expect(xml.contains(#"url="https://example.com/ep1/chapters.json""#))
+        #expect(xml.contains(#"type="application/json+chapters""#))
     }
 
     @Test
-    func test_xmlRepresentation_throwsIfURLInvalid() {
-        let url = URL(string: "file:///Users/local.json")!
-        let chapters = Namespace.Podcast.Chapters(url: url, type: .json)
+    func xmlRepresentationWithCustomType() throws {
+        let url = URL(string: "https://example.com/ep1/chapters.json")!
+        let chapters = ChaptersLink(url: url, type: "application/json")
 
-        #expect(throws: URL.URLValidatorError.self) {
-            try chapters.xmlRepresentation()
-        }
+        let xml = try chapters.xmlRepresentation()
+
+        #expect(xml.contains(#"type="application/json""#))
     }
 
     @Test
-    func test_xmlRepresentation_throwsIfTypeInvalid() {
+    func xmlRepresentationIsSelfClosingTag() throws {
         let url = URL(string: "https://example.com/chapters.json")!
-        let chapters = Namespace.Podcast.Chapters(url: url, type: "application/unknown")
+        let chapters = ChaptersLink(url: url)
 
-        #expect(throws: Namespace.Podcast.Chapters.ChaptersTypeError.self) {
-            try chapters.xmlRepresentation()
-        }
+        let xml = try chapters.xmlRepresentation()
+
+        #expect(xml.contains("/>"))
     }
 
-    @Test
-    func test_chaptersTypeRawValue_isCorrect() {
-        #expect(Namespace.Podcast.Chapters.ChaptersType.json.rawValue == "application/json")
-    }
+    // MARK: - Sendable
 
     @Test
-    func test_chaptersTypeErrorDescription() {
-        let error = Namespace.Podcast.Chapters.ChaptersTypeError.invalidType
-        #expect(error.localizedDescription == "Invalid chapters type")
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(ChaptersLink.self)
     }
 }

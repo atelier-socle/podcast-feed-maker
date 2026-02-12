@@ -4,42 +4,132 @@ import Testing
 
 struct iTunesAuthorTests {
 
+    // MARK: - Channel
+
     @Test
-    func test_init_shouldStoreAuthorName() {
-        let author = Namespace.iTunes.Author(name: "John Doe")
-        #expect(author.name == "John Doe")
+    func test_channel_itunesAuthor_shouldStoreValue() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesAuthor: "John Doe"
+        )
+        #expect(channel.itunesAuthor == "John Doe")
     }
 
     @Test
-    func test_xmlRepresentation_shouldEscapeSpecialCharacters() throws {
-        let author = Namespace.iTunes.Author(name: "John & Sons <Media>")
-        let xml = try author.xmlRepresentation()
-        #expect(xml == "\t<itunes:author>John &amp; Sons &lt;Media&gt;</itunes:author>")
+    func test_channel_itunesAuthor_defaultsToNil() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast"
+        )
+        #expect(channel.itunesAuthor == nil)
     }
 
     @Test
-    func test_authorEquatable() {
-        let a1 = Namespace.iTunes.Author(name: "Same")
-        let a2 = Namespace.iTunes.Author(name: "Same")
-        let a3 = Namespace.iTunes.Author(name: "Different")
-
-        #expect(a1 == a2)
-        #expect(a1 != a3)
+    func test_channel_itunesAuthor_withSpecialCharacters() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesAuthor: "John & Sons <Media>"
+        )
+        #expect(channel.itunesAuthor == "John & Sons <Media>")
     }
 
     @Test
-    func test_authorHashable() {
-        let set: Set = [
-            Namespace.iTunes.Author(name: "A"),
-            Namespace.iTunes.Author(name: "B"),
-            Namespace.iTunes.Author(name: "A")
-        ]
-        #expect(set.count == 2)
+    func test_channel_itunesAuthor_withEmptyString() {
+        let channel = Channel(
+            title: "My Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "A great podcast",
+            itunesAuthor: ""
+        )
+        #expect(channel.itunesAuthor == "")
+    }
+
+    // MARK: - Item
+
+    @Test
+    func test_item_itunesAuthor_shouldStoreValue() {
+        let item = Item(itunesAuthor: "Jane Smith")
+        #expect(item.itunesAuthor == "Jane Smith")
     }
 
     @Test
-    func test_authorSendableConformance() {
+    func test_item_itunesAuthor_defaultsToNil() {
+        let item = Item()
+        #expect(item.itunesAuthor == nil)
+    }
+
+    @Test
+    func test_item_itunesAuthor_withSpecialCharacters() {
+        let item = Item(itunesAuthor: "Bob & Alice <Podcast>")
+        #expect(item.itunesAuthor == "Bob & Alice <Podcast>")
+    }
+
+    // MARK: - Equatable
+
+    @Test
+    func test_channel_equatable_sameAuthor() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesAuthor: "Same Author"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesAuthor: "Same Author"
+        )
+        #expect(channelA == channelB)
+    }
+
+    @Test
+    func test_channel_equatable_differentAuthor() {
+        let channelA = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesAuthor: "Author A"
+        )
+        let channelB = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesAuthor: "Author B"
+        )
+        #expect(channelA != channelB)
+    }
+
+    @Test
+    func test_item_equatable_sameAuthor() {
+        let itemA = Item(itunesAuthor: "Same")
+        let itemB = Item(itunesAuthor: "Same")
+        #expect(itemA == itemB)
+    }
+
+    @Test
+    func test_item_equatable_differentAuthor() {
+        let itemA = Item(itunesAuthor: "A")
+        let itemB = Item(itunesAuthor: "B")
+        #expect(itemA != itemB)
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func test_channelSendableConformance() {
         func assertSendable<T: Sendable>(_: T.Type) {}
-        assertSendable(Namespace.iTunes.Author.self)
+        assertSendable(Channel.self)
+    }
+
+    @Test
+    func test_itemSendableConformance() {
+        func assertSendable<T: Sendable>(_: T.Type) {}
+        assertSendable(Item.self)
     }
 }

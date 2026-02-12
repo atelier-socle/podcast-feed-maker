@@ -4,42 +4,76 @@ import Testing
 
 struct PodcastTextFieldTests {
 
-    @Test
-    func test_init_setsPropertiesCorrectly() {
-        let tag = Namespace.Podcast.TextField("This is a test", verify: true)
+    // MARK: - Initialization
 
-        #expect(tag.text == "This is a test")
-        #expect(tag.verify == true)
+    @Test
+    func initWithValueAndPurpose() {
+        let txt = PodcastTxt(value: "S6lpp-7ZCn8-VZNOk", purpose: "verify")
+
+        #expect(txt.value == "S6lpp-7ZCn8-VZNOk")
+        #expect(txt.purpose == "verify")
     }
 
     @Test
-    func test_xmlRepresentation_withVerifyTrue() throws {
-        let tag = Namespace.Podcast.TextField("1234567890", verify: true)
-        let expected = "\t<podcast:txt purpose=\"verify\">1234567890</podcast:txt>"
-        let result = try tag.xmlRepresentation()
+    func initWithValueOnly() {
+        let txt = PodcastTxt(value: "Some generic text")
 
-        #expect(result == expected)
+        #expect(txt.value == "Some generic text")
+        #expect(txt.purpose == nil)
     }
 
-    @Test
-    func test_xmlRepresentation_withVerifyFalse() throws {
-        let tag = Namespace.Podcast.TextField("Some generic text", verify: false)
-        let expected = "\t<podcast:txt>Some generic text</podcast:txt>"
-        let result = try tag.xmlRepresentation()
-
-        #expect(result == expected)
-    }
+    // MARK: - Equatable & Hashable
 
     @Test
-    func test_equatableAndHashable() {
-        let a = Namespace.Podcast.TextField("abc", verify: true)
-        let b = Namespace.Podcast.TextField("abc", verify: true)
-        let c = Namespace.Podcast.TextField("xyz", verify: false)
+    func equatableConformance() {
+        let a = PodcastTxt(value: "abc", purpose: "verify")
+        let b = PodcastTxt(value: "abc", purpose: "verify")
+        let c = PodcastTxt(value: "xyz")
 
         #expect(a == b)
         #expect(a != c)
+    }
 
-        let set: Set = [a, c]
-        #expect(set.contains(b))
+    @Test
+    func hashableConformance() {
+        let a = PodcastTxt(value: "abc", purpose: "verify")
+        let b = PodcastTxt(value: "abc", purpose: "verify")
+        let c = PodcastTxt(value: "xyz")
+
+        let set: Set = [a, b, c]
+        #expect(set.count == 2)
+        #expect(set.contains(a))
+    }
+
+    // MARK: - XML Representation
+
+    @Test
+    func xmlRepresentationWithPurpose() throws {
+        let txt = PodcastTxt(value: "1234567890", purpose: "verify")
+
+        let xml = try txt.xmlRepresentation()
+
+        #expect(xml.contains("podcast:txt"))
+        #expect(xml.contains(#"purpose="verify""#))
+        #expect(xml.contains(">1234567890</podcast:txt>"))
+    }
+
+    @Test
+    func xmlRepresentationWithoutPurpose() throws {
+        let txt = PodcastTxt(value: "Some generic text")
+
+        let xml = try txt.xmlRepresentation()
+
+        #expect(xml.contains("podcast:txt"))
+        #expect(xml.contains(">Some generic text</podcast:txt>"))
+        #expect(!xml.contains("purpose="))
+    }
+
+    // MARK: - Sendable
+
+    @Test
+    func sendableConformance() {
+        func requiresSendable<T: Sendable>(_: T.Type) {}
+        requiresSendable(PodcastTxt.self)
     }
 }
