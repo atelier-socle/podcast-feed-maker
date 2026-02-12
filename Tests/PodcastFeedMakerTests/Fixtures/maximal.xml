@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:podcast="https://podcastindex.org/namespace/1.0"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:psc="http://podlove.org/simple-chapters">
+  <channel>
+    <title>Maximal Podcast</title>
+    <link>https://example.com</link>
+    <description>A feed exercising every single tag</description>
+    <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://example.com/next" rel="next" />
+    <language>en-us</language>
+    <copyright>Copyright 2025 Example Inc.</copyright>
+    <managingEditor>editor@example.com</managingEditor>
+    <webMaster>webmaster@example.com</webMaster>
+    <pubDate>Thu, 12 Feb 2026 14:30:00 +0000</pubDate>
+    <lastBuildDate>Wed, 11 Feb 2026 12:00:00 +0000</lastBuildDate>
+    <category domain="tech">Technology</category>
+    <category>Education</category>
+    <generator>PodcastFeedMaker</generator>
+    <docs>https://www.rssboard.org/rss-specification</docs>
+    <cloud domain="rpc.example.com" port="80" path="/rpc" registerProcedure="notify" protocol="xml-rpc" />
+    <ttl>60</ttl>
+    <image>
+      <url>https://example.com/logo.png</url>
+      <title>Maximal Podcast</title>
+      <link>https://example.com</link>
+      <width>144</width>
+      <height>400</height>
+      <description>Show logo</description>
+    </image>
+    <textInput>
+      <title>Search</title>
+      <description>Search episodes</description>
+      <name>q</name>
+      <link>https://example.com/search</link>
+    </textInput>
+    <skipHours>
+      <hour>0</hour>
+      <hour>6</hour>
+      <hour>12</hour>
+    </skipHours>
+    <skipDays>
+      <day>Saturday</day>
+      <day>Sunday</day>
+    </skipDays>
+    <itunes:author>John Doe</itunes:author>
+    <itunes:block>yes</itunes:block>
+    <itunes:category text="Technology">
+      <itunes:category text="Tech News" />
+    </itunes:category>
+    <itunes:category text="Education" />
+    <itunes:complete>yes</itunes:complete>
+    <itunes:explicit>true</itunes:explicit>
+    <itunes:image href="https://example.com/itunes-art.jpg" />
+    <itunes:keywords>swift,development,podcast</itunes:keywords>
+    <itunes:new-feed-url>https://example.com/new-feed.xml</itunes:new-feed-url>
+    <itunes:owner>
+      <itunes:name>Jane Doe</itunes:name>
+      <itunes:email>jane@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:subtitle>A short subtitle</itunes:subtitle>
+    <itunes:summary>A longer summary of the show</itunes:summary>
+    <itunes:title>Title Override</itunes:title>
+    <itunes:type>serial</itunes:type>
+    <itunes:applepodcastsverify>true</itunes:applepodcastsverify>
+    <dc:creator>John Doe</dc:creator>
+    <dc:contributor>Jane Doe</dc:contributor>
+    <dc:date>2025-01-01</dc:date>
+    <dc:description>DC description</dc:description>
+    <dc:format>audio/mpeg</dc:format>
+    <dc:identifier>urn:uuid:12345</dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:publisher>Example Publisher</dc:publisher>
+    <dc:relation>https://related.example.com</dc:relation>
+    <dc:rights>All rights reserved</dc:rights>
+    <dc:source>https://source.example.com</dc:source>
+    <dc:subject>Technology</dc:subject>
+    <dc:title>DC Title</dc:title>
+    <dc:type>Sound</dc:type>
+    <dc:coverage>Worldwide</dc:coverage>
+    <podcast:guid>abcdef01-2345-6789-abcd-ef0123456789</podcast:guid>
+    <podcast:locked owner="jane@example.com">yes</podcast:locked>
+    <podcast:medium>podcast</podcast:medium>
+    <podcast:funding url="https://example.com/donate">Support the show</podcast:funding>
+    <podcast:person role="host" group="cast" img="https://example.com/john.jpg" href="https://example.com/john">John Doe</podcast:person>
+    <podcast:person role="editor">Jane Doe</podcast:person>
+    <podcast:location geo="geo:37.7749,-122.4194" osm="R1234567">San Francisco</podcast:location>
+    <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
+    <podcast:value type="lightning" method="keysend" suggested="100">
+      <podcast:valueRecipient name="Host" type="node" address="abc123" split="90" fee="false" />
+      <podcast:valueRecipient name="Producer" type="node" address="def456" customKey="ck1" customValue="cv1" split="10" />
+      <podcast:valueTimeSplit startTime="60.0" duration="120.0" remotePercentage="50">
+        <podcast:valueRecipient name="Guest" type="node" address="ghi789" split="100" />
+        <podcast:remoteItem feedGuid="remote-guid-123" feedUrl="https://remote.example.com/feed.xml" itemGuid="remote-item-1" medium="podcast" />
+      </podcast:valueTimeSplit>
+    </podcast:value>
+    <podcast:block id="spotify">yes</podcast:block>
+    <podcast:block>no</podcast:block>
+    <podcast:txt purpose="verify">verification-code-123</podcast:txt>
+    <podcast:txt>general-txt-value</podcast:txt>
+    <podcast:podroll>
+      <podcast:remoteItem feedGuid="podroll-guid-1" feedUrl="https://friend.example.com/feed.xml" />
+      <podcast:remoteItem feedGuid="podroll-guid-2" itemGuid="item-42" medium="music" />
+    </podcast:podroll>
+    <podcast:updateFrequency rrule="FREQ=WEEKLY;BYDAY=MO" dtstart="2025-01-06" complete="false">Weekly on Mondays</podcast:updateFrequency>
+    <podcast:podping>true</podcast:podping>
+    <podcast:publisher guid="pub-guid-1" url="https://publisher.example.com">Example Publisher</podcast:publisher>
+    <podcast:chat server="irc.example.com" protocol="irc" accountId="#podcast" space="main" embedUrl="https://chat.example.com/embed" />
+    <podcast:trailer url="https://example.com/trailer.mp3" pubdate="Mon, 01 Jan 2025 00:00:00 +0000" length="5000000" type="audio/mpeg" season="1">Season 1 Trailer</podcast:trailer>
+    <podcast:liveItem status="live" start="2026-02-12T20:00:00Z" end="2026-02-12T22:00:00Z">
+      <title>Live Episode</title>
+      <description>Broadcasting live!</description>
+      <enclosure url="https://example.com/live.mp3" length="0" type="audio/mpeg" />
+      <guid isPermaLink="false">live-guid-1</guid>
+      <itunes:image href="https://example.com/live-art.jpg" />
+      <podcast:contentLink href="https://example.com/live-chat">Live Chat</podcast:contentLink>
+      <podcast:contentLink href="https://example.com/live-video">Live Video</podcast:contentLink>
+      <podcast:person role="host">John Doe</podcast:person>
+      <podcast:alternateEnclosure type="audio/opus" length="1000000" bitrate="128" height="0" lang="en" title="Opus Stream" default="true">
+        <podcast:source uri="https://example.com/live.opus" contentType="audio/opus" />
+        <podcast:integrity type="sri-hash" value="sha256-abc123" />
+      </podcast:alternateEnclosure>
+      <podcast:value type="lightning" method="keysend">
+        <podcast:valueRecipient name="Live Host" type="node" address="live-addr" split="100" />
+      </podcast:value>
+      <podcast:socialInteract uri="https://social.example.com/live" protocol="activitypub" accountId="@podcast" accountUrl="https://social.example.com/@podcast" priority="1" />
+    </podcast:liveItem>
+    <item>
+      <title>Episode 1: Getting Started</title>
+      <link>https://example.com/ep1</link>
+      <description>First episode of the show</description>
+      <author>john@example.com</author>
+      <category domain="episodes">Season 1</category>
+      <comments>https://example.com/ep1/comments</comments>
+      <enclosure url="https://example.com/ep1.mp3" length="50000000" type="audio/mpeg" />
+      <guid isPermaLink="true">https://example.com/ep1</guid>
+      <pubDate>Mon, 10 Feb 2025 10:00:00 +0000</pubDate>
+      <source url="https://source.example.com/feed.xml">Original Feed</source>
+      <itunes:author>John Doe</itunes:author>
+      <itunes:block>no</itunes:block>
+      <itunes:duration>3661</itunes:duration>
+      <itunes:episode>1</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/ep1-art.jpg" />
+      <itunes:keywords>intro,welcome</itunes:keywords>
+      <itunes:season>1</itunes:season>
+      <itunes:subtitle>Welcome to the show</itunes:subtitle>
+      <itunes:summary>A detailed summary of episode 1</itunes:summary>
+      <itunes:title>Ep 1 Title Override</itunes:title>
+      <atom:link href="https://example.com/ep1.json" rel="alternate" type="application/json" />
+      <dc:creator>John Doe</dc:creator>
+      <dc:rights>CC BY 4.0</dc:rights>
+      <podcast:transcript url="https://example.com/ep1.vtt" type="text/vtt" language="en" rel="captions" />
+      <podcast:transcript url="https://example.com/ep1.srt" type="application/srt" />
+      <podcast:chapters url="https://example.com/ep1-chapters.json" type="application/json+chapters" />
+      <podcast:soundbite startTime="30.5" duration="45.0">Best Moment</podcast:soundbite>
+      <podcast:soundbite startTime="120.0" duration="15.0" />
+      <podcast:person role="guest" group="cast" img="https://example.com/guest.jpg" href="https://example.com/guest">Guest Speaker</podcast:person>
+      <podcast:location geo="geo:48.8566,2.3522" osm="R123">Paris</podcast:location>
+      <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
+      <podcast:alternateEnclosure type="audio/opus" length="30000000" bitrate="96" title="Opus Version" default="true">
+        <podcast:source uri="https://example.com/ep1.opus" contentType="audio/opus" />
+        <podcast:source uri="https://cdn.example.com/ep1.opus" />
+        <podcast:integrity type="sri-hash" value="sha256-xyz789" />
+      </podcast:alternateEnclosure>
+      <podcast:value type="lightning" method="keysend">
+        <podcast:valueRecipient name="Podcaster" type="node" address="addr1" split="80" fee="true" />
+        <podcast:valueRecipient type="node" address="addr2" split="20" />
+      </podcast:value>
+      <podcast:socialInteract uri="https://social.example.com/ep1" protocol="activitypub" accountId="@podcast" />
+      <podcast:txt purpose="verify">item-verify-123</podcast:txt>
+      <podcast:season name="Season One">1</podcast:season>
+      <podcast:episode display="1A">1.5</podcast:episode>
+      <psc:chapters version="1.2">
+        <psc:chapter start="00:00:00.000" title="Intro" href="https://example.com/ch1" image="https://example.com/ch1.jpg" />
+        <psc:chapter start="00:05:30.000" title="Main Topic" />
+        <psc:chapter start="00:45:00.000" title="Outro" />
+      </psc:chapters>
+      <content:encoded><![CDATA[<p>Rich <strong>HTML</strong> content for episode 1.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Episode 2: Deep Dive</title>
+      <enclosure url="https://example.com/ep2.mp3" length="60000000" type="audio/mpeg" />
+      <guid isPermaLink="false">ep2-guid-unique</guid>
+      <pubDate>Mon, 17 Feb 2025 10:00:00 +0000</pubDate>
+      <itunes:duration>1:15:00</itunes:duration>
+      <itunes:episode>2</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>true</itunes:explicit>
+      <itunes:season>1</itunes:season>
+    </item>
+  </channel>
+</rss>

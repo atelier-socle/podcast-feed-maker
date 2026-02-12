@@ -26,7 +26,8 @@ let package = Package(
             name: "PodcastFeedMaker"),
         .testTarget(
             name: "PodcastFeedMakerTests",
-            dependencies: ["PodcastFeedMaker"]
+            dependencies: ["PodcastFeedMaker"],
+            resources: [.copy("Fixtures")]
         )
     ]
 )
