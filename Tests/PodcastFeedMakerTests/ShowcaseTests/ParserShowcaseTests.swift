@@ -394,7 +394,7 @@ struct ParserShowcase { // swiftlint:disable:this type_body_length
         let channel = try #require(result.feed.channel)
         #expect(channel.title == "Minimal Podcast")
         // Warnings array exists (may be empty for well-formed feeds)
-        #expect(result.warnings is [ParserError])
+        #expect(result.warnings.count >= 0)
     }
 
     @Test("FeedParser — parseWithDiagnostics from Data")
@@ -892,7 +892,7 @@ struct MalformedParsingShowcase {
         #expect(channel.items[0].itunesDuration == 1800)
 
         // Warnings array is accessible
-        #expect(result.warnings is [ParserError])
+        #expect(result.warnings.count >= 0)
     }
 
     @Test("FeedParser — throws for completely invalid XML")
