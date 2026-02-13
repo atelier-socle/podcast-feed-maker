@@ -60,11 +60,11 @@ struct RSS20ItemShowcase {
     }
 
     @Test("Item initializes with all RSS 2.0 core properties")
-    func itemAllRSSProperties() throws {
-        let linkURL = try #require(URL(string: "https://swifttalk.dev/episodes/1"))
-        let commentsURL = try #require(URL(string: "https://swifttalk.dev/episodes/1/comments"))
-        let enclosureURL = try #require(URL(string: "https://cdn.swifttalk.dev/episode1.mp3"))
-        let sourceURL = try #require(URL(string: "https://otherpodcast.com/feed.xml"))
+    func itemAllRSSProperties() {
+        let linkURL = makeURL("https://swifttalk.dev/episodes/1")
+        let commentsURL = makeURL("https://swifttalk.dev/episodes/1/comments")
+        let enclosureURL = makeURL("https://cdn.swifttalk.dev/episode1.mp3")
+        let sourceURL = makeURL("https://otherpodcast.com/feed.xml")
         let pubDate = Date(timeIntervalSince1970: 1_700_000_000)
 
         let item = Item(
@@ -132,8 +132,8 @@ struct RSS20ItemShowcase {
     // MARK: - Enclosure
 
     @Test("Enclosure initializes with string type")
-    func enclosureStringInit() throws {
-        let url = try #require(URL(string: "https://cdn.example.com/episode.mp3"))
+    func enclosureStringInit() {
+        let url = makeURL("https://cdn.example.com/episode.mp3")
         let enclosure = Enclosure(url: url, length: 24_576_000, type: "audio/mpeg")
 
         #expect(enclosure.url == url)
@@ -142,8 +142,8 @@ struct RSS20ItemShowcase {
     }
 
     @Test("Enclosure initializes with MIMEType enum")
-    func enclosureMIMETypeInit() throws {
-        let url = try #require(URL(string: "https://cdn.example.com/episode.opus"))
+    func enclosureMIMETypeInit() {
+        let url = makeURL("https://cdn.example.com/episode.opus")
         let enclosure = Enclosure(url: url, length: 12_000_000, mimeType: .opus)
 
         #expect(enclosure.type == "audio/opus")
@@ -203,9 +203,9 @@ struct RSS20ItemShowcase {
     // MARK: - RSSImage
 
     @Test("RSSImage initializes with all properties")
-    func rssImageAllProperties() throws {
-        let imageURL = try #require(URL(string: "https://example.com/podcast-logo.png"))
-        let siteURL = try #require(URL(string: "https://example.com"))
+    func rssImageAllProperties() {
+        let imageURL = makeURL("https://example.com/podcast-logo.png")
+        let siteURL = makeURL("https://example.com")
 
         let image = RSSImage(
             url: imageURL,
@@ -225,9 +225,9 @@ struct RSS20ItemShowcase {
     }
 
     @Test("RSSImage initializes with required properties only")
-    func rssImageRequiredOnly() throws {
-        let url = try #require(URL(string: "https://example.com/logo.jpg"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageRequiredOnly() {
+        let url = makeURL("https://example.com/logo.jpg")
+        let link = makeURL("https://example.com")
         let image = RSSImage(url: url, title: "Logo", link: link)
 
         #expect(image.width == nil)
@@ -269,8 +269,8 @@ struct RSS20ItemShowcase {
     // MARK: - RSSTextInput
 
     @Test("RSSTextInput initializes with all properties")
-    func rssTextInputAllProperties() throws {
-        let url = try #require(URL(string: "https://example.com/search"))
+    func rssTextInputAllProperties() {
+        let url = makeURL("https://example.com/search")
         let textInput = RSSTextInput(
             title: "Search",
             description: "Search our episodes",
@@ -321,8 +321,8 @@ struct RSS20ItemShowcase {
     // MARK: - RSSSource
 
     @Test("RSSSource identifies the originating feed")
-    func rssSourceAllProperties() throws {
-        let url = try #require(URL(string: "https://otherpodcast.com/feed.xml"))
+    func rssSourceAllProperties() {
+        let url = makeURL("https://otherpodcast.com/feed.xml")
         let source = RSSSource(title: "The Other Podcast", url: url)
 
         #expect(source.title == "The Other Podcast")

@@ -275,10 +275,10 @@ struct ITunesCategorySubcategoryValidationTests {
     // MARK: - Channel Integration
 
     @Test
-    func test_channel_itunesCategories_storesCategories() throws {
+    func test_channel_itunesCategories_storesCategories() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesCategories: [
                 .arts(.books),
@@ -293,10 +293,10 @@ struct ITunesCategorySubcategoryValidationTests {
     }
 
     @Test
-    func test_channel_itunesCategories_defaultsToEmpty() throws {
+    func test_channel_itunesCategories_defaultsToEmpty() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesCategories.isEmpty)

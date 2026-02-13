@@ -8,11 +8,11 @@ struct ITunesNewFeedUrlTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesNewFeedUrl_shouldStoreURL() throws {
-        let url = try #require(URL(string: "https://example.com/feed.xml"))
+    func test_channel_itunesNewFeedUrl_shouldStoreURL() {
+        let url = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesNewFeedUrl: url
         )
@@ -20,21 +20,21 @@ struct ITunesNewFeedUrlTests {
     }
 
     @Test
-    func test_channel_itunesNewFeedUrl_defaultsToNil() throws {
+    func test_channel_itunesNewFeedUrl_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesNewFeedUrl == nil)
     }
 
     @Test
-    func test_channel_itunesNewFeedUrl_absoluteString() throws {
-        let url = try #require(URL(string: "https://newhost.example.com/podcast/feed.xml"))
+    func test_channel_itunesNewFeedUrl_absoluteString() {
+        let url = makeURL("https://newhost.example.com/podcast/feed.xml")
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesNewFeedUrl: url
         )
@@ -44,9 +44,9 @@ struct ITunesNewFeedUrlTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameNewFeedUrl() throws {
-        let url = try #require(URL(string: "https://example.com/feed.xml"))
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameNewFeedUrl() {
+        let url = makeURL("https://example.com/feed.xml")
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -63,19 +63,19 @@ struct ITunesNewFeedUrlTests {
     }
 
     @Test
-    func test_channel_equatable_differentNewFeedUrl() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentNewFeedUrl() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
             description: "Desc",
-            itunesNewFeedUrl: try #require(URL(string: "https://a.com/feed.xml"))
+            itunesNewFeedUrl: makeURL("https://a.com/feed.xml")
         )
         let channelB = Channel(
             title: "Podcast",
             link: link,
             description: "Desc",
-            itunesNewFeedUrl: try #require(URL(string: "https://b.com/feed.xml"))
+            itunesNewFeedUrl: makeURL("https://b.com/feed.xml")
         )
         #expect(channelA != channelB)
     }
@@ -83,10 +83,10 @@ struct ITunesNewFeedUrlTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() throws {
-        let urlA = try #require(URL(string: "https://a.com/feed.xml"))
-        let urlB = try #require(URL(string: "https://b.com/feed.xml"))
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_hashable() {
+        let urlA = makeURL("https://a.com/feed.xml")
+        let urlB = makeURL("https://b.com/feed.xml")
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

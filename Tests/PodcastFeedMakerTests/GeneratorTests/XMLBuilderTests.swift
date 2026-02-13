@@ -236,29 +236,29 @@ struct XMLBuilderBoolTests {
 struct XMLBuilderURLTests {
 
     @Test("encodeURL encodes special characters")
-    func encodeURLBasic() throws {
-        let url = try #require(URL(string: "https://swift.org/search?query=école+swift&lang=fr"))
+    func encodeURLBasic() {
+        let url = makeURL("https://swift.org/search?query=école+swift&lang=fr")
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
     }
 
     @Test("encodeURL returns string or fallback")
-    func encodeURLFallback() throws {
-        let url = try #require(URL(string: "https://example.com/query?param=ç©🎉"))
+    func encodeURLFallback() {
+        let url = makeURL("https://example.com/query?param=ç©🎉")
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.starts(with: "https://example.com"))
     }
 
     @Test("validateURL accepts valid HTTPS")
     func validateURLValid() throws {
-        let url = try #require(URL(string: "https://swift.org"))
+        let url = makeURL("https://swift.org")
         try XMLBuilder.validateURL(url, context: "test")
     }
 
     @Test("validateURL rejects file URL")
     func validateURLFile() throws {
-        let url = try #require(URL(string: "file://path"))
+        let url = makeURL("file://path")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(url, context: "test")
         }
@@ -266,7 +266,7 @@ struct XMLBuilderURLTests {
 
     @Test("validateURL rejects invalid scheme")
     func validateURLScheme() throws {
-        let url = try #require(URL(string: "ftp://example.com"))
+        let url = makeURL("ftp://example.com")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(url, context: "test")
         }
@@ -274,7 +274,7 @@ struct XMLBuilderURLTests {
 
     @Test("validateURL throws for URL without host")
     func validateURLNoHost() throws {
-        let url = try #require(URL(string: "https:///path"))
+        let url = makeURL("https:///path")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(url, context: "test")
         }

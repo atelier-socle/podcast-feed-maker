@@ -8,10 +8,10 @@ struct ITunesKeywordsTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesKeywords_shouldStoreValues() throws {
+    func test_channel_itunesKeywords_shouldStoreValues() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesKeywords: ["News", "Technology", "Innovation"]
         )
@@ -19,20 +19,20 @@ struct ITunesKeywordsTests {
     }
 
     @Test
-    func test_channel_itunesKeywords_defaultsToEmpty() throws {
+    func test_channel_itunesKeywords_defaultsToEmpty() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesKeywords.isEmpty)
     }
 
     @Test
-    func test_channel_itunesKeywords_withEmptyArray() throws {
+    func test_channel_itunesKeywords_withEmptyArray() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesKeywords: []
         )
@@ -40,10 +40,10 @@ struct ITunesKeywordsTests {
     }
 
     @Test
-    func test_channel_itunesKeywords_withSingleKeyword() throws {
+    func test_channel_itunesKeywords_withSingleKeyword() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesKeywords: ["Swift"]
         )
@@ -75,8 +75,8 @@ struct ITunesKeywordsTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameKeywords() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameKeywords() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -93,8 +93,8 @@ struct ITunesKeywordsTests {
     }
 
     @Test
-    func test_channel_equatable_differentKeywords() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentKeywords() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

@@ -9,17 +9,17 @@ import Testing
 struct ItunesNewFeedUrlComplianceTests {
 
     @Test("Builder sets new feed URL")
-    func builderNewFeedUrl() throws {
+    func builderNewFeedUrl() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         ).newFeedUrl("https://example.com/new-feed.xml")
         #expect(channel.itunesNewFeedUrl?.absoluteString == "https://example.com/new-feed.xml")
     }
 
     @Test("CrossCutting warns when new-feed-url is not HTTPS")
-    func crossCuttingHttpWarning() throws {
+    func crossCuttingHttpWarning() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             itunesNewFeedUrl: URL(string: "http://example.com/feed.xml")
         )
         let feed = PodcastFeed(channel: channel)
@@ -31,9 +31,9 @@ struct ItunesNewFeedUrlComplianceTests {
     }
 
     @Test("CrossCutting no warning for HTTPS new-feed-url")
-    func crossCuttingHttpsOk() throws {
+    func crossCuttingHttpsOk() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             itunesNewFeedUrl: URL(string: "https://example.com/feed.xml")
         )
         let feed = PodcastFeed(channel: channel)
@@ -45,9 +45,9 @@ struct ItunesNewFeedUrlComplianceTests {
     }
 
     @Test("Apple validation shows INFO when new-feed-url present")
-    func appleInfoWhenPresent() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+    func appleInfoWhenPresent() {
+        let linkURL = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let channel = Channel(
             title: "T", link: linkURL, description: "D",
             items: [
@@ -73,7 +73,7 @@ struct ItunesNewFeedUrlComplianceTests {
     @Test("itunes:new-feed-url round-trips")
     func newFeedUrlRoundTrip() throws {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             itunesNewFeedUrl: URL(string: "https://example.com/new-feed.xml")
         )
         let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
@@ -90,17 +90,17 @@ struct ItunesNewFeedUrlComplianceTests {
 struct ItunesCompleteComplianceTests {
 
     @Test("Builder sets complete flag")
-    func builderComplete() throws {
+    func builderComplete() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         ).complete(true)
         #expect(channel.itunesComplete == true)
     }
 
     @Test("CrossCutting emits INFO when complete is true")
-    func crossCuttingInfo() throws {
+    func crossCuttingInfo() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             itunesComplete: true
         )
         let feed = PodcastFeed(channel: channel)
@@ -112,9 +112,9 @@ struct ItunesCompleteComplianceTests {
     }
 
     @Test("CrossCutting no INFO when complete is nil")
-    func crossCuttingNoInfoWhenNil() throws {
+    func crossCuttingNoInfoWhenNil() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         let feed = PodcastFeed(channel: channel)
         let results = CrossCuttingValidation.validate(feed)
@@ -127,7 +127,7 @@ struct ItunesCompleteComplianceTests {
     @Test("itunes:complete round-trips")
     func completeRoundTrip() throws {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             itunesComplete: true
         )
         let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
@@ -153,7 +153,7 @@ struct RSSCategoryDomainComplianceTests {
     @Test("Generator emits domain attribute")
     func generatorDomain() throws {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             categories: [RSSCategory(value: "Technology", domain: "tech")]
         )
         let feed = PodcastFeed(channel: channel)
@@ -207,7 +207,7 @@ struct RSSCategoryDomainComplianceTests {
     @Test("RSS category domain round-trips")
     func domainRoundTrip() throws {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             categories: [
                 RSSCategory(value: "Technology", domain: "tech"),
                 RSSCategory(value: "Education")

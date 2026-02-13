@@ -284,7 +284,7 @@ struct RoundTripShowcase {
     func roundTripCore() throws {
         let channel = Channel(
             title: "Round-Trip Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Testing round-trip.",
             language: "fr-FR",
             copyright: "2026 Test Corp",
@@ -309,7 +309,7 @@ struct RoundTripShowcase {
         let item = Item(
             title: "RT Episode",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://cdn.example.com/rt.mp3")),
+                url: makeURL("https://cdn.example.com/rt.mp3"),
                 length: 20_000_000,
                 type: "audio/mpeg"
             ),
@@ -323,7 +323,7 @@ struct RoundTripShowcase {
         )
         let channel = Channel(
             title: "RT Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "iTunes round-trip.",
             items: [item],
             itunesAuthor: "Show Author",
@@ -358,7 +358,7 @@ struct RoundTripShowcase {
             title: "Podcast NS Episode",
             transcripts: [
                 Transcript(
-                    url: try #require(URL(string: "https://example.com/ep.vtt")),
+                    url: makeURL("https://example.com/ep.vtt"),
                     type: "text/vtt",
                     language: "en"
                 )
@@ -372,13 +372,13 @@ struct RoundTripShowcase {
         )
         let channel = Channel(
             title: "NS Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Podcast NS round-trip.",
             items: [item],
             podcastGuid: PodcastGuid(value: "abcdef-12345"),
             locked: Locked(isLocked: false, owner: "admin@test.com"),
             funding: [
-                Funding(url: try #require(URL(string: "https://donate.example.com")), message: "Donate")
+                Funding(url: makeURL("https://donate.example.com"), message: "Donate")
             ]
         )
         let original = PodcastFeed(version: "2.0", namespaces: [.podcast], channel: channel)
@@ -411,7 +411,7 @@ struct RoundTripShowcase {
         )
         let channel = Channel(
             title: "Content Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Content round-trip.",
             items: [item]
         )
@@ -442,7 +442,7 @@ struct RoundTripShowcase {
         )
         let channel = Channel(
             title: "Chapters Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Podlove round-trip.",
             items: [item]
         )
@@ -474,7 +474,7 @@ struct RoundTripShowcase {
         }
         let channel = Channel(
             title: "Streaming RT",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Streaming round-trip.",
             items: items
         )
@@ -503,7 +503,7 @@ struct RoundTripShowcase {
                 title: "First",
                 description: "Episode one.",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://cdn.example.com/1.mp3")),
+                    url: makeURL("https://cdn.example.com/1.mp3"),
                     length: 10_000_000,
                     type: "audio/mpeg"
                 ),
@@ -515,7 +515,7 @@ struct RoundTripShowcase {
                 title: "Second",
                 description: "Episode two.",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://cdn.example.com/2.mp3")),
+                    url: makeURL("https://cdn.example.com/2.mp3"),
                     length: 15_000_000,
                     type: "audio/mpeg"
                 ),
@@ -527,7 +527,7 @@ struct RoundTripShowcase {
                 title: "Third",
                 description: "Episode three.",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://cdn.example.com/3.mp3")),
+                    url: makeURL("https://cdn.example.com/3.mp3"),
                     length: 20_000_000,
                     type: "audio/mpeg"
                 ),
@@ -538,7 +538,7 @@ struct RoundTripShowcase {
         ]
         let channel = Channel(
             title: "Multi Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Multiple episodes.",
             items: items,
             itunesAuthor: "Multi Author"

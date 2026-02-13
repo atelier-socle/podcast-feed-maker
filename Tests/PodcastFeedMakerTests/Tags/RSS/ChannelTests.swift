@@ -33,7 +33,7 @@ struct ChannelRSSCoreTests {
         let channel = try makeMinimalChannel()
 
         #expect(channel.title == "My Podcast")
-        let expectedLink = try #require(URL(string: "https://podcast.example.com"))
+        let expectedLink = makeURL("https://podcast.example.com")
         #expect(channel.link == expectedLink)
         #expect(channel.description == "A podcast about Swift")
     }
@@ -77,9 +77,9 @@ struct ChannelRSSCoreTests {
     // MARK: - Initialization with Optional Fields
 
     @Test("Channel can be initialized with optional RSS fields")
-    func channelInitWithOptionalFields() throws {
+    func channelInitWithOptionalFields() {
         let date = Date(timeIntervalSince1970: 1_000_000)
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -103,10 +103,10 @@ struct ChannelRSSCoreTests {
     }
 
     @Test("Channel can be initialized with items")
-    func channelInitWithItems() throws {
+    func channelInitWithItems() {
         let item1 = Item(title: "Episode 1")
         let item2 = Item(title: "Episode 2")
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -160,7 +160,7 @@ struct ChannelRSSCoreTests {
 
     @Test("Channel XML contains optional RSS tags when set")
     func channelXmlContainsOptionalTags() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -180,7 +180,7 @@ struct ChannelRSSCoreTests {
 
     @Test("Channel XML includes item elements")
     func channelXmlIncludesItems() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -247,8 +247,8 @@ struct ChannelRSSCoreTests {
     }
 
     @Test("Channels with different optional fields are not equal")
-    func channelsWithDifferentOptionalFieldsAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentOptionalFieldsAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", language: "en")
         let channel2 = Channel(title: "T", link: url, description: "D", language: "fr")
         #expect(channel1 != channel2)

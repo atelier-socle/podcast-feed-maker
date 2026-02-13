@@ -53,8 +53,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     // MARK: - RemoteItem
 
     @Test("RemoteItem with all properties")
-    func remoteItemFull() throws {
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func remoteItemFull() {
+        let feedURL = makeURL("https://example.com/feed.xml")
 
         let remote = RemoteItem(
             feedGuid: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1",
@@ -82,9 +82,9 @@ struct PodcastNS20Phase4ExtendedShowcase {
     // MARK: - Podroll
 
     @Test("Podroll contains multiple recommended podcasts")
-    func podrollMultipleRecommendations() throws {
-        let url1 = try #require(URL(string: "https://podcast1.example.com/feed.xml"))
-        let url2 = try #require(URL(string: "https://podcast2.example.com/feed.xml"))
+    func podrollMultipleRecommendations() {
+        let url1 = makeURL("https://podcast1.example.com/feed.xml")
+        let url2 = makeURL("https://podcast2.example.com/feed.xml")
 
         let podroll = Podroll(remoteItems: [
             RemoteItem(feedGuid: "guid-1111", feedUrl: url1, medium: "podcast"),
@@ -140,8 +140,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     // MARK: - PodcastChat
 
     @Test("PodcastChat with all properties")
-    func podcastChatFull() throws {
-        let embedURL = try #require(URL(string: "https://example.com/chat-embed"))
+    func podcastChatFull() {
+        let embedURL = makeURL("https://example.com/chat-embed")
 
         let chat = PodcastChat(
             server: "irc.zeronode.net",
@@ -181,8 +181,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     // MARK: - PodcastPublisher
 
     @Test("PodcastPublisher wraps a RemoteItem")
-    func podcastPublisherProperties() throws {
-        let url = try #require(URL(string: "https://publisher.example.com/feed.xml"))
+    func podcastPublisherProperties() {
+        let url = makeURL("https://publisher.example.com/feed.xml")
 
         let publisher = PodcastPublisher(
             remoteItem: RemoteItem(
@@ -200,8 +200,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     // MARK: - PodcastImage
 
     @Test("PodcastImage with all seven attributes")
-    func podcastImageFull() throws {
-        let href = try #require(URL(string: "https://example.com/artwork.png"))
+    func podcastImageFull() {
+        let href = makeURL("https://example.com/artwork.png")
 
         let image = PodcastImage(
             href: href,
@@ -223,8 +223,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     }
 
     @Test("PodcastImage with href only")
-    func podcastImageMinimal() throws {
-        let href = try #require(URL(string: "https://example.com/social-card.jpg"))
+    func podcastImageMinimal() {
+        let href = makeURL("https://example.com/social-card.jpg")
         let image = PodcastImage(href: href)
 
         #expect(image.href == href)
@@ -237,8 +237,8 @@ struct PodcastNS20Phase4ExtendedShowcase {
     }
 
     @Test("PodcastImage supports multiple purpose tokens")
-    func podcastImageMultiplePurposes() throws {
-        let href = try #require(URL(string: "https://example.com/banner.jpg"))
+    func podcastImageMultiplePurposes() {
+        let href = makeURL("https://example.com/banner.jpg")
         let image = PodcastImage(href: href, aspectRatio: "16/9", purpose: "social canvas")
 
         #expect(image.purpose == "social canvas")

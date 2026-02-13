@@ -6,9 +6,9 @@ import Testing
 // MARK: - Test Helpers
 
 /// Builds a minimal Apple-valid feed for use as a starting point.
-private func makeAppleValidFeed() throws -> PodcastFeed {
+private func makeAppleValidFeed() -> PodcastFeed {
     let enclosure = Enclosure(
-        url: try #require(URL(string: "https://cdn.example.com/ep1.mp3")),
+        url: makeURL("https://cdn.example.com/ep1.mp3"),
         length: 12_345_678,
         type: "audio/mpeg"
     )
@@ -25,7 +25,7 @@ private func makeAppleValidFeed() throws -> PodcastFeed {
     )
     let channel = Channel(
         title: "Showcase Podcast",
-        link: try #require(URL(string: "https://example.com")),
+        link: makeURL("https://example.com"),
         description: "A podcast about showcasing validation.",
         language: "en-us",
         items: [item],
@@ -35,10 +35,10 @@ private func makeAppleValidFeed() throws -> PodcastFeed {
         itunesImage: URL(string: "https://cdn.example.com/artwork.jpg"),
         itunesOwner: ITunesOwner(name: "Jane Doe", email: "jane@example.com"),
         itunesType: .episodic,
-        atomLinks: [.selfLink(href: try #require(URL(string: "https://example.com/feed.xml")))],
+        atomLinks: [.selfLink(href: makeURL("https://example.com/feed.xml"))],
         podcastGuid: PodcastGuid(value: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
         locked: Locked(isLocked: true, owner: "jane@example.com"),
-        funding: [Funding(url: try #require(URL(string: "https://example.com/donate")), message: "Support us")]
+        funding: [Funding(url: makeURL("https://example.com/donate"), message: "Support us")]
     )
     return PodcastFeed(channel: channel)
 }
@@ -51,8 +51,8 @@ struct PodcastIndexValidationShowcase {
     let validator = FeedValidator()
 
     @Test("podcast:locked is recommended (warning)")
-    func lockedRecommended() throws {
-        var feed = try makeAppleValidFeed()
+    func lockedRecommended() {
+        var feed = makeAppleValidFeed()
         feed.channel?.locked = nil
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
@@ -62,8 +62,8 @@ struct PodcastIndexValidationShowcase {
     }
 
     @Test("podcast:guid is recommended (warning)")
-    func guidRecommended() throws {
-        var feed = try makeAppleValidFeed()
+    func guidRecommended() {
+        var feed = makeAppleValidFeed()
         feed.channel?.podcastGuid = nil
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
@@ -73,8 +73,8 @@ struct PodcastIndexValidationShowcase {
     }
 
     @Test("podcast:funding is encouraged (warning)")
-    func fundingEncouraged() throws {
-        var feed = try makeAppleValidFeed()
+    func fundingEncouraged() {
+        var feed = makeAppleValidFeed()
         feed.channel?.funding = []
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
@@ -84,8 +84,8 @@ struct PodcastIndexValidationShowcase {
     }
 
     @Test("podcast:value encourages V4V (info when absent)")
-    func valueEncouraged() throws {
-        var feed = try makeAppleValidFeed()
+    func valueEncouraged() {
+        var feed = makeAppleValidFeed()
         feed.channel?.value = nil
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
@@ -95,8 +95,8 @@ struct PodcastIndexValidationShowcase {
     }
 
     @Test("Valid fully-tagged feed passes Podcast Index")
-    func validFeedPasses() throws {
-        let feed = try makeAppleValidFeed()
+    func validFeedPasses() {
+        let feed = makeAppleValidFeed()
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.isValid)
         #expect(report.platform == .podcastIndex)
@@ -111,8 +111,8 @@ struct PSP1ValidationShowcase {
     let validator = FeedValidator()
 
     @Test("Language is required (error when missing)")
-    func languageRequired() throws {
-        var feed = try makeAppleValidFeed()
+    func languageRequired() {
+        var feed = makeAppleValidFeed()
         feed.channel?.language = nil
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -122,8 +122,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("atom:link with rel=self is required (error when missing)")
-    func atomLinkSelfRequired() throws {
-        var feed = try makeAppleValidFeed()
+    func atomLinkSelfRequired() {
+        var feed = makeAppleValidFeed()
         feed.channel?.atomLinks = []
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -133,8 +133,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("podcast:locked is required (error when missing)")
-    func lockedRequired() throws {
-        var feed = try makeAppleValidFeed()
+    func lockedRequired() {
+        var feed = makeAppleValidFeed()
         feed.channel?.locked = nil
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -144,8 +144,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("podcast:guid is required (error when missing)")
-    func podcastGuidRequired() throws {
-        var feed = try makeAppleValidFeed()
+    func podcastGuidRequired() {
+        var feed = makeAppleValidFeed()
         feed.channel?.podcastGuid = nil
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -155,8 +155,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("Item GUID is required (error when missing)")
-    func itemGuidRequired() throws {
-        var feed = try makeAppleValidFeed()
+    func itemGuidRequired() {
+        var feed = makeAppleValidFeed()
         feed.channel?.items[0].guid = nil
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -166,8 +166,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("Leading or trailing whitespace produces warning")
-    func whitespaceWarning() throws {
-        var feed = try makeAppleValidFeed()
+    func whitespaceWarning() {
+        var feed = makeAppleValidFeed()
         feed.channel?.title = "  Showcase Podcast  "
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -177,8 +177,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("Title exceeding 255 characters produces warning")
-    func titleLengthWarning() throws {
-        var feed = try makeAppleValidFeed()
+    func titleLengthWarning() {
+        var feed = makeAppleValidFeed()
         feed.channel?.title = String(repeating: "X", count: 300)
         let report = validator.validate(feed, for: .psp1)
         #expect(
@@ -188,8 +188,8 @@ struct PSP1ValidationShowcase {
     }
 
     @Test("Valid PSP-1 feed passes with no errors")
-    func validPSP1Feed() throws {
-        let feed = try makeAppleValidFeed()
+    func validPSP1Feed() {
+        let feed = makeAppleValidFeed()
         let report = validator.validate(feed, for: .psp1)
         #expect(report.isValid)
         #expect(report.errors.isEmpty)
@@ -205,15 +205,15 @@ struct CrossPlatformValidationShowcase {
     let validator = FeedValidator()
 
     @Test("Single platform validation returns one report")
-    func singlePlatform() throws {
-        let feed = try makeAppleValidFeed()
+    func singlePlatform() {
+        let feed = makeAppleValidFeed()
         let report = validator.validate(feed, for: .apple)
         #expect(report.platform == .apple)
     }
 
     @Test("Multi-platform validation returns one report per platform")
-    func multiPlatform() throws {
-        let feed = try makeAppleValidFeed()
+    func multiPlatform() {
+        let feed = makeAppleValidFeed()
         let reports = validator.validate(feed, for: [.apple, .spotify, .amazon])
         #expect(reports.count == 3)
         let platforms = Set(reports.map(\.platform))
@@ -221,8 +221,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("validateAll returns reports for all 5 platforms")
-    func allPlatforms() throws {
-        let feed = try makeAppleValidFeed()
+    func allPlatforms() {
+        let feed = makeAppleValidFeed()
         let reports = validator.validateAll(feed)
         #expect(reports.count == ValidationPlatform.allCases.count)
         let platforms = Set(reports.map(\.platform))
@@ -252,12 +252,12 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("Cross-cutting checks detect duplicate GUIDs")
-    func duplicateGuidDetection() throws {
-        var feed = try makeAppleValidFeed()
+    func duplicateGuidDetection() {
+        var feed = makeAppleValidFeed()
         let duplicate = Item(
             title: "Episode 2",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://cdn.example.com/ep2.mp3")),
+                url: makeURL("https://cdn.example.com/ep2.mp3"),
                 length: 10_000_000,
                 type: "audio/mpeg"
             ),
@@ -272,8 +272,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("Cross-cutting checks detect GUID/isPermaLink inconsistency")
-    func guidPermaLinkInconsistency() throws {
-        var feed = try makeAppleValidFeed()
+    func guidPermaLinkInconsistency() {
+        var feed = makeAppleValidFeed()
         feed.channel?.items[0].guid = GUID(
             value: "not-a-url-just-an-id",
             isPermaLink: true
@@ -286,8 +286,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("Cross-cutting checks note missing atom:link self")
-    func atomSelfLinkInfo() throws {
-        var feed = try makeAppleValidFeed()
+    func atomSelfLinkInfo() {
+        var feed = makeAppleValidFeed()
         feed.channel?.atomLinks = []
         let report = validator.validate(feed, for: .amazon)
         #expect(
@@ -297,8 +297,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("Cross-cutting checks note itunes:complete true")
-    func itunesCompleteInfo() throws {
-        var feed = try makeAppleValidFeed()
+    func itunesCompleteInfo() {
+        var feed = makeAppleValidFeed()
         feed.channel?.itunesComplete = true
         let report = validator.validate(feed, for: .apple)
         #expect(
@@ -308,8 +308,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("Cross-cutting checks warn on new-feed-url without HTTPS")
-    func newFeedUrlSchemeWarning() throws {
-        var feed = try makeAppleValidFeed()
+    func newFeedUrlSchemeWarning() {
+        var feed = makeAppleValidFeed()
         feed.channel?.itunesNewFeedUrl = URL(string: "http://example.com/new-feed.xml")
         let report = validator.validate(feed, for: .apple)
         #expect(
@@ -319,8 +319,8 @@ struct CrossPlatformValidationShowcase {
     }
 
     @Test("ValidationReport convenience properties filter correctly")
-    func reportConvenienceProperties() throws {
-        var feed = try makeAppleValidFeed()
+    func reportConvenienceProperties() {
+        var feed = makeAppleValidFeed()
         feed.channel?.itunesImage = nil
         feed.channel?.itunesAuthor = nil
         let report = validator.validate(feed, for: .apple)

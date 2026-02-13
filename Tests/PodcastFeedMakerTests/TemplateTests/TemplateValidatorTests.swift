@@ -10,25 +10,25 @@ struct TemplateValidatorTests {
 
     // MARK: - Helpers
 
-    private static func makeTestURL() throws -> URL {
-        try #require(URL(string: "https://example.com"))
+    private static func makeTestURL() -> URL {
+        makeURL("https://example.com")
     }
 
-    private static func makeImageURL() throws -> URL {
-        try #require(URL(string: "https://example.com/art.jpg"))
+    private static func makeImageURL() -> URL {
+        makeURL("https://example.com/art.jpg")
     }
 
-    private func makeMinimalFeed() throws -> PodcastFeed {
-        let testURL = try Self.makeTestURL()
+    private func makeMinimalFeed() -> PodcastFeed {
+        let testURL = Self.makeTestURL()
         let channel = Channel(
             title: "Test", link: testURL, description: "A test podcast"
         )
         return PodcastFeed(channel: channel)
     }
 
-    private func makeBasicCompliantFeed() throws -> PodcastFeed {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    private func makeBasicCompliantFeed() -> PodcastFeed {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         return PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -36,9 +36,9 @@ struct TemplateValidatorTests {
         }
     }
 
-    private func makeStandardCompliantFeed() throws -> PodcastFeed {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    private func makeStandardCompliantFeed() -> PodcastFeed {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         return PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -57,15 +57,15 @@ struct TemplateValidatorTests {
     // MARK: - Basic Validation
 
     @Test("compliant basic feed has no errors")
-    func basicCompliant() throws {
-        let feed = try makeBasicCompliantFeed()
+    func basicCompliant() {
+        let feed = makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
         #expect(report.isCompliant)
     }
 
     @Test("missing itunesImage produces error")
-    func missingItunesImage() throws {
-        let testURL = try Self.makeTestURL()
+    func missingItunesImage() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -78,9 +78,9 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing itunesCategory produces error")
-    func missingCategory() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    func missingCategory() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -92,9 +92,9 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing itunesExplicit produces error")
-    func missingExplicit() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    func missingExplicit() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -106,8 +106,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing recommended tags produce warnings not errors")
-    func recommendedWarnings() throws {
-        let feed = try makeBasicCompliantFeed()
+    func recommendedWarnings() {
+        let feed = makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
         // language is recommended for basic -- should be a warning
         let languageWarning = report.warnings.first { $0.tag == .language }
@@ -119,16 +119,16 @@ struct TemplateValidatorTests {
     // MARK: - Standard Validation
 
     @Test("standard compliant feed has no errors")
-    func standardCompliant() throws {
-        let feed = try makeStandardCompliantFeed()
+    func standardCompliant() {
+        let feed = makeStandardCompliantFeed()
         let report = validator.validate(feed, against: StandardTemplate())
         #expect(report.isCompliant)
     }
 
     @Test("standard template detects missing podcastGuid")
-    func missingPodcastGuid() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    func missingPodcastGuid() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -149,8 +149,8 @@ struct TemplateValidatorTests {
     // MARK: - Item Validation
 
     @Test("missing required item tags produce errors")
-    func missingItemTags() throws {
-        var feed = try makeBasicCompliantFeed()
+    func missingItemTags() {
+        var feed = makeBasicCompliantFeed()
         // Add an item without title or enclosure
         feed.channel?.items = [Item()]
         let report = validator.validate(feed, against: BasicTemplate())
@@ -161,8 +161,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("item with all required basic tags passes")
-    func itemWithRequiredTags() throws {
-        var feed = try makeBasicCompliantFeed()
+    func itemWithRequiredTags() {
+        var feed = makeBasicCompliantFeed()
         feed.channel?.items = [
             Item(
                 title: "Episode 1",
@@ -190,17 +190,17 @@ struct TemplateValidatorTests {
     // MARK: - Level Detection
 
     @Test("detectLevel returns basic for minimal feed")
-    func detectBasic() throws {
-        let feed = try makeBasicCompliantFeed()
+    func detectBasic() {
+        let feed = makeBasicCompliantFeed()
         let level = validator.detectLevel(feed)
         #expect(level == .basic)
     }
 
     @Test("detectLevel returns standard for PSP-1 compliant feed")
-    func detectStandard() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func detectStandard() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
+        let feedURL = makeURL("https://example.com/feed.xml")
         let config = PSP1Configuration(
             title: "Show",
             link: testURL,
@@ -223,8 +223,8 @@ struct TemplateValidatorTests {
     // MARK: - Level Mismatch Detection
 
     @Test("expert tag in basic feed produces info")
-    func levelMismatch() throws {
-        var feed = try makeBasicCompliantFeed()
+    func levelMismatch() {
+        var feed = makeBasicCompliantFeed()
         feed.channel?.value = PodcastValue(
             type: "lightning", method: "keysend", recipients: []
         )
@@ -234,8 +234,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("level mismatch info has suggestedLevel populated")
-    func levelMismatchSuggestedLevel() throws {
-        var feed = try makeBasicCompliantFeed()
+    func levelMismatchSuggestedLevel() {
+        var feed = makeBasicCompliantFeed()
         feed.channel?.value = PodcastValue(
             type: "lightning", method: "keysend", recipients: []
         )
@@ -245,8 +245,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("error results have nil suggestedLevel")
-    func errorResultsNilSuggestedLevel() throws {
-        let testURL = try Self.makeTestURL()
+    func errorResultsNilSuggestedLevel() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -259,8 +259,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("warning results have nil suggestedLevel")
-    func warningResultsNilSuggestedLevel() throws {
-        let feed = try makeBasicCompliantFeed()
+    func warningResultsNilSuggestedLevel() {
+        let feed = makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
         for warning in report.warnings {
             #expect(warning.suggestedLevel == nil)
@@ -270,9 +270,9 @@ struct TemplateValidatorTests {
     // MARK: - Standard = PSP1Configuration
 
     @Test("standard template + PSP-1 fields passes PSP-1 validation")
-    func standardMatchesPSP1() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    func standardMatchesPSP1() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in

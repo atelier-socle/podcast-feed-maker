@@ -18,8 +18,8 @@ struct PodcastNS20Phase4ValueShowcase {
 
     // MARK: - PodcastValue
 
-    private static func makeCompleteValue() throws -> PodcastValue {
-        let remoteURL = try #require(URL(string: "https://other.example.com/feed.xml"))
+    private static func makeCompleteValue() -> PodcastValue {
+        let remoteURL = makeURL("https://other.example.com/feed.xml")
         return PodcastValue(
             type: "lightning",
             method: "keysend",
@@ -62,9 +62,9 @@ struct PodcastNS20Phase4ValueShowcase {
     }
 
     @Test("PodcastValue with recipients and time splits")
-    func podcastValueComplete() throws {
-        let value = try Self.makeCompleteValue()
-        let remoteURL = try #require(URL(string: "https://other.example.com/feed.xml"))
+    func podcastValueComplete() {
+        let value = Self.makeCompleteValue()
+        let remoteURL = makeURL("https://other.example.com/feed.xml")
 
         #expect(value.type == "lightning")
         #expect(value.method == "keysend")
@@ -167,10 +167,10 @@ struct PodcastNS20Phase4ValueShowcase {
     // MARK: - PodcastLiveItem
 
     @Test("PodcastLiveItem with full configuration")
-    func liveItemFull() throws {
-        let enclosureURL = try #require(URL(string: "https://stream.example.com/live.mp3"))
-        let chatURL = try #require(URL(string: "https://example.com/chat"))
-        let artworkURL = try #require(URL(string: "https://example.com/live-art.jpg"))
+    func liveItemFull() {
+        let enclosureURL = makeURL("https://stream.example.com/live.mp3")
+        let chatURL = makeURL("https://example.com/chat")
+        let artworkURL = makeURL("https://example.com/live-art.jpg")
         let startDate = Date(timeIntervalSince1970: 1_700_000_000)
         let endDate = Date(timeIntervalSince1970: 1_700_007_200)
 
@@ -222,8 +222,8 @@ struct PodcastNS20Phase4ValueShowcase {
     }
 
     @Test("ContentLink holds href and title")
-    func contentLinkProperties() throws {
-        let url = try #require(URL(string: "https://example.com/show-notes"))
+    func contentLinkProperties() {
+        let url = makeURL("https://example.com/show-notes")
         let link = ContentLink(href: url, title: "Show Notes")
 
         #expect(link.href == url)
@@ -233,8 +233,8 @@ struct PodcastNS20Phase4ValueShowcase {
     // MARK: - SocialInteract
 
     @Test("SocialInteract with all properties")
-    func socialInteractFull() throws {
-        let accountURL = try #require(URL(string: "https://mastodon.social/@podcasthost"))
+    func socialInteractFull() {
+        let accountURL = makeURL("https://mastodon.social/@podcasthost")
 
         let social = SocialInteract(
             uri: "https://mastodon.social/@podcasthost/109876543210",

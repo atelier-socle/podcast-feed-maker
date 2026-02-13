@@ -8,16 +8,16 @@ struct TemplateCompositionTests {
 
     // MARK: - Helpers
 
-    private static func makeTestURL() throws -> URL {
-        try #require(URL(string: "https://example.com"))
+    private static func makeTestURL() -> URL {
+        makeURL("https://example.com")
     }
 
-    private static func makeImageURL() throws -> URL {
-        try #require(URL(string: "https://example.com/art.jpg"))
+    private static func makeImageURL() -> URL {
+        makeURL("https://example.com/art.jpg")
     }
 
-    private static func makeFeedURL() throws -> URL {
-        try #require(URL(string: "https://example.com/feed.xml"))
+    private static func makeFeedURL() -> URL {
+        makeURL("https://example.com/feed.xml")
     }
 
     // MARK: - Real-World Composition Scenarios
@@ -67,9 +67,9 @@ struct TemplateCompositionTests {
     // MARK: - Validation with Composed Templates
 
     @Test("Composed template validates correctly")
-    func composedValidation() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+    func composedValidation() {
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let template = BasicTemplate()
             .requiring(.podcastGuid)
 
@@ -86,8 +86,8 @@ struct TemplateCompositionTests {
     }
 
     @Test("Composed template factory: PodcastFeed.template() works")
-    func composedFactory() throws {
-        let testURL = try Self.makeTestURL()
+    func composedFactory() {
+        let testURL = Self.makeTestURL()
         let template = StandardTemplate().named("Custom")
         let feed = PodcastFeed.template(
             template,
@@ -101,10 +101,10 @@ struct TemplateCompositionTests {
     }
 
     @Test("detectLevel works on feed built from composed template")
-    func detectLevelComposed() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+    func detectLevelComposed() {
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in

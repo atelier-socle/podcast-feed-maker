@@ -19,7 +19,7 @@ struct GeneratorShowcase {
     ) throws -> PodcastFeed {
         let channel = Channel(
             title: "Minimal Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A minimal test feed.",
             items: items
         )
@@ -27,13 +27,13 @@ struct GeneratorShowcase {
     }
 
     /// Builds a rich feed with iTunes, Atom, Podcast NS 2.0, DC, Content, and Podlove data.
-    private static func richItem() throws -> Item {
+    private static func richItem() -> Item {
         Item(
             title: "Episode 1: Getting Started",
             link: URL(string: "https://example.com/ep1"),
             description: "The very first episode.",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://cdn.example.com/ep1.mp3")),
+                url: makeURL("https://cdn.example.com/ep1.mp3"),
                 length: 48_000_000,
                 type: "audio/mpeg"
             ),
@@ -50,13 +50,13 @@ struct GeneratorShowcase {
             contentEncoded: ContentEncoded(value: "<p>Full <strong>show notes</strong> here.</p>"),
             transcripts: [
                 Transcript(
-                    url: try #require(URL(string: "https://example.com/ep1.vtt")),
+                    url: makeURL("https://example.com/ep1.vtt"),
                     type: "text/vtt",
                     language: "en"
                 )
             ],
             chaptersLink: ChaptersLink(
-                url: try #require(URL(string: "https://example.com/ep1/chapters.json"))
+                url: makeURL("https://example.com/ep1/chapters.json")
             ),
             soundbites: [
                 Soundbite(startTime: 120.0, duration: 45.0, title: "Best moment")
@@ -85,10 +85,10 @@ struct GeneratorShowcase {
 
     }
 
-    private static func richFeed() throws -> PodcastFeed {
+    private static func richFeed() -> PodcastFeed {
         let channel = Channel(
             title: "The Showcase Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A podcast demonstrating PodcastFeedMaker.",
             language: "en-US",
             copyright: "2026 Atelier Socle",
@@ -97,7 +97,7 @@ struct GeneratorShowcase {
             lastBuildDate: Date(timeIntervalSince1970: 1_739_404_800),
             generator: "PodcastFeedMaker/1.0",
             ttl: 60,
-            items: [try richItem()],
+            items: [richItem()],
             itunesAuthor: "Atelier Socle",
             itunesCategories: [
                 .technology,
@@ -108,14 +108,14 @@ struct GeneratorShowcase {
             itunesOwner: ITunesOwner(name: "Wlad", email: "wlad@example.com"),
             itunesType: .episodic,
             atomLinks: [
-                AtomLink.selfLink(href: try #require(URL(string: "https://example.com/feed.xml")))
+                AtomLink.selfLink(href: makeURL("https://example.com/feed.xml"))
             ],
             dublinCore: DublinCore(creator: "Atelier Socle", language: "en"),
             podcastGuid: PodcastGuid(value: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1"),
             locked: Locked(isLocked: true, owner: "wlad@example.com"),
             funding: [
                 Funding(
-                    url: try #require(URL(string: "https://example.com/donate")),
+                    url: makeURL("https://example.com/donate"),
                     message: "Support the show"
                 )
             ],
@@ -135,7 +135,7 @@ struct GeneratorShowcase {
 
     @Test("FeedGenerator — synchronous full XML generation")
     func feedGeneratorSynchronous() throws {
-        let feed = try Self.richFeed()
+        let feed = Self.richFeed()
         let generator = FeedGenerator()
         let xml = try generator.generate(feed)
 
@@ -180,7 +180,7 @@ struct GeneratorShowcase {
         // Feed uses only iTunes features, no podcast NS, no DC, etc.
         let channel = Channel(
             title: "iTunes Only Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Only iTunes tags.",
             itunesAuthor: "Host",
             itunesExplicit: false
@@ -277,7 +277,7 @@ struct GeneratorShowcase {
     func feedGeneratorXMLEscaping() throws {
         let channel = Channel(
             title: "Rock & Roll <Live> \"Special\" Edition",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A show about R&B music."
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [], channel: channel)
@@ -322,7 +322,7 @@ struct GeneratorShowcase {
 
     @Test("FeedGenerator — generate feed with all 7 namespaces declared")
     func feedGeneratorAllNamespaces() throws {
-        let feed = try Self.richFeed()
+        let feed = Self.richFeed()
         let generator = FeedGenerator()
         let xml = try generator.generate(feed)
 
@@ -365,7 +365,7 @@ struct GeneratorITunesShowcase {
     ) throws -> PodcastFeed {
         let channel = Channel(
             title: "Minimal Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A minimal test feed.",
             items: items
         )
@@ -410,7 +410,7 @@ struct GeneratorITunesShowcase {
     func feedGeneratorITunesCategory() throws {
         let channel = Channel(
             title: "Cat Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Categories.",
             itunesCategories: [
                 ITunesCategory(
@@ -431,7 +431,7 @@ struct GeneratorITunesShowcase {
     func feedGeneratorITunesOwner() throws {
         let channel = Channel(
             title: "Owner Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Owner test.",
             itunesOwner: ITunesOwner(name: "Jane", email: "jane@example.com")
         )
@@ -449,7 +449,7 @@ struct GeneratorITunesShowcase {
     func feedGeneratorITunesExplicit() throws {
         let channel = Channel(
             title: "Explicit Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Explicit test.",
             itunesExplicit: true
         )
@@ -464,7 +464,7 @@ struct GeneratorITunesShowcase {
     func feedGeneratorITunesBlock() throws {
         let channel = Channel(
             title: "Block Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Block test.",
             itunesBlock: true
         )
@@ -479,7 +479,7 @@ struct GeneratorITunesShowcase {
     func feedGeneratorITunesType() throws {
         let channel = Channel(
             title: "Serial Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Serial.",
             itunesType: .serial
         )

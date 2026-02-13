@@ -10,7 +10,7 @@ struct TemplateFactoryShowcase {
 
     @Test("PodcastFeed.basic creates feed using BasicTemplate namespaces")
     func basicFactory() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.basic(
             title: "Basic Show",
             link: link,
@@ -23,8 +23,8 @@ struct TemplateFactoryShowcase {
     }
 
     @Test("PodcastFeed.standard creates feed using StandardTemplate namespaces")
-    func standardFactory() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func standardFactory() {
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.standard(
             title: "Standard Show",
             link: link,
@@ -34,8 +34,8 @@ struct TemplateFactoryShowcase {
     }
 
     @Test("PodcastFeed.advanced creates feed using AdvancedTemplate namespaces")
-    func advancedFactory() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func advancedFactory() {
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.advanced(
             title: "Advanced Show",
             link: link,
@@ -45,8 +45,8 @@ struct TemplateFactoryShowcase {
     }
 
     @Test("PodcastFeed.expert creates feed using ExpertTemplate namespaces")
-    func expertFactory() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func expertFactory() {
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.expert(
             title: "Expert Show",
             link: link,
@@ -58,7 +58,7 @@ struct TemplateFactoryShowcase {
 
     @Test("PodcastFeed.template uses generic template")
     func genericTemplate() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.template(
             StandardTemplate(),
             title: "Generic Show",
@@ -71,7 +71,7 @@ struct TemplateFactoryShowcase {
 
     @Test("Configure closure allows fluent channel modification")
     func configureClosure() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.basic(
             title: "Configured Show",
             link: link,
@@ -93,7 +93,7 @@ struct TemplateFactoryShowcase {
 
     @Test("Factory without configure closure returns plain channel")
     func noConfigureClosure() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let feed = PodcastFeed.basic(
             title: "Plain Show",
             link: link,
@@ -114,10 +114,10 @@ struct TemplateValidatorShowcase {
     let templateValidator = TemplateValidator()
 
     @Test("Validate feed against BasicTemplate: missing required tags produce errors")
-    func validateBasicMissing() throws {
+    func validateBasicMissing() {
         let channel = Channel(
             title: "",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: ""
         )
         let feed = PodcastFeed(channel: channel)
@@ -133,10 +133,10 @@ struct TemplateValidatorShowcase {
     }
 
     @Test("Validate feed against BasicTemplate: missing recommended tags produce warnings")
-    func validateBasicRecommended() throws {
+    func validateBasicRecommended() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Description",
             itunesCategories: [.technology],
             itunesExplicit: false,
@@ -152,10 +152,10 @@ struct TemplateValidatorShowcase {
     }
 
     @Test("Validate feed passes StandardTemplate when all PSP-1 fields present")
-    func validateStandardPasses() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://cdn.example.com/e.mp3"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func validateStandardPasses() {
+        let link = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://cdn.example.com/e.mp3")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Standard Show",
             link: link,
@@ -187,10 +187,10 @@ struct TemplateValidatorShowcase {
     }
 
     @Test("detectLevel identifies the highest matching level")
-    func detectLevel() throws {
+    func detectLevel() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Description",
             itunesCategories: [.technology],
             itunesExplicit: false,
@@ -202,11 +202,11 @@ struct TemplateValidatorShowcase {
     }
 
     @Test("detectLevel returns standard for PSP-1 compliant feed")
-    func detectStandard() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/f.xml"))
-        let imageURL = try #require(URL(string: "https://cdn.example.com/a.jpg"))
-        let enclosureURL = try #require(URL(string: "https://cdn.example.com/e.mp3"))
+    func detectStandard() {
+        let link = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/f.xml")
+        let imageURL = makeURL("https://cdn.example.com/a.jpg")
+        let enclosureURL = makeURL("https://cdn.example.com/e.mp3")
         let config = PSP1Configuration(
             title: "Show", link: link,
             description: "D", feedURL: feedURL,
@@ -264,10 +264,10 @@ struct TemplateValidatorShowcase {
     }
 
     @Test("Level mismatch detection produces info with suggestedLevel")
-    func levelMismatch() throws {
+    func levelMismatch() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Description",
             itunesCategories: [.technology],
             itunesExplicit: false,
@@ -410,14 +410,14 @@ struct TemplateCompositionShowcase {
     }
 
     @Test("ComposedTemplate can be validated by TemplateValidator")
-    func composedValidation() throws {
+    func composedValidation() {
         let template = BasicTemplate()
             .requiring(.podcastLocked, .podcastGuid)
             .named("Locked Basic")
 
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Description",
             itunesCategories: [.technology],
             itunesExplicit: false,

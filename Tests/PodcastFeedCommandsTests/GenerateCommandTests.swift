@@ -44,7 +44,7 @@ struct GenerateCommandTests {
         defer { try? FileManager.default.removeItem(atPath: jsonPath) }
 
         // Create a minimal feed JSON that will trigger template warnings
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             version: "2.0",
             namespaces: PodcastNamespace.allStandard,
@@ -56,7 +56,7 @@ struct GenerateCommandTests {
                     Item(
                         title: "Episode 1",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep1.mp3")),
+                            url: makeURL("https://example.com/ep1.mp3"),
                             length: 1000,
                             type: "audio/mpeg"
                         )
@@ -97,7 +97,7 @@ struct GenerateCommandTests {
         defer { try? FileManager.default.removeItem(atPath: jsonPath) }
 
         // Create a minimal but valid feed JSON
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             version: "2.0",
             namespaces: PodcastNamespace.allStandard,
@@ -109,7 +109,7 @@ struct GenerateCommandTests {
                     Item(
                         title: "Episode 1",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep1.mp3")),
+                            url: makeURL("https://example.com/ep1.mp3"),
                             length: 5000,
                             type: "audio/mpeg"
                         )
@@ -139,7 +139,7 @@ struct GenerateCommandTests {
         let jsonPath = "/tmp/pfm_gen_badplatform_\(UUID()).json"
         defer { try? FileManager.default.removeItem(atPath: jsonPath) }
 
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             version: "2.0",
             namespaces: PodcastNamespace.allStandard,
@@ -151,7 +151,7 @@ struct GenerateCommandTests {
                     Item(
                         title: "Episode 1",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep1.mp3")),
+                            url: makeURL("https://example.com/ep1.mp3"),
                             length: 5000,
                             type: "audio/mpeg"
                         )

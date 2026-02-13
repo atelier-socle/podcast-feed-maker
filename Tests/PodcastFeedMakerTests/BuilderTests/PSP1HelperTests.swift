@@ -8,10 +8,10 @@ import Testing
 @Suite("PSP-1 Compliance Helper")
 struct PSP1HelperTests {
 
-    private func makePSP1Feed() throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://example.com/artwork.jpg"))
+    private func makePSP1Feed() -> PodcastFeed {
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://example.com/artwork.jpg")
         let config = PSP1Configuration(
             title: "PSP-1 Podcast",
             link: url,
@@ -29,58 +29,58 @@ struct PSP1HelperTests {
     }
 
     @Test("sets channel title")
-    func setsTitle() throws {
-        let feed = try makePSP1Feed()
+    func setsTitle() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.title == "PSP-1 Podcast")
     }
 
     @Test("sets channel link")
-    func setsLink() throws {
-        let feed = try makePSP1Feed()
+    func setsLink() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.link.absoluteString == "https://example.com")
     }
 
     @Test("sets channel description")
-    func setsDescription() throws {
-        let feed = try makePSP1Feed()
+    func setsDescription() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.description == "A PSP-1 compliant podcast")
     }
 
     @Test("sets itunesAuthor")
-    func setsAuthor() throws {
-        let feed = try makePSP1Feed()
+    func setsAuthor() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.itunesAuthor == "Host Name")
     }
 
     @Test("sets itunesOwner with name and email")
-    func setsOwner() throws {
-        let feed = try makePSP1Feed()
+    func setsOwner() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.itunesOwner?.name == "Owner Name")
         #expect(feed.channel?.itunesOwner?.email == "owner@example.com")
     }
 
     @Test("sets itunesCategory")
-    func setsCategory() throws {
-        let feed = try makePSP1Feed()
+    func setsCategory() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.itunesCategories.count == 1)
         #expect(feed.channel?.itunesCategories[0].text == "Technology")
     }
 
     @Test("sets itunesExplicit")
-    func setsExplicit() throws {
-        let feed = try makePSP1Feed()
+    func setsExplicit() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.itunesExplicit == false)
     }
 
     @Test("sets itunesImage")
-    func setsImage() throws {
-        let feed = try makePSP1Feed()
+    func setsImage() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.itunesImage?.absoluteString == "https://example.com/artwork.jpg")
     }
 
     @Test("sets atom:link with rel=self")
-    func setsAtomLink() throws {
-        let feed = try makePSP1Feed()
+    func setsAtomLink() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.atomLinks.count == 1)
         #expect(feed.channel?.atomLinks[0].rel == "self")
         #expect(feed.channel?.atomLinks[0].href.absoluteString == "https://example.com/feed.xml")
@@ -88,27 +88,27 @@ struct PSP1HelperTests {
     }
 
     @Test("sets podcast:guid")
-    func setsGuid() throws {
-        let feed = try makePSP1Feed()
+    func setsGuid() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.podcastGuid?.value == "ead4c236-bf58-58c6-a2c6-a6b28d128cb6")
     }
 
     @Test("sets podcast:locked with owner email")
-    func setsLocked() throws {
-        let feed = try makePSP1Feed()
+    func setsLocked() {
+        let feed = makePSP1Feed()
         #expect(feed.channel?.locked?.isLocked == true)
         #expect(feed.channel?.locked?.owner == "owner@example.com")
     }
 
     @Test("uses allStandard namespaces")
-    func usesAllStandardNamespaces() throws {
-        let feed = try makePSP1Feed()
+    func usesAllStandardNamespaces() {
+        let feed = makePSP1Feed()
         #expect(feed.namespaces == PodcastNamespace.allStandard)
     }
 
     @Test("passes PSP-1 validation with zero errors")
-    func passesPSP1Validation() throws {
-        let feed = try makePSP1Feed()
+    func passesPSP1Validation() {
+        let feed = makePSP1Feed()
         let report = FeedValidator().validate(feed, for: .psp1)
         #expect(report.isValid)
         #expect(report.errors.isEmpty)
@@ -116,7 +116,7 @@ struct PSP1HelperTests {
 
     @Test("generates valid XML")
     func generatesValidXML() throws {
-        let feed = try makePSP1Feed()
+        let feed = makePSP1Feed()
         let xml = try FeedGenerator().generate(feed)
         #expect(xml.contains("PSP-1 Podcast"))
         #expect(xml.contains("podcast:guid"))

@@ -56,9 +56,9 @@ struct CustomValidationRuleTests {
     // MARK: - Tests
 
     @Test("Custom rule produces results")
-    func customRuleResults() throws {
+    func customRuleResults() {
         let item = Item(title: "Episode")
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -74,8 +74,8 @@ struct CustomValidationRuleTests {
     }
 
     @Test("Custom rule returns empty for compliant feed")
-    func customRuleCompliant() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/t.vtt"))
+    func customRuleCompliant() {
+        let transcriptURL = makeURL("https://example.com/t.vtt")
         let item = Item(
             title: "Episode",
             transcripts: [
@@ -85,7 +85,7 @@ struct CustomValidationRuleTests {
                 )
             ]
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -100,8 +100,8 @@ struct CustomValidationRuleTests {
     }
 
     @Test("Multiple custom rules compose")
-    func multipleRulesCompose() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func multipleRulesCompose() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -119,8 +119,8 @@ struct CustomValidationRuleTests {
     }
 
     @Test("Custom rule results are sorted by severity")
-    func resultsSorted() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func resultsSorted() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Podcast",

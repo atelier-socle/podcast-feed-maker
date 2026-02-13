@@ -8,11 +8,11 @@ struct ITunesImageTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesImage_shouldStoreURL() throws {
-        let url = try #require(URL(string: "https://example.com/podcast.jpg"))
+    func test_channel_itunesImage_shouldStoreURL() {
+        let url = makeURL("https://example.com/podcast.jpg")
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesImage: url
         )
@@ -20,21 +20,21 @@ struct ITunesImageTests {
     }
 
     @Test
-    func test_channel_itunesImage_defaultsToNil() throws {
+    func test_channel_itunesImage_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesImage == nil)
     }
 
     @Test
-    func test_channel_itunesImage_withHTTPSUrl() throws {
-        let url = try #require(URL(string: "https://cdn.example.com/artwork-3000x3000.png"))
+    func test_channel_itunesImage_withHTTPSUrl() {
+        let url = makeURL("https://cdn.example.com/artwork-3000x3000.png")
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesImage: url
         )
@@ -44,8 +44,8 @@ struct ITunesImageTests {
     // MARK: - Item
 
     @Test
-    func test_item_itunesImage_shouldStoreURL() throws {
-        let url = try #require(URL(string: "https://example.com/episode.jpg"))
+    func test_item_itunesImage_shouldStoreURL() {
+        let url = makeURL("https://example.com/episode.jpg")
         let item = Item(itunesImage: url)
         #expect(item.itunesImage == url)
     }
@@ -59,9 +59,9 @@ struct ITunesImageTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameImage() throws {
-        let url = try #require(URL(string: "https://example.com/1.jpg"))
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameImage() {
+        let url = makeURL("https://example.com/1.jpg")
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -78,44 +78,44 @@ struct ITunesImageTests {
     }
 
     @Test
-    func test_channel_equatable_differentImage() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentImage() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
             description: "Desc",
-            itunesImage: try #require(URL(string: "https://example.com/1.jpg"))
+            itunesImage: makeURL("https://example.com/1.jpg")
         )
         let channelB = Channel(
             title: "Podcast",
             link: link,
             description: "Desc",
-            itunesImage: try #require(URL(string: "https://example.com/2.jpg"))
+            itunesImage: makeURL("https://example.com/2.jpg")
         )
         #expect(channelA != channelB)
     }
 
     @Test
-    func test_item_equatable_sameImage() throws {
-        let url = try #require(URL(string: "https://example.com/ep.jpg"))
+    func test_item_equatable_sameImage() {
+        let url = makeURL("https://example.com/ep.jpg")
         let itemA = Item(itunesImage: url)
         let itemB = Item(itunesImage: url)
         #expect(itemA == itemB)
     }
 
     @Test
-    func test_item_equatable_differentImage() throws {
-        let itemA = Item(itunesImage: try #require(URL(string: "https://example.com/1.jpg")))
-        let itemB = Item(itunesImage: try #require(URL(string: "https://example.com/2.jpg")))
+    func test_item_equatable_differentImage() {
+        let itemA = Item(itunesImage: makeURL("https://example.com/1.jpg"))
+        let itemB = Item(itunesImage: makeURL("https://example.com/2.jpg"))
         #expect(itemA != itemB)
     }
 
     // MARK: - Hashable
 
     @Test
-    func test_item_hashable() throws {
-        let url1 = try #require(URL(string: "https://example.com/1.jpg"))
-        let url2 = try #require(URL(string: "https://example.com/2.jpg"))
+    func test_item_hashable() {
+        let url1 = makeURL("https://example.com/1.jpg")
+        let url2 = makeURL("https://example.com/2.jpg")
         let itemA = Item(itunesImage: url1)
         let itemB = Item(itunesImage: url1)
         let itemC = Item(itunesImage: url2)

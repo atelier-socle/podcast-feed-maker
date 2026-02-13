@@ -14,8 +14,8 @@ struct CopyrightTests {
     // MARK: - Initialization
 
     @Test("Channel copyright defaults to nil")
-    func channelCopyrightDefaultsToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelCopyrightDefaultsToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -26,8 +26,8 @@ struct CopyrightTests {
     }
 
     @Test("Channel copyright can be set at initialization")
-    func channelCopyrightCanBeSet() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelCopyrightCanBeSet() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -39,8 +39,8 @@ struct CopyrightTests {
     }
 
     @Test("Channel copyright is mutable")
-    func channelCopyrightIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelCopyrightIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -55,7 +55,7 @@ struct CopyrightTests {
 
     @Test("Channel XML contains copyright tag when set")
     func channelXmlContainsCopyright() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -69,7 +69,7 @@ struct CopyrightTests {
 
     @Test("Channel XML omits copyright tag when nil")
     func channelXmlOmitsCopyrightWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -82,7 +82,7 @@ struct CopyrightTests {
 
     @Test("Channel XML escapes special characters in copyright")
     func channelXmlEscapesSpecialCharsInCopyright() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -96,7 +96,7 @@ struct CopyrightTests {
 
     @Test("Channel XML escapes ampersand and angle brackets in copyright")
     func channelXmlEscapesAmpersandInCopyright() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -111,24 +111,24 @@ struct CopyrightTests {
     // MARK: - Equatable
 
     @Test("Channels with same copyright are equal")
-    func channelsWithSameCopyrightAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameCopyrightAreEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different copyrights are not equal")
-    func channelsWithDifferentCopyrightsAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentCopyrightsAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2024")
         #expect(channel1 != channel2)
     }
 
     @Test("Channels with nil vs non-nil copyright are not equal")
-    func channelsWithNilVsNonNilCopyrightAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithNilVsNonNilCopyrightAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         #expect(channel1 != channel2)

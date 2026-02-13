@@ -265,7 +265,7 @@ struct MediaTypeVerificationIntegrationTests {
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
         // Enclosure with matching type (no mismatch)
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         let enclosureURL = try #require(URL(string: url))
         let feed = PodcastFeed(
             channel: Channel(
@@ -289,9 +289,9 @@ struct MediaTypeVerificationIntegrationTests {
     }
 
     @Test("Live item enclosure and artwork are extracted")
-    func liveItemExtraction() throws {
+    func liveItemExtraction() {
         let validator = NetworkValidator()
-        let liveEnclosureURL = try #require(URL(string: "https://cdn.example.com/live.mp3"))
+        let liveEnclosureURL = makeURL("https://cdn.example.com/live.mp3")
         let liveItem = PodcastLiveItem(
             status: .live,
             start: Date(),
@@ -302,7 +302,7 @@ struct MediaTypeVerificationIntegrationTests {
             ),
             itunesImage: URL(string: "https://cdn.example.com/live-art.jpg")
         )
-        let channelLink = try #require(URL(string: "https://example.com"))
+        let channelLink = makeURL("https://example.com")
         var channel = Channel(
             title: "Test",
             link: channelLink,

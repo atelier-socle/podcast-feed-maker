@@ -47,10 +47,10 @@ struct ITunesChannelTypeTests {
     // MARK: - Channel Integration
 
     @Test
-    func test_channel_itunesType_episodic() throws {
+    func test_channel_itunesType_episodic() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesType: .episodic
         )
@@ -58,10 +58,10 @@ struct ITunesChannelTypeTests {
     }
 
     @Test
-    func test_channel_itunesType_serial() throws {
+    func test_channel_itunesType_serial() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesType: .serial
         )
@@ -69,10 +69,10 @@ struct ITunesChannelTypeTests {
     }
 
     @Test
-    func test_channel_itunesType_defaultsToNil() throws {
+    func test_channel_itunesType_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesType == nil)

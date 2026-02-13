@@ -8,10 +8,10 @@ struct ITunesSubtitleTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesSubtitle_shouldStoreValue() throws {
+    func test_channel_itunesSubtitle_shouldStoreValue() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesSubtitle: "Welcome to the show"
         )
@@ -19,20 +19,20 @@ struct ITunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_defaultsToNil() throws {
+    func test_channel_itunesSubtitle_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesSubtitle == nil)
     }
 
     @Test
-    func test_channel_itunesSubtitle_withEmptyString() throws {
+    func test_channel_itunesSubtitle_withEmptyString() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesSubtitle: ""
         )
@@ -40,10 +40,10 @@ struct ITunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_withSpecialCharacters() throws {
+    func test_channel_itunesSubtitle_withSpecialCharacters() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesSubtitle: "Latest updates & highlights"
         )
@@ -51,11 +51,11 @@ struct ITunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_with255Characters() throws {
+    func test_channel_itunesSubtitle_with255Characters() {
         let text = String(repeating: "a", count: 255)
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesSubtitle: text
         )
@@ -65,8 +65,8 @@ struct ITunesSubtitleTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameSubtitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameSubtitle() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -83,8 +83,8 @@ struct ITunesSubtitleTests {
     }
 
     @Test
-    func test_channel_equatable_differentSubtitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentSubtitle() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -103,8 +103,8 @@ struct ITunesSubtitleTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_hashable() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

@@ -211,7 +211,7 @@ struct RoundTripShowcaseTests {
             title: "New Episode",
             description: "A freshly added episode.",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://example.com/new.mp3")),
+                url: makeURL("https://example.com/new.mp3"),
                 length: 10_000_000,
                 type: "audio/mpeg"
             ),

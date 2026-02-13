@@ -7,8 +7,8 @@ struct PodcastFeedMakerTests {
 
     @Test
     func test_xmlRepresentation_generatesValidFeed() throws {
-        let channelLink = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/image.jpg"))
+        let channelLink = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/image.jpg")
         let channel = Channel(
             title: "My Podcast",
             link: channelLink,
@@ -44,7 +44,7 @@ struct PodcastFeedMakerTests {
 
     @Test("generateStream yields chunks")
     func generateStreamYieldsChunks() async throws {
-        let streamLink = try #require(URL(string: "https://example.com"))
+        let streamLink = makeURL("https://example.com")
         let channel = Channel(
             title: "Stream Test",
             link: streamLink,
@@ -62,7 +62,7 @@ struct PodcastFeedMakerTests {
 
     @Test("generateStream with prettyPrint false")
     func generateStreamMinified() async throws {
-        let minLink = try #require(URL(string: "https://example.com"))
+        let minLink = makeURL("https://example.com")
         let channel = Channel(
             title: "Stream Test",
             link: minLink,

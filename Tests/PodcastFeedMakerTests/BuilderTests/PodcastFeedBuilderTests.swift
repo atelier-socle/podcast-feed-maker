@@ -11,8 +11,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Basic Construction
 
     @Test("Channel only produces feed with empty items")
-    func channelOnly() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelOnly() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "My Podcast",
@@ -25,8 +25,8 @@ struct PodcastFeedBuilderChannelTests {
     }
 
     @Test("Channel with one item")
-    func channelWithOneItem() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelWithOneItem() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "My Podcast",
@@ -40,8 +40,8 @@ struct PodcastFeedBuilderChannelTests {
     }
 
     @Test("Channel with multiple items")
-    func channelWithMultipleItems() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelWithMultipleItems() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Podcast",
@@ -59,8 +59,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Items Auto-Assigned
 
     @Test("Items declared after channel are auto-assigned to channel.items")
-    func itemsAutoAssigned() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func itemsAutoAssigned() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Show",
@@ -78,8 +78,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Namespaces
 
     @Test("Feed has allStandard namespaces")
-    func feedHasAllStandardNamespaces() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func feedHasAllStandardNamespaces() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Podcast",
@@ -93,8 +93,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Fluent Modifiers Inside Builder
 
     @Test("Fluent modifiers work inside builder")
-    func fluentModifiersInsideBuilder() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func fluentModifiersInsideBuilder() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Podcast",
@@ -118,7 +118,7 @@ struct PodcastFeedBuilderChannelTests {
 
     @Test("Full spec example compiles and generates valid XML")
     func fullSpecExample() throws {
-        let url = try #require(URL(string: "https://techtalks.example.com"))
+        let url = makeURL("https://techtalks.example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Tech Talks",
@@ -158,8 +158,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Existing Init Still Works
 
     @Test("Existing init(channel:) still works")
-    func existingInitStillWorks() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func existingInitStillWorks() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Old School",
             link: url,
@@ -174,8 +174,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Channel With Pre-Existing Items
 
     @Test("Builder appends items to channel's existing items")
-    func builderAppendsToExistingItems() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func builderAppendsToExistingItems() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Show",
@@ -193,8 +193,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Items Before Channel
 
     @Test("Items before channel are still collected")
-    func itemsBeforeChannel() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func itemsBeforeChannel() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Item(title: "First")
             Channel(
@@ -210,8 +210,8 @@ struct PodcastFeedBuilderChannelTests {
     // MARK: - Version
 
     @Test("Feed version defaults to 2.0")
-    func versionDefaults() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func versionDefaults() {
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Show",
@@ -231,8 +231,8 @@ struct PodcastFeedBuilderItemTests {
     // MARK: - buildBlock Array Variant
 
     @Test("buildBlock array variant assembles feed from array of components")
-    func buildBlockArrayVariant() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func buildBlockArrayVariant() {
+        let url = makeURL("https://example.com")
         let components: [FeedComponent] = [
             Channel(
                 title: "Array Show",
@@ -284,8 +284,8 @@ struct PodcastFeedBuilderItemTests {
     }
 
     @Test("buildEither second returns the component unchanged")
-    func buildEitherSecond() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func buildEitherSecond() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Second Branch",
             link: url,
@@ -317,9 +317,9 @@ struct PodcastFeedBuilderItemTests {
     // MARK: - Assemble Multiple Channels Fallback
 
     @Test("Assemble with multiple channels uses first and assigns items")
-    func assembleMultipleChannels() throws {
-        let url1 = try #require(URL(string: "https://example.com/1"))
-        let url2 = try #require(URL(string: "https://example.com/2"))
+    func assembleMultipleChannels() {
+        let url1 = makeURL("https://example.com/1")
+        let url2 = makeURL("https://example.com/2")
         let components: [FeedComponent] = [
             Channel(
                 title: "First Channel",
@@ -358,8 +358,8 @@ struct PodcastFeedBuilderItemTests {
     }
 
     @Test("buildEither first with Channel preserves identity")
-    func buildEitherFirstChannel() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func buildEitherFirstChannel() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Either First",
             link: url,
@@ -371,8 +371,8 @@ struct PodcastFeedBuilderItemTests {
     }
 
     @Test("buildEither second with Channel preserves identity")
-    func buildEitherSecondChannel() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func buildEitherSecondChannel() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Either Second",
             link: url,
@@ -393,8 +393,8 @@ struct PodcastFeedBuilderItemTests {
     }
 
     @Test("buildExpression wraps Channel as FeedComponent")
-    func buildExpressionChannel() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func buildExpressionChannel() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Wrapped Channel",
             link: url,

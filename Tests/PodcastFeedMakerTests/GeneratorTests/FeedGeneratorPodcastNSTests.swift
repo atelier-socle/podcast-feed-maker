@@ -5,16 +5,16 @@ import Testing
 
 // MARK: - Helpers
 
-private func minimalChannel() throws -> Channel {
+private func minimalChannel() -> Channel {
     Channel(
         title: "Test Podcast",
-        link: try #require(URL(string: "https://example.com")),
+        link: makeURL("https://example.com"),
         description: "A test podcast"
     )
 }
 
-private func minimalFeed(channel: Channel? = nil) throws -> PodcastFeed {
-    PodcastFeed(channel: try channel ?? minimalChannel())
+private func minimalFeed(channel: Channel? = nil) -> PodcastFeed {
+    PodcastFeed(channel: channel ?? minimalChannel())
 }
 
 // MARK: - Podcast NS 2.0 Channel Tests
@@ -23,7 +23,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast GUID")
     func podcastGuid() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.podcastGuid = PodcastGuid(value: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<podcast:guid>917393e3-1b1e-5cef-ace4-edaa54e1f3e1</podcast:guid>"))
@@ -31,7 +31,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast locked")
     func podcastLocked() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.locked = Locked(isLocked: true, owner: "owner@example.com")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:locked owner="owner@example.com">yes</podcast:locked>"#))
@@ -39,7 +39,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast medium")
     func podcastMedium() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.medium = .podcast
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<podcast:medium>podcast</podcast:medium>"))
@@ -47,8 +47,8 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast funding")
     func podcastFunding() throws {
-        var ch = try minimalChannel()
-        let donateURL = try #require(URL(string: "https://example.com/donate"))
+        var ch = minimalChannel()
+        let donateURL = makeURL("https://example.com/donate")
         ch.funding = [Funding(url: donateURL, message: "Support Us")]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:funding url="https://example.com/donate">Support Us</podcast:funding>"#))
@@ -56,9 +56,9 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast person")
     func podcastPerson() throws {
-        var ch = try minimalChannel()
-        let personHref = try #require(URL(string: "https://example.com/jane"))
-        let personImg = try #require(URL(string: "https://example.com/jane.jpg"))
+        var ch = minimalChannel()
+        let personHref = makeURL("https://example.com/jane")
+        let personImg = makeURL("https://example.com/jane.jpg")
         ch.persons = [
             PodcastPerson(
                 name: "Jane Host",
@@ -76,7 +76,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast location")
     func podcastLocation() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.location = PodcastLocation(name: "Austin, TX", geo: "geo:30.2672,-97.7431", osm: "R113314")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:location geo="geo:30.2672,-97.7431" osm="R113314">Austin, TX</podcast:location>"#))
@@ -84,8 +84,8 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast license with and without URL")
     func podcastLicense() throws {
-        var ch = try minimalChannel()
-        let licenseURL = try #require(URL(string: "https://creativecommons.org/licenses/by/4.0/"))
+        var ch = minimalChannel()
+        let licenseURL = makeURL("https://creativecommons.org/licenses/by/4.0/")
         ch.license = PodcastLicense(identifier: "cc-by-4.0", url: licenseURL)
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>"#))
@@ -93,7 +93,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast value with recipients")
     func podcastValue() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.value = PodcastValue(
             type: "lightning",
             method: "keysend",
@@ -112,7 +112,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast block with platform id")
     func podcastBlock() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.podcastBlocks = [
             PodcastBlock(isBlocked: true, id: "google"),
             PodcastBlock(isBlocked: true)
@@ -124,7 +124,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast txt records")
     func podcastTxt() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.txtRecords = [
             PodcastTxt(value: "verify=abc123", purpose: "verify"),
             PodcastTxt(value: "some text")
@@ -136,8 +136,8 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast podroll with remote items")
     func podcastPodroll() throws {
-        var ch = try minimalChannel()
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        var ch = minimalChannel()
+        let feedURL = makeURL("https://example.com/feed.xml")
         ch.podroll = Podroll(remoteItems: [
             RemoteItem(feedGuid: "abc-123", feedUrl: feedURL),
             RemoteItem(feedGuid: "def-456")
@@ -151,7 +151,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast update frequency")
     func updateFrequency() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.updateFrequency = UpdateFrequency(label: "Weekly on Fridays", rrule: "FREQ=WEEKLY;BYDAY=FR")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:updateFrequency rrule="FREQ=WEEKLY;BYDAY=FR">Weekly on Fridays</podcast:updateFrequency>"#))
@@ -159,7 +159,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast podping")
     func podping() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.podpingEnabled = true
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<podcast:podping>true</podcast:podping>"))
@@ -167,7 +167,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast publisher")
     func publisher() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.publisher = PodcastPublisher(
             remoteItem: RemoteItem(
                 feedGuid: "pub-guid-123",
@@ -183,7 +183,7 @@ struct FeedGeneratorPodcastChannelTests {
 
     @Test("Podcast chat")
     func chat() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.chat = PodcastChat(server: "irc.zeronode.net", protocol: "irc", accountId: "host", space: "#podcast")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(##"<podcast:chat server="irc.zeronode.net" protocol="irc" accountId="host" space="#podcast" />"##))
@@ -207,8 +207,8 @@ struct FeedGeneratorPodcastItemTests {
         let calendar = Calendar(identifier: .gregorian)
         let date = try #require(calendar.date(from: components))
 
-        var ch = try minimalChannel()
-        let trailerURL = try #require(URL(string: "https://example.com/trailer.mp3"))
+        var ch = minimalChannel()
+        let trailerURL = makeURL("https://example.com/trailer.mp3")
         ch.trailers = [
             Trailer(
                 title: "Season 2 Trailer",
@@ -241,9 +241,9 @@ struct FeedGeneratorPodcastItemTests {
         let calendar = Calendar(identifier: .gregorian)
         let startDate = try #require(calendar.date(from: components))
 
-        var ch = try minimalChannel()
-        let liveURL = try #require(URL(string: "https://example.com/live.mp3"))
-        let chatURL = try #require(URL(string: "https://example.com/chat"))
+        var ch = minimalChannel()
+        let liveURL = makeURL("https://example.com/live.mp3")
+        let chatURL = makeURL("https://example.com/chat")
         ch.liveItems = [
             PodcastLiveItem(
                 status: .live,
@@ -262,8 +262,8 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item transcripts")
     func transcripts() throws {
-        var ch = try minimalChannel()
-        let transcriptURL = try #require(URL(string: "https://example.com/t.vtt"))
+        var ch = minimalChannel()
+        let transcriptURL = makeURL("https://example.com/t.vtt")
         ch.items = [
             Item(transcripts: [
                 Transcript(url: transcriptURL, type: "text/vtt", language: "en")
@@ -275,8 +275,8 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item chapters link")
     func chaptersLink() throws {
-        var ch = try minimalChannel()
-        let chaptersURL = try #require(URL(string: "https://example.com/chapters.json"))
+        var ch = minimalChannel()
+        let chaptersURL = makeURL("https://example.com/chapters.json")
         ch.items = [Item(chaptersLink: ChaptersLink(url: chaptersURL))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<podcast:chapters url="https://example.com/chapters.json" type="application/json+chapters" />"#))
@@ -284,7 +284,7 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item soundbites")
     func soundbites() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [
             Item(soundbites: [
                 Soundbite(startTime: 30.5, duration: 60.0, title: "Best Moment"),
@@ -298,7 +298,7 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item alternate enclosure with source and integrity")
     func alternateEnclosure() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [
             Item(alternateEnclosures: [
                 AlternateEnclosure(
@@ -321,8 +321,8 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item social interact")
     func socialInteract() throws {
-        var ch = try minimalChannel()
-        let accountURL = try #require(URL(string: "https://mastodon.social/@host"))
+        var ch = minimalChannel()
+        let accountURL = makeURL("https://mastodon.social/@host")
         ch.items = [
             Item(socialInteractions: [
                 SocialInteract(
@@ -342,7 +342,7 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Item podcast season and episode")
     func podcastSeasonEpisode() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [
             Item(
                 podcastSeason: PodcastSeason(number: 3, name: "Mysteries"),
@@ -356,7 +356,7 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Podcast episode with decimal number")
     func podcastEpisodeDecimal() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [Item(podcastEpisode: PodcastEpisode(number: 3.5))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<podcast:episode>3.5</podcast:episode>"))
@@ -364,7 +364,7 @@ struct FeedGeneratorPodcastItemTests {
 
     @Test("Value time split with remote item")
     func valueTimeSplit() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [
             Item(
                 value: PodcastValue(
@@ -395,9 +395,9 @@ struct FeedGeneratorPodloveTests {
 
     @Test("Podlove Simple Chapters")
     func podloveChapters() throws {
-        var ch = try minimalChannel()
-        let topicURL = try #require(URL(string: "https://example.com/topic"))
-        let imageURL = try #require(URL(string: "https://example.com/img.jpg"))
+        var ch = minimalChannel()
+        let topicURL = makeURL("https://example.com/topic")
+        let imageURL = makeURL("https://example.com/img.jpg")
         ch.items = [
             Item(
                 podloveChapters: PodloveChapters(

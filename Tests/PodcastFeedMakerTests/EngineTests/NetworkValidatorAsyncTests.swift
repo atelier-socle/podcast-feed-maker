@@ -19,7 +19,7 @@ private func makeFeed(
     PodcastFeed(
         channel: Channel(
             title: "Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A podcast",
             items: items,
             itunesImage: channelImage,

@@ -25,12 +25,12 @@ struct PSP1ValidationTests {
         itunesAuthor: String? = "Host",
         items: [Item] = []
     ) throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let resolvedAtomLinks: [AtomLink]
         if let atomLinks {
             resolvedAtomLinks = atomLinks
         } else {
-            let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+            let feedURL = makeURL("https://example.com/feed.xml")
             resolvedAtomLinks = [.selfLink(href: feedURL)]
         }
         return PodcastFeed(
@@ -50,8 +50,8 @@ struct PSP1ValidationTests {
             ))
     }
 
-    private func validItem() throws -> Item {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+    private func validItem() -> Item {
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         return Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -97,7 +97,7 @@ struct PSP1ValidationTests {
 
     @Test("atom:link without rel=self is error")
     func atomLinkNoSelf() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         let link = AtomLink(
             href: linkURL, rel: "alternate"
         )
@@ -195,7 +195,7 @@ struct PSP1ValidationTests {
 
     @Test("Item without GUID is error")
     func itemNoGuid() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -261,7 +261,7 @@ struct PSP1ValidationTests {
 
     @Test("Item title with leading whitespace is warning")
     func itemTitleWhitespace() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let item = Item(
             title: " Episode Title",
             enclosure: Enclosure(
@@ -284,7 +284,7 @@ struct PSP1ValidationTests {
     @Test("Item title over 255 chars is warning")
     func itemLongTitle() throws {
         let longTitle = String(repeating: "x", count: 300)
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let item = Item(
             title: longTitle,
             enclosure: Enclosure(

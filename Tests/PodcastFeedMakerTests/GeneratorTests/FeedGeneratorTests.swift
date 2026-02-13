@@ -5,16 +5,16 @@ import Testing
 
 // MARK: - Helpers
 
-private func minimalChannel() throws -> Channel {
+private func minimalChannel() -> Channel {
     Channel(
         title: "Test Podcast",
-        link: try #require(URL(string: "https://example.com")),
+        link: makeURL("https://example.com"),
         description: "A test podcast"
     )
 }
 
-private func minimalFeed(channel: Channel? = nil) throws -> PodcastFeed {
-    PodcastFeed(channel: try channel ?? minimalChannel())
+private func minimalFeed(channel: Channel? = nil) -> PodcastFeed {
+    PodcastFeed(channel: channel ?? minimalChannel())
 }
 
 // MARK: - Core Generation Tests
@@ -80,7 +80,7 @@ struct FeedGeneratorNamespaceTests {
 
     @Test("feedDefined mode uses feed namespaces")
     func feedDefinedMode() throws {
-        let feed = PodcastFeed(namespaces: [.itunes, .atom], channel: try minimalChannel())
+        let feed = PodcastFeed(namespaces: [.itunes, .atom], channel: minimalChannel())
         let gen = FeedGenerator(namespaceMode: .feedDefined)
         let xml = try gen.generate(feed)
         #expect(xml.contains("xmlns:itunes="))
@@ -90,7 +90,7 @@ struct FeedGeneratorNamespaceTests {
 
     @Test("auto mode resolves from content")
     func autoMode() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.itunesAuthor = "Host"
         let feed = PodcastFeed(namespaces: PodcastNamespace.allStandard, channel: ch)
         let gen = FeedGenerator(namespaceMode: .auto)
@@ -114,7 +114,7 @@ struct FeedGeneratorRSSTests {
 
     @Test("Channel optional RSS fields")
     func channelOptionalRSSFields() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.language = "en-us"
         ch.copyright = "Copyright 2025"
         ch.managingEditor = "editor@example.com"
@@ -143,7 +143,7 @@ struct FeedGeneratorRSSTests {
         let calendar = Calendar(identifier: .gregorian)
         let date = calendar.date(from: components)
 
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.pubDate = date
         ch.lastBuildDate = date
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
@@ -153,7 +153,7 @@ struct FeedGeneratorRSSTests {
 
     @Test("RSS categories with and without domain")
     func rssCategories() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.categories = [
             RSSCategory(value: "Technology"),
             RSSCategory(value: "News", domain: "https://example.com")
@@ -165,7 +165,7 @@ struct FeedGeneratorRSSTests {
 
     @Test("RSS cloud element")
     func rssCloud() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.cloud = RSSCloud(domain: "rpc.example.com", port: 80, path: "/RPC2", registerProcedure: "pingMe", protocolType: "soap")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<cloud domain="rpc.example.com" port="80" path="/RPC2" registerProcedure="pingMe" protocol="soap" />"#))
@@ -173,9 +173,9 @@ struct FeedGeneratorRSSTests {
 
     @Test("RSS image with all fields")
     func rssImage() throws {
-        var ch = try minimalChannel()
-        let imageURL = try #require(URL(string: "https://example.com/logo.png"))
-        let linkURL = try #require(URL(string: "https://example.com"))
+        var ch = minimalChannel()
+        let imageURL = makeURL("https://example.com/logo.png")
+        let linkURL = makeURL("https://example.com")
         ch.image = RSSImage(
             url: imageURL,
             title: "Logo",
@@ -196,8 +196,8 @@ struct FeedGeneratorRSSTests {
 
     @Test("RSS text input element")
     func rssTextInput() throws {
-        var ch = try minimalChannel()
-        let searchURL = try #require(URL(string: "https://example.com/search"))
+        var ch = minimalChannel()
+        let searchURL = makeURL("https://example.com/search")
         ch.textInput = RSSTextInput(title: "Search", description: "Search this feed", name: "query", link: searchURL)
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<textInput>"))
@@ -208,7 +208,7 @@ struct FeedGeneratorRSSTests {
 
     @Test("Skip schedule elements")
     func skipSchedule() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.skipSchedule = SkipSchedule(hours: [0, 1, 2], days: [.saturday, .sunday])
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<skipHours>"))
@@ -224,8 +224,8 @@ struct FeedGeneratorRSSTests {
 
     @Test("Item enclosure")
     func itemEnclosure() throws {
-        var ch = try minimalChannel()
-        let encURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        var ch = minimalChannel()
+        let encURL = makeURL("https://example.com/ep.mp3")
         ch.items = [Item(enclosure: Enclosure(url: encURL, length: 12345, type: "audio/mpeg"))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<enclosure url="https://example.com/ep.mp3" length="12345" type="audio/mpeg" />"#))
@@ -233,7 +233,7 @@ struct FeedGeneratorRSSTests {
 
     @Test("Item GUID")
     func itemGUID() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [Item(guid: GUID(value: "https://example.com/ep1", isPermaLink: true))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<guid isPermaLink="true">https://example.com/ep1</guid>"#))
@@ -241,8 +241,8 @@ struct FeedGeneratorRSSTests {
 
     @Test("Item source")
     func itemSource() throws {
-        var ch = try minimalChannel()
-        let sourceURL = try #require(URL(string: "https://other.com/feed.xml"))
+        var ch = minimalChannel()
+        let sourceURL = makeURL("https://other.com/feed.xml")
         ch.items = [Item(source: RSSSource(title: "Other Feed", url: sourceURL))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<source url="https://other.com/feed.xml">Other Feed</source>"#))
@@ -255,12 +255,12 @@ struct FeedGeneratorITunesTests {
 
     @Test("Channel iTunes properties")
     func channelITunesProperties() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.itunesAuthor = "John Doe"
         ch.itunesBlock = true
         ch.itunesComplete = true
         ch.itunesExplicit = true
-        ch.itunesImage = try #require(URL(string: "https://example.com/art.jpg"))
+        ch.itunesImage = makeURL("https://example.com/art.jpg")
         ch.itunesKeywords = ["swift", "development"]
         ch.itunesSubtitle = "A short subtitle"
         ch.itunesSummary = "A longer summary"
@@ -281,12 +281,12 @@ struct FeedGeneratorITunesTests {
 
     @Test("itunes:explicit uses true/false format")
     func itunesExplicitFormat() throws {
-        var chTrue = try minimalChannel()
+        var chTrue = minimalChannel()
         chTrue.itunesExplicit = true
         let xmlTrue = try FeedGenerator().generate(minimalFeed(channel: chTrue))
         #expect(xmlTrue.contains("<itunes:explicit>true</itunes:explicit>"))
 
-        var chFalse = try minimalChannel()
+        var chFalse = minimalChannel()
         chFalse.itunesExplicit = false
         let xmlFalse = try FeedGenerator().generate(minimalFeed(channel: chFalse))
         #expect(xmlFalse.contains("<itunes:explicit>false</itunes:explicit>"))
@@ -294,7 +294,7 @@ struct FeedGeneratorITunesTests {
 
     @Test("iTunes owner element")
     func itunesOwner() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.itunesOwner = ITunesOwner(name: "Jane Doe", email: "jane@example.com")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<itunes:owner>"))
@@ -305,7 +305,7 @@ struct FeedGeneratorITunesTests {
 
     @Test("iTunes categories with subcategories")
     func itunesCategories() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.itunesCategories = [
             ITunesCategory(text: "Technology"),
             ITunesCategory(text: "News", subcategories: [ITunesCategory(text: "Tech News")])
@@ -318,15 +318,15 @@ struct FeedGeneratorITunesTests {
 
     @Test("iTunes new-feed-url")
     func itunesNewFeedUrl() throws {
-        var ch = try minimalChannel()
-        ch.itunesNewFeedUrl = try #require(URL(string: "https://example.com/new-feed.xml"))
+        var ch = minimalChannel()
+        ch.itunesNewFeedUrl = makeURL("https://example.com/new-feed.xml")
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<itunes:new-feed-url>https://example.com/new-feed.xml</itunes:new-feed-url>"))
     }
 
     @Test("Item iTunes properties")
     func itemITunesProperties() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [
             Item(
                 itunesAuthor: "Author",
@@ -357,8 +357,8 @@ struct FeedGeneratorAtomTests {
 
     @Test("Atom self link")
     func atomSelfLink() throws {
-        var ch = try minimalChannel()
-        let selfURL = try #require(URL(string: "https://example.com/feed.xml"))
+        var ch = minimalChannel()
+        let selfURL = makeURL("https://example.com/feed.xml")
         ch.atomLinks = [AtomLink.selfLink(href: selfURL)]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains(#"<atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml" />"#))
@@ -366,8 +366,8 @@ struct FeedGeneratorAtomTests {
 
     @Test("Atom link with all attributes")
     func atomLinkFull() throws {
-        var ch = try minimalChannel()
-        let linkURL = try #require(URL(string: "https://example.com"))
+        var ch = minimalChannel()
+        let linkURL = makeURL("https://example.com")
         ch.atomLinks = [
             AtomLink(
                 href: linkURL,
@@ -394,7 +394,7 @@ struct FeedGeneratorDublinCoreTests {
 
     @Test("Dublin Core all 15 properties")
     func dublinCoreAllProperties() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.dublinCore = DublinCore(
             creator: "Creator",
             contributor: "Contributor",
@@ -432,7 +432,7 @@ struct FeedGeneratorDublinCoreTests {
 
     @Test("Dublin Core at item level")
     func dublinCoreItem() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [Item(dublinCore: DublinCore(creator: "Jane", subject: "AI"))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<dc:creator>Jane</dc:creator>"))

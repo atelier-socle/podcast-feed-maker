@@ -46,31 +46,31 @@ struct HelpersTests {
 
     @Test
     func testValidateURL() throws {
-        let validURL = try #require(URL(string: "https://swift.org"))
+        let validURL = makeURL("https://swift.org")
         try XMLBuilder.validateURL(validURL, context: "test")
 
-        let ftpURL = try #require(URL(string: "ftp://invalid-url"))
+        let ftpURL = makeURL("ftp://invalid-url")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(ftpURL, context: "test")
         }
 
-        let fileURL = try #require(URL(string: "file://file_path"))
+        let fileURL = makeURL("file://file_path")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(fileURL, context: "test")
         }
     }
 
     @Test
-    func testEncodeURL() throws {
-        let input = try #require(URL(string: "https://swift.org/search?query=école+swift&lang=fr"))
+    func testEncodeURL() {
+        let input = makeURL("https://swift.org/search?query=école+swift&lang=fr")
         let encoded = XMLBuilder.encodeURL(input)
         #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
     }
 
     @Test
-    func test_encodeURL_returnsEscapedStringOrFallback() throws {
-        let url = try #require(URL(string: "https://example.com/query?param=ç©🎉"))
+    func test_encodeURL_returnsEscapedStringOrFallback() {
+        let url = makeURL("https://example.com/query?param=ç©🎉")
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.starts(with: "https://example.com"))
     }

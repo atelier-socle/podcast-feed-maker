@@ -16,9 +16,9 @@ struct ImageTests {
     // MARK: - Initialization
 
     @Test("RSSImage can be initialized with required properties")
-    func rssImageInitWithRequiredProperties() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageInitWithRequiredProperties() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(url: url, title: "Podcast Logo", link: link)
 
         #expect(image.url == url)
@@ -30,9 +30,9 @@ struct ImageTests {
     }
 
     @Test("RSSImage can be initialized with all properties")
-    func rssImageInitWithAllProperties() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageInitWithAllProperties() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: url,
             title: "Podcast Logo",
@@ -48,17 +48,17 @@ struct ImageTests {
     }
 
     @Test("RSSImage properties are mutable")
-    func rssImagePropertiesAreMutable() throws {
-        let oldURL = try #require(URL(string: "https://example.com/old.png"))
-        let oldLink = try #require(URL(string: "https://old.example.com"))
+    func rssImagePropertiesAreMutable() {
+        let oldURL = makeURL("https://example.com/old.png")
+        let oldLink = makeURL("https://old.example.com")
         var image = RSSImage(
             url: oldURL,
             title: "Old Title",
             link: oldLink
         )
 
-        let newURL = try #require(URL(string: "https://example.com/new.png"))
-        let newLink = try #require(URL(string: "https://new.example.com"))
+        let newURL = makeURL("https://example.com/new.png")
+        let newLink = makeURL("https://new.example.com")
         image.url = newURL
         image.title = "New Title"
         image.link = newLink
@@ -75,9 +75,9 @@ struct ImageTests {
     // MARK: - XML Generation
 
     @Test("RSSImage generates XML with expected elements via XMLBuilder")
-    func rssImageXmlRepresentation() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageXmlRepresentation() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: url,
             title: "Podcast Logo",
@@ -104,9 +104,9 @@ struct ImageTests {
     }
 
     @Test("RSSImage generates XML escaping special characters in title")
-    func rssImageXmlEscapesTitle() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageXmlEscapesTitle() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: url,
             title: "Show & Tell <Podcast>",
@@ -131,9 +131,9 @@ struct ImageTests {
     // MARK: - Channel Integration
 
     @Test("Channel can hold an RSSImage")
-    func channelCanHoldImage() throws {
-        let imgURL = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func channelCanHoldImage() {
+        let imgURL = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: imgURL,
             title: "Logo",
@@ -152,8 +152,8 @@ struct ImageTests {
 
     @Test("Channel XML contains image element when set")
     func channelXmlContainsImage() throws {
-        let imgURL = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+        let imgURL = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: imgURL,
             title: "Logo",
@@ -173,7 +173,7 @@ struct ImageTests {
 
     @Test("Channel XML omits image element when nil")
     func channelXmlOmitsImageWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -187,18 +187,18 @@ struct ImageTests {
     // MARK: - Equatable
 
     @Test("RSSImages with same properties are equal")
-    func rssImagesEqual() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImagesEqual() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let img1 = RSSImage(url: url, title: "Logo", link: link)
         let img2 = RSSImage(url: url, title: "Logo", link: link)
         #expect(img1 == img2)
     }
 
     @Test("RSSImages with different titles are not equal")
-    func rssImagesDifferentTitles() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImagesDifferentTitles() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let img1 = RSSImage(url: url, title: "Logo A", link: link)
         let img2 = RSSImage(url: url, title: "Logo B", link: link)
         #expect(img1 != img2)
@@ -207,9 +207,9 @@ struct ImageTests {
     // MARK: - Hashable
 
     @Test("RSSImage is Hashable")
-    func rssImageHashable() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+    func rssImageHashable() {
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(url: url, title: "Logo", link: link)
         let set: Set = [image]
         #expect(set.contains(RSSImage(url: url, title: "Logo", link: link)))
@@ -219,8 +219,8 @@ struct ImageTests {
 
     @Test("RSSImage can be encoded and decoded via JSON")
     func rssImageCodable() throws {
-        let url = try #require(URL(string: "https://example.com/logo.png"))
-        let link = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com/logo.png")
+        let link = makeURL("https://example.com")
         let image = RSSImage(
             url: url,
             title: "Logo",

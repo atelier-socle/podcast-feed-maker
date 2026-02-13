@@ -8,8 +8,8 @@ struct TemplateRoundTripTests {
 
     @Test("basic template -> generate -> parse -> channel.title matches")
     func basicRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Round Trip Show", link: testURL, description: "Testing round-trip"
         ) { ch in
@@ -27,9 +27,9 @@ struct TemplateRoundTripTests {
 
     @Test("standard template -> generate -> parse -> validate against template")
     func standardRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Standard Show", link: testURL, description: "A standard podcast"
         ) { ch in
@@ -53,9 +53,9 @@ struct TemplateRoundTripTests {
 
     @Test("standard template passes PSP-1 platform validation after round-trip")
     func standardPSP1RoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "PSP-1 Show", link: testURL, description: "Compliant"
         ) { ch in
@@ -79,9 +79,9 @@ struct TemplateRoundTripTests {
 
     @Test("advanced template round-trips with items")
     func advancedWithItemsRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         var feed = PodcastFeed.advanced(
             title: "Advanced Show", link: testURL, description: "Rich metadata"
         ) { ch in
@@ -117,9 +117,9 @@ struct TemplateRoundTripTests {
 
     @Test("detectLevel after round-trip matches original template level")
     func detectLevelAfterRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Level Test", link: testURL, description: "Testing"
         ) { ch in
@@ -143,9 +143,9 @@ struct TemplateRoundTripTests {
 
     @Test("expert template -> generate -> parse -> validate against template")
     func expertRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         var feed = PodcastFeed.expert(
             title: "Expert Show", link: testURL, description: "Full coverage"
         ) { ch in
@@ -163,7 +163,7 @@ struct TemplateRoundTripTests {
         }
         feed.channel?.persons = [PodcastPerson(name: "Host")]
 
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.srt"))
+        let transcriptURL = makeURL("https://example.com/ep1.srt")
         var item = Item(
             title: "Episode 1",
             enclosure: Enclosure.mp3(url: "https://example.com/ep1.mp3", length: 50_000),
@@ -188,8 +188,8 @@ struct TemplateRoundTripTests {
 
     @Test("Apple platform validation passes after basic template round-trip")
     func applePlatformRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let imageURL = Self.makeImageURL()
         var feed = PodcastFeed.basic(
             title: "Apple Show", link: testURL, description: "Apple-compatible podcast"
         ) { ch in
@@ -218,9 +218,9 @@ struct TemplateRoundTripTests {
 
     @Test("all-platform validation passes after standard template with PSP-1 fields")
     func allPlatformRoundTrip() throws {
-        let testURL = try Self.makeTestURL()
-        let feedURL = try Self.makeFeedURL()
-        let imageURL = try Self.makeImageURL()
+        let testURL = Self.makeTestURL()
+        let feedURL = Self.makeFeedURL()
+        let imageURL = Self.makeImageURL()
         var feed = PodcastFeed.standard(
             title: "Universal Show", link: testURL, description: "Cross-platform podcast"
         ) { ch in
@@ -256,15 +256,15 @@ struct TemplateRoundTripTests {
 
     // MARK: - Helpers
 
-    private static func makeTestURL() throws -> URL {
-        try #require(URL(string: "https://example.com"))
+    private static func makeTestURL() -> URL {
+        makeURL("https://example.com")
     }
 
-    private static func makeFeedURL() throws -> URL {
-        try #require(URL(string: "https://example.com/feed.xml"))
+    private static func makeFeedURL() -> URL {
+        makeURL("https://example.com/feed.xml")
     }
 
-    private static func makeImageURL() throws -> URL {
-        try #require(URL(string: "https://example.com/art.jpg"))
+    private static func makeImageURL() -> URL {
+        makeURL("https://example.com/art.jpg")
     }
 }

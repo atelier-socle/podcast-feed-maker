@@ -14,8 +14,8 @@ struct GeneratorTests {
     // MARK: - Initialization
 
     @Test("Channel generator defaults to nil")
-    func channelGeneratorDefaultsToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelGeneratorDefaultsToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -26,8 +26,8 @@ struct GeneratorTests {
     }
 
     @Test("Channel generator can be set at initialization")
-    func channelGeneratorCanBeSet() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelGeneratorCanBeSet() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -39,8 +39,8 @@ struct GeneratorTests {
     }
 
     @Test("Channel generator is mutable")
-    func channelGeneratorIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelGeneratorIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -55,7 +55,7 @@ struct GeneratorTests {
 
     @Test("Channel XML contains generator tag when set")
     func channelXmlContainsGenerator() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -69,7 +69,7 @@ struct GeneratorTests {
 
     @Test("Channel XML omits generator tag when nil")
     func channelXmlOmitsGeneratorWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -82,7 +82,7 @@ struct GeneratorTests {
 
     @Test("Channel XML escapes special characters in generator")
     func channelXmlEscapesSpecialCharsInGenerator() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -97,16 +97,16 @@ struct GeneratorTests {
     // MARK: - Equatable
 
     @Test("Channels with same generator are equal")
-    func channelsWithSameGeneratorAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameGeneratorAreEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", generator: "Gen")
         let channel2 = Channel(title: "T", link: url, description: "D", generator: "Gen")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different generators are not equal")
-    func channelsWithDifferentGeneratorsAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentGeneratorsAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", generator: "Gen1")
         let channel2 = Channel(title: "T", link: url, description: "D", generator: "Gen2")
         #expect(channel1 != channel2)

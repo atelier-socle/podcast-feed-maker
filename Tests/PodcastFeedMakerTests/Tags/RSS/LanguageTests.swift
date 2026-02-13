@@ -16,8 +16,8 @@ struct LanguageTests {
     // MARK: - Initialization
 
     @Test("Channel language defaults to nil")
-    func channelLanguageDefaultsToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLanguageDefaultsToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -28,8 +28,8 @@ struct LanguageTests {
     }
 
     @Test("Channel language can be set at initialization")
-    func channelLanguageCanBeSet() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLanguageCanBeSet() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -41,8 +41,8 @@ struct LanguageTests {
     }
 
     @Test("Channel language is mutable")
-    func channelLanguageIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLanguageIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -55,8 +55,8 @@ struct LanguageTests {
     }
 
     @Test("Channel language accepts BCP 47 language tags")
-    func channelLanguageAcceptsBcp47() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLanguageAcceptsBcp47() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -71,7 +71,7 @@ struct LanguageTests {
 
     @Test("Channel XML contains language tag when set")
     func channelXmlContainsLanguage() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -85,7 +85,7 @@ struct LanguageTests {
 
     @Test("Channel XML omits language tag when nil")
     func channelXmlOmitsLanguageWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -98,7 +98,7 @@ struct LanguageTests {
 
     @Test("Channel XML preserves language string as-is")
     func channelXmlPreservesLanguageString() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -113,16 +113,16 @@ struct LanguageTests {
     // MARK: - Equatable
 
     @Test("Channels with same language are equal")
-    func channelsWithSameLanguageAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameLanguageAreEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", language: "en")
         let channel2 = Channel(title: "T", link: url, description: "D", language: "en")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different languages are not equal")
-    func channelsWithDifferentLanguagesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentLanguagesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", language: "en")
         let channel2 = Channel(title: "T", link: url, description: "D", language: "fr")
         #expect(channel1 != channel2)

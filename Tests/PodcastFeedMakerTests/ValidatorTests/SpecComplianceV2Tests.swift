@@ -83,7 +83,7 @@ struct LegacyExplicitParsingTests {
 
     @Test("Generator always outputs 'true' or 'false'")
     func generatorOutputsModernValues() throws {
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         var channel = Channel(
             title: "Test",
             link: url,
@@ -109,9 +109,9 @@ struct PSP1LanguageRequiredTests {
     private let validator = FeedValidator()
 
     @Test("Missing language is error for PSP-1")
-    func missingLanguageIsError() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func missingLanguageIsError() {
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -129,9 +129,9 @@ struct PSP1LanguageRequiredTests {
     }
 
     @Test("Present language passes PSP-1")
-    func presentLanguagePasses() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func presentLanguagePasses() {
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -151,10 +151,10 @@ struct PSP1LanguageRequiredTests {
     }
 
     @Test("PSP1Configuration includes language and defaults to 'en'")
-    func psp1ConfigLanguage() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func psp1ConfigLanguage() {
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://example.com/art.jpg")
         let config = PSP1Configuration(
             title: "Test",
             link: url,
@@ -185,8 +185,8 @@ struct PSP1TextChecksTests {
         itunesAuthor: String? = "Host",
         itunesTitle: String? = nil
     ) throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -255,10 +255,10 @@ struct DescriptionByteLimitTests {
     private let validator = FeedValidator()
 
     @Test("Apple warns for channel description > 4000 bytes")
-    func appleChannelDescBytes() throws {
+    func appleChannelDescBytes() {
         let longDesc = String(repeating: "\u{00E9}", count: 2001)
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -286,10 +286,10 @@ struct DescriptionByteLimitTests {
     }
 
     @Test("Apple warns for item description > 4000 bytes")
-    func appleItemDescBytes() throws {
+    func appleItemDescBytes() {
         let longItemDesc = String(repeating: "\u{00E9}", count: 2001)
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -318,10 +318,10 @@ struct DescriptionByteLimitTests {
     }
 
     @Test("PSP-1 warns for channel description > 4000 bytes")
-    func psp1ChannelDescBytes() throws {
+    func psp1ChannelDescBytes() {
         let longDesc = String(repeating: "\u{00E9}", count: 2001)
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -343,11 +343,11 @@ struct DescriptionByteLimitTests {
     }
 
     @Test("PSP-1 warns for item description > 4000 bytes")
-    func psp1ItemDescBytes() throws {
+    func psp1ItemDescBytes() {
         let longItemDesc = String(repeating: "\u{00E9}", count: 2001)
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -381,9 +381,9 @@ struct DescriptionByteLimitTests {
     }
 
     @Test("Description under 4000 bytes passes Apple")
-    func shortDescriptionPasses() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+    func shortDescriptionPasses() {
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -419,9 +419,9 @@ struct AppleASCIIURLTests {
     private let validator = FeedValidator()
 
     @Test("Non-ASCII enclosure URL triggers warning")
-    func nonASCIIEnclosureURL() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/%C3%A9pisode.mp3"))
+    func nonASCIIEnclosureURL() {
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/%C3%A9pisode.mp3")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -450,9 +450,9 @@ struct AppleASCIIURLTests {
     }
 
     @Test("ASCII-only enclosure URL passes")
-    func asciiEnclosureURL() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/episode-1.mp3"))
+    func asciiEnclosureURL() {
+        let url = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/episode-1.mp3")
         let channel = Channel(
             title: "Test",
             link: url,
@@ -493,7 +493,7 @@ struct PodcastMediumPublisherLTests {
     @Test("publisherL round-trips through parse/generate")
     func publisherLRoundTrip() throws {
         let engine = PodcastFeedEngine()
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         var channel = Channel(
             title: "Test",
             link: url,

@@ -96,10 +96,10 @@ struct PodcastFeedEngineTests {
     }
 
     @Test("validate catches missing channel title")
-    func validateMissingTitle() throws {
+    func validateMissingTitle() {
         let channel = Channel(
             title: "",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -140,7 +140,7 @@ struct PodcastFeedEngineTests {
     func isEquivalentIdentical() throws {
         let channel = Channel(
             title: "Test",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A test podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -152,7 +152,7 @@ struct PodcastFeedEngineTests {
     func isEquivalentDifferentFormatting() throws {
         let channel = Channel(
             title: "Test",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A test podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -165,12 +165,12 @@ struct PodcastFeedEngineTests {
     func isEquivalentDifferent() throws {
         let channel1 = Channel(
             title: "Podcast A",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "First podcast"
         )
         let channel2 = Channel(
             title: "Podcast B",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Second podcast"
         )
         let xml1 = try engine.generate(PodcastFeed(channel: channel1))
@@ -283,7 +283,7 @@ struct PodcastFeedEngineAsyncTests {
             for: url
         )
 
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         let enclosureURL = try #require(URL(string: url))
         let channel = Channel(
             title: "Test",
@@ -336,7 +336,7 @@ struct PodcastFeedEngineAsyncTests {
             for: url
         )
 
-        let dimsLinkURL = try #require(URL(string: "https://example.com"))
+        let dimsLinkURL = makeURL("https://example.com")
         let channel = Channel(
             title: "Test",
             link: dimsLinkURL,
@@ -364,7 +364,7 @@ struct PodcastFeedEngineAsyncTests {
 
     @Test("generateStream yields header, items, and footer")
     func generateStreamYieldsChunks() async throws {
-        let streamLinkURL = try #require(URL(string: "https://example.com"))
+        let streamLinkURL = makeURL("https://example.com")
         let channel = Channel(
             title: "Test",
             link: streamLinkURL,
@@ -388,7 +388,7 @@ struct PodcastFeedEngineAsyncTests {
 
     @Test("generateStream with prettyPrint false")
     func generateStreamMinified() async throws {
-        let minLinkURL = try #require(URL(string: "https://example.com"))
+        let minLinkURL = makeURL("https://example.com")
         let channel = Channel(
             title: "Test",
             link: minLinkURL,

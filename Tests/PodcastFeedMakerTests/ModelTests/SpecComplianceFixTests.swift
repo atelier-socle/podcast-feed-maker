@@ -9,9 +9,9 @@ import Testing
 struct PodcastImageComplianceTests {
 
     @Test("PodcastImage model stores all 7 attributes")
-    func modelAttributes() throws {
+    func modelAttributes() {
         let image = PodcastImage(
-            href: try #require(URL(string: "https://example.com/art.jpg")),
+            href: makeURL("https://example.com/art.jpg"),
             alt: "Show art",
             aspectRatio: "1/1",
             width: 3000,
@@ -29,8 +29,8 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("PodcastImage defaults are nil")
-    func modelDefaults() throws {
-        let image = PodcastImage(href: try #require(URL(string: "https://example.com/a.jpg")))
+    func modelDefaults() {
+        let image = PodcastImage(href: makeURL("https://example.com/a.jpg"))
         #expect(image.alt == nil)
         #expect(image.aspectRatio == nil)
         #expect(image.width == nil)
@@ -40,23 +40,23 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("Channel holds multiple podcast:image elements")
-    func channelMultipleImages() throws {
+    func channelMultipleImages() {
         let images = [
-            PodcastImage(href: try #require(URL(string: "https://example.com/art.jpg")), purpose: "artwork"),
-            PodcastImage(href: try #require(URL(string: "https://example.com/social.jpg")), purpose: "social")
+            PodcastImage(href: makeURL("https://example.com/art.jpg"), purpose: "artwork"),
+            PodcastImage(href: makeURL("https://example.com/social.jpg"), purpose: "social")
         ]
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             podcastImages: images
         )
         #expect(channel.podcastImages.count == 2)
     }
 
     @Test("Item holds multiple podcast:image elements")
-    func itemMultipleImages() throws {
+    func itemMultipleImages() {
         var item = Item(title: "Ep")
         item.podcastImages = [
-            PodcastImage(href: try #require(URL(string: "https://example.com/ep-art.jpg")), purpose: "artwork")
+            PodcastImage(href: makeURL("https://example.com/ep-art.jpg"), purpose: "artwork")
         ]
         #expect(item.podcastImages.count == 1)
     }
@@ -64,11 +64,11 @@ struct PodcastImageComplianceTests {
     @Test("Generator emits podcast:image with aspect-ratio hyphen")
     func generatorEmitsImage() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.podcastImages = [
             PodcastImage(
-                href: try #require(URL(string: "https://example.com/art.jpg")),
+                href: makeURL("https://example.com/art.jpg"),
                 alt: "Art",
                 aspectRatio: "1/1",
                 width: 3000,
@@ -133,11 +133,11 @@ struct PodcastImageComplianceTests {
     @Test("podcast:image round-trips")
     func imageRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.podcastImages = [
             PodcastImage(
-                href: try #require(URL(string: "https://example.com/art.jpg")),
+                href: makeURL("https://example.com/art.jpg"),
                 alt: "Art",
                 aspectRatio: "16/9",
                 width: 1920,
@@ -159,12 +159,12 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("NamespaceResolver detects podcast:image")
-    func namespaceResolverDetects() throws {
+    func namespaceResolverDetects() {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.podcastImages = [
-            PodcastImage(href: try #require(URL(string: "https://example.com/art.jpg")))
+            PodcastImage(href: makeURL("https://example.com/art.jpg"))
         ]
         let feed = PodcastFeed(channel: channel)
         let ns = NamespaceResolver.resolve(feed)
@@ -192,7 +192,7 @@ struct PodcastPublisherComplianceTests {
     @Test("Generator emits publisher container with remoteItem")
     func generatorEmitsContainer() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.publisher = PodcastPublisher(
             remoteItem: RemoteItem(
@@ -233,7 +233,7 @@ struct PodcastPublisherComplianceTests {
     @Test("Publisher round-trips")
     func publisherRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.publisher = PodcastPublisher(
             remoteItem: RemoteItem(
@@ -249,9 +249,9 @@ struct PodcastPublisherComplianceTests {
     }
 
     @Test("Builder creates publisher with remoteItem")
-    func builderPublisher() throws {
+    func builderPublisher() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         ).publisher(feedGuid: "abc", feedUrl: "https://pub.example.com/feed.xml")
         #expect(channel.publisher?.remoteItem.feedGuid == "abc")
         #expect(channel.publisher?.remoteItem.medium == "publisher")
@@ -277,9 +277,9 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Channel supports multiple locations")
-    func channelMultipleLocations() throws {
+    func channelMultipleLocations() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
+            title: "T", link: makeURL("https://example.com"), description: "D",
             locations: [
                 PodcastLocation(name: "Austin", rel: "creator", country: "US"),
                 PodcastLocation(name: "Paris", rel: "subject", country: "FR")
@@ -290,9 +290,9 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Location computed property backward compatibility")
-    func computedPropertyBackwardCompat() throws {
+    func computedPropertyBackwardCompat() {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.location = PodcastLocation(name: "Berlin")
         #expect(channel.locations.count == 1)
@@ -304,7 +304,7 @@ struct PodcastLocationComplianceTests {
     @Test("Generator emits rel and country attributes")
     func generatorEmitsAttributes() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.locations = [
             PodcastLocation(name: "NYC", geo: "geo:40.7,-74.0", rel: "creator", country: "US")
@@ -342,7 +342,7 @@ struct PodcastLocationComplianceTests {
     @Test("Location round-trips with rel and country")
     func locationRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.locations = [
             PodcastLocation(name: "Berlin", rel: "creator", country: "DE")
@@ -357,9 +357,9 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Builder creates location with rel and country")
-    func builderLocation() throws {
+    func builderLocation() {
         let channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         ).location(name: "NYC", geo: "geo:40.7,-74.0", rel: "creator", country: "US")
         #expect(channel.locations.count == 1)
         #expect(channel.locations[0].rel == "creator")
@@ -419,7 +419,7 @@ struct PodcastImagesComplianceTests {
     @Test("podcast:images srcset round-trips")
     func srcsetRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
+            title: "T", link: makeURL("https://example.com"), description: "D"
         )
         channel.podcastImagesSrcset = PodcastImages(
             srcset: "https://example.com/art-3000.jpg 3000w, https://example.com/art-600.jpg 600w"

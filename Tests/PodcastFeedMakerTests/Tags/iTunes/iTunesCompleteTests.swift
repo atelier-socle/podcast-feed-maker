@@ -8,10 +8,10 @@ struct ITunesCompleteTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesComplete_true() throws {
+    func test_channel_itunesComplete_true() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesComplete: true
         )
@@ -19,10 +19,10 @@ struct ITunesCompleteTests {
     }
 
     @Test
-    func test_channel_itunesComplete_false() throws {
+    func test_channel_itunesComplete_false() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesComplete: false
         )
@@ -30,10 +30,10 @@ struct ITunesCompleteTests {
     }
 
     @Test
-    func test_channel_itunesComplete_defaultsToNil() throws {
+    func test_channel_itunesComplete_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesComplete == nil)
@@ -42,8 +42,8 @@ struct ITunesCompleteTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameComplete() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameComplete() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -60,8 +60,8 @@ struct ITunesCompleteTests {
     }
 
     @Test
-    func test_channel_equatable_differentComplete() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentComplete() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -80,8 +80,8 @@ struct ITunesCompleteTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_hashable() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

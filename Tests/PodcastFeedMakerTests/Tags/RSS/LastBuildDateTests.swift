@@ -15,8 +15,8 @@ struct LastBuildDateTests {
     // MARK: - Initialization
 
     @Test("Channel lastBuildDate defaults to nil")
-    func channelLastBuildDateDefaultsToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLastBuildDateDefaultsToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -27,9 +27,9 @@ struct LastBuildDateTests {
     }
 
     @Test("Channel lastBuildDate can be set at initialization")
-    func channelLastBuildDateCanBeSet() throws {
+    func channelLastBuildDateCanBeSet() {
         let date = Date(timeIntervalSince1970: 1_000_000)
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -41,8 +41,8 @@ struct LastBuildDateTests {
     }
 
     @Test("Channel lastBuildDate is mutable")
-    func channelLastBuildDateIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelLastBuildDateIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -66,7 +66,7 @@ struct LastBuildDateTests {
         )
         let date = try #require(components.date)
 
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -80,7 +80,7 @@ struct LastBuildDateTests {
 
     @Test("Channel XML omits lastBuildDate tag when nil")
     func channelXmlOmitsLastBuildDateWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -94,8 +94,8 @@ struct LastBuildDateTests {
     // MARK: - Equatable
 
     @Test("Channels with same lastBuildDate are equal")
-    func channelsWithSameLastBuildDateAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameLastBuildDateAreEqual() {
+        let url = makeURL("https://example.com")
         let date = Date(timeIntervalSince1970: 100)
         let channel1 = Channel(title: "T", link: url, description: "D", lastBuildDate: date)
         let channel2 = Channel(title: "T", link: url, description: "D", lastBuildDate: date)
@@ -103,8 +103,8 @@ struct LastBuildDateTests {
     }
 
     @Test("Channels with different lastBuildDates are not equal")
-    func channelsWithDifferentLastBuildDatesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentLastBuildDatesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let date1 = Date(timeIntervalSince1970: 100)
         let date2 = Date(timeIntervalSince1970: 200)
         let channel1 = Channel(title: "T", link: url, description: "D", lastBuildDate: date1)

@@ -8,13 +8,13 @@ struct TemplateFeedFactoryTests {
 
     // MARK: - Helpers
 
-    private static func makeTestURL() throws -> URL {
-        try #require(URL(string: "https://example.com"))
+    private static func makeTestURL() -> URL {
+        makeURL("https://example.com")
     }
 
     @Test("basic factory creates feed with correct namespaces")
-    func basicNamespaces() throws {
-        let testURL = try Self.makeTestURL()
+    func basicNamespaces() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         )
@@ -24,8 +24,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("basic factory sets channel title, link, description")
-    func basicChannelFields() throws {
-        let testURL = try Self.makeTestURL()
+    func basicChannelFields() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "My Podcast", link: testURL, description: "A great show"
         )
@@ -35,8 +35,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("basic factory applies configure closure")
-    func basicConfigureClosure() throws {
-        let testURL = try Self.makeTestURL()
+    func basicConfigureClosure() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { channel in
@@ -48,8 +48,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("standard factory includes podcast namespace")
-    func standardNamespaces() throws {
-        let testURL = try Self.makeTestURL()
+    func standardNamespaces() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         )
@@ -60,8 +60,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("advanced factory includes content namespace")
-    func advancedNamespaces() throws {
-        let testURL = try Self.makeTestURL()
+    func advancedNamespaces() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.advanced(
             title: "Show", link: testURL, description: "About"
         )
@@ -70,8 +70,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("expert factory includes all 6 standard namespaces")
-    func expertNamespaces() throws {
-        let testURL = try Self.makeTestURL()
+    func expertNamespaces() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.expert(
             title: "Show", link: testURL, description: "About"
         )
@@ -81,8 +81,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("template factory with generic parameter works")
-    func genericFactory() throws {
-        let testURL = try Self.makeTestURL()
+    func genericFactory() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.template(
             BasicTemplate(),
             title: "Generic", link: testURL, description: "Test"
@@ -91,9 +91,9 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("configure closure can chain fluent modifiers")
-    func fluentChaining() throws {
-        let testURL = try Self.makeTestURL()
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func fluentChaining() {
+        let testURL = Self.makeTestURL()
+        let imageURL = makeURL("https://example.com/art.jpg")
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -117,8 +117,8 @@ struct TemplateFeedFactoryTests {
     }
 
     @Test("factory without configure closure uses identity")
-    func noConfigureClosure() throws {
-        let testURL = try Self.makeTestURL()
+    func noConfigureClosure() {
+        let testURL = Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Minimal", link: testURL, description: "Test"
         )

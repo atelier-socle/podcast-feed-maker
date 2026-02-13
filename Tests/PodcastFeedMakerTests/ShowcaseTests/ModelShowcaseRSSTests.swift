@@ -11,8 +11,8 @@ struct RSS20ModelShowcase {
     // MARK: - Channel
 
     @Test("Channel initializes with required properties only")
-    func channelRequiredOnly() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelRequiredOnly() {
+        let url = makeURL("https://example.com")
         let channel = Channel(title: "Swift Talk", link: url, description: "A podcast about Swift")
 
         #expect(channel.title == "Swift Talk")
@@ -36,11 +36,11 @@ struct RSS20ModelShowcase {
         #expect(channel.items.isEmpty)
     }
 
-    private static func makeFullRSSChannel() throws -> Channel {
-        let siteURL = try #require(URL(string: "https://swifttalk.dev"))
-        let docsURL = try #require(URL(string: "https://www.rssboard.org/rss-specification"))
-        let imageURL = try #require(URL(string: "https://swifttalk.dev/logo.png"))
-        let searchURL = try #require(URL(string: "https://swifttalk.dev/search"))
+    private static func makeFullRSSChannel() -> Channel {
+        let siteURL = makeURL("https://swifttalk.dev")
+        let docsURL = makeURL("https://www.rssboard.org/rss-specification")
+        let imageURL = makeURL("https://swifttalk.dev/logo.png")
+        let searchURL = makeURL("https://swifttalk.dev/search")
         let pubDate = Date(timeIntervalSince1970: 1_700_000_000)
         let buildDate = Date(timeIntervalSince1970: 1_700_100_000)
 
@@ -91,8 +91,8 @@ struct RSS20ModelShowcase {
     }
 
     @Test("Channel initializes with all RSS 2.0 core properties")
-    func channelAllRSSProperties() throws {
-        let channel = try Self.makeFullRSSChannel()
+    func channelAllRSSProperties() {
+        let channel = Self.makeFullRSSChannel()
 
         #expect(channel.language == "en-US")
         #expect(channel.copyright == "Copyright 2025 Atelier Socle")
@@ -112,12 +112,12 @@ struct RSS20ModelShowcase {
         #expect(channel.skipSchedule?.days.contains(.saturday) == true)
     }
 
-    private static func makeAllNamespaceChannel() throws -> Channel {
-        let url = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let artworkURL = try #require(URL(string: "https://example.com/artwork.jpg"))
-        let donateURL = try #require(URL(string: "https://example.com/donate"))
-        let publisherURL = try #require(URL(string: "https://publisher.example.com/feed.xml"))
+    private static func makeAllNamespaceChannel() -> Channel {
+        let url = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let artworkURL = makeURL("https://example.com/artwork.jpg")
+        let donateURL = makeURL("https://example.com/donate")
+        let publisherURL = makeURL("https://publisher.example.com/feed.xml")
 
         return Channel(
             title: "Full Namespace Show",
@@ -167,10 +167,10 @@ struct RSS20ModelShowcase {
     }
 
     @Test("Channel supports all namespace properties")
-    func channelAllNamespaceProperties() throws {
-        let artworkURL = try #require(URL(string: "https://example.com/artwork.jpg"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let channel = try Self.makeAllNamespaceChannel()
+    func channelAllNamespaceProperties() {
+        let artworkURL = makeURL("https://example.com/artwork.jpg")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let channel = Self.makeAllNamespaceChannel()
 
         #expect(channel.itunesAuthor == "Wlad")
         #expect(channel.itunesBlock == false)
@@ -213,8 +213,8 @@ struct RSS20ModelShowcase {
     }
 
     @Test("Channel location convenience accessor works")
-    func channelLocationConvenience() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelLocationConvenience() {
+        let url = makeURL("https://example.com")
         var channel = Channel(title: "Test", link: url, description: "Test")
 
         // Setting via convenience sets a single-element array

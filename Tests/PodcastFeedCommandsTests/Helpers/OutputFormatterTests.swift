@@ -10,11 +10,11 @@ struct OutputFormatterTests {
     // MARK: - Feed Summary
 
     @Test("Feed summary shows title and episode count")
-    func feedSummary() throws {
+    func feedSummary() {
         let feed = PodcastFeed(
             channel: Channel(
                 title: "My Podcast",
-                link: try #require(URL(string: "https://example.com")),
+                link: makeURL("https://example.com"),
                 description: "A podcast about things",
                 items: [
                     Item(title: "Episode 1"),
@@ -36,12 +36,12 @@ struct OutputFormatterTests {
     }
 
     @Test("Feed summary truncates long description")
-    func truncatesDescription() throws {
+    func truncatesDescription() {
         let longDesc = String(repeating: "x", count: 500)
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Test",
-                link: try #require(URL(string: "https://example.com")),
+                link: makeURL("https://example.com"),
                 description: longDesc
             ))
         let summary = OutputFormatter.formatFeedSummary(feed, verbose: false)

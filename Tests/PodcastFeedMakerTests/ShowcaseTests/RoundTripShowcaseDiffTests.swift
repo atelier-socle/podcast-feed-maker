@@ -202,7 +202,7 @@ struct RoundTripDiffShowcase {
         let newItem = Item(
             title: "Episode 2 — Brand New",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://example.com/ep2.mp3")),
+                url: makeURL("https://example.com/ep2.mp3"),
                 length: 30_000_000,
                 type: "audio/mpeg"
             ),
@@ -277,8 +277,8 @@ struct RoundTripDiffShowcase {
 
     // MARK: - Multi-Episode Round-Trip
 
-    private static func makeMultiEpisodeFeed() throws -> PodcastFeed {
-        let feedURL = try #require(URL(string: "https://example.com"))
+    private static func makeMultiEpisodeFeed() -> PodcastFeed {
+        let feedURL = makeURL("https://example.com")
         let channel = Channel(
             title: "Multi-Episode Show",
             link: feedURL,
@@ -288,7 +288,7 @@ struct RoundTripDiffShowcase {
                 Item(
                     title: "Episode 3 — Latest",
                     enclosure: Enclosure(
-                        url: try #require(URL(string: "https://example.com/ep3.mp3")),
+                        url: makeURL("https://example.com/ep3.mp3"),
                         length: 50_000_000,
                         type: "audio/mpeg"
                     ),
@@ -301,7 +301,7 @@ struct RoundTripDiffShowcase {
                 Item(
                     title: "Episode 2 — Middle",
                     enclosure: Enclosure(
-                        url: try #require(URL(string: "https://example.com/ep2.mp3")),
+                        url: makeURL("https://example.com/ep2.mp3"),
                         length: 40_000_000,
                         type: "audio/mpeg"
                     ),
@@ -314,7 +314,7 @@ struct RoundTripDiffShowcase {
                 Item(
                     title: "Trailer",
                     enclosure: Enclosure(
-                        url: try #require(URL(string: "https://example.com/trailer.mp3")),
+                        url: makeURL("https://example.com/trailer.mp3"),
                         length: 5_000_000,
                         type: "audio/mpeg"
                     ),
@@ -332,7 +332,7 @@ struct RoundTripDiffShowcase {
 
     @Test("Round-trip preserves episode ordering and all per-item metadata")
     func multiEpisodeRoundTrip() throws {
-        let feed = try Self.makeMultiEpisodeFeed()
+        let feed = Self.makeMultiEpisodeFeed()
         let generator = FeedGenerator(namespaceMode: .auto)
         let parser = FeedParser()
 

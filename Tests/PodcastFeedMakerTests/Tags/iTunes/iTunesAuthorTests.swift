@@ -8,10 +8,10 @@ struct ITunesAuthorTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesAuthor_shouldStoreValue() throws {
+    func test_channel_itunesAuthor_shouldStoreValue() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesAuthor: "John Doe"
         )
@@ -19,20 +19,20 @@ struct ITunesAuthorTests {
     }
 
     @Test
-    func test_channel_itunesAuthor_defaultsToNil() throws {
+    func test_channel_itunesAuthor_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesAuthor == nil)
     }
 
     @Test
-    func test_channel_itunesAuthor_withSpecialCharacters() throws {
+    func test_channel_itunesAuthor_withSpecialCharacters() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesAuthor: "John & Sons <Media>"
         )
@@ -40,10 +40,10 @@ struct ITunesAuthorTests {
     }
 
     @Test
-    func test_channel_itunesAuthor_withEmptyString() throws {
+    func test_channel_itunesAuthor_withEmptyString() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesAuthor: ""
         )
@@ -73,8 +73,8 @@ struct ITunesAuthorTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameAuthor() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameAuthor() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -91,8 +91,8 @@ struct ITunesAuthorTests {
     }
 
     @Test
-    func test_channel_equatable_differentAuthor() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentAuthor() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

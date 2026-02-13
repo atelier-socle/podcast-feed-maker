@@ -8,10 +8,10 @@ struct ITunesTitleTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesTitle_shouldStoreValue() throws {
+    func test_channel_itunesTitle_shouldStoreValue() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesTitle: "This is my show title"
         )
@@ -19,20 +19,20 @@ struct ITunesTitleTests {
     }
 
     @Test
-    func test_channel_itunesTitle_defaultsToNil() throws {
+    func test_channel_itunesTitle_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesTitle == nil)
     }
 
     @Test
-    func test_channel_itunesTitle_withEmptyString() throws {
+    func test_channel_itunesTitle_withEmptyString() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesTitle: ""
         )
@@ -40,10 +40,10 @@ struct ITunesTitleTests {
     }
 
     @Test
-    func test_channel_itunesTitle_withSpecialCharacters() throws {
+    func test_channel_itunesTitle_withSpecialCharacters() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesTitle: #"Swift & Friends "Live""#
         )
@@ -73,8 +73,8 @@ struct ITunesTitleTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameTitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameTitle() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -91,8 +91,8 @@ struct ITunesTitleTests {
     }
 
     @Test
-    func test_channel_equatable_differentTitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentTitle() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -125,8 +125,8 @@ struct ITunesTitleTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_hashable() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

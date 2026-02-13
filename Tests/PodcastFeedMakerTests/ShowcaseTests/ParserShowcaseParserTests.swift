@@ -41,14 +41,14 @@ struct ParserShowcase {
     }
 
     /// Builds a full episode with all 7 namespaces for round-trip testing.
-    private static func makeFullEpisode() throws -> Item {
+    private static func makeFullEpisode() -> Item {
         Item(
             title: "Full Episode",
             link: URL(string: "https://example.com/ep1"),
             description: "Episode description.",
             author: "author@example.com",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://cdn.example.com/ep1.mp3")),
+                url: makeURL("https://cdn.example.com/ep1.mp3"),
                 length: 48_000_000,
                 type: "audio/mpeg"
             ),
@@ -63,20 +63,20 @@ struct ParserShowcase {
             itunesSubtitle: "Subtitle here",
             itunesTitle: "Special Title",
             atomLinks: [
-                AtomLink(href: try #require(URL(string: "https://example.com/ep1/comments")), rel: "replies")
+                AtomLink(href: makeURL("https://example.com/ep1/comments"), rel: "replies")
             ],
             dublinCore: DublinCore(creator: "Jane Host", subject: "Tech"),
             contentEncoded: ContentEncoded(value: "<p>Full <strong>show notes</strong>.</p>"),
             transcripts: [
                 Transcript(
-                    url: try #require(URL(string: "https://example.com/ep1.vtt")),
+                    url: makeURL("https://example.com/ep1.vtt"),
                     type: "text/vtt",
                     language: "en",
                     rel: "captions"
                 )
             ],
             chaptersLink: ChaptersLink(
-                url: try #require(URL(string: "https://example.com/ep1/chapters.json"))
+                url: makeURL("https://example.com/ep1/chapters.json")
             ),
             soundbites: [
                 Soundbite(startTime: 120.5, duration: 45.0, title: "Best moment")
@@ -95,10 +95,10 @@ struct ParserShowcase {
         )
     }
 
-    private static func makeAllNamespacesChannel() throws -> Channel {
+    private static func makeAllNamespacesChannel() -> Channel {
         Channel(
             title: "The Complete Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Covering all 7 namespaces.",
             language: "en-US",
             copyright: "2026 Atelier Socle",
@@ -107,7 +107,7 @@ struct ParserShowcase {
             lastBuildDate: Date(timeIntervalSince1970: 1_739_404_800),
             generator: "PodcastFeedMaker/1.0",
             ttl: 60,
-            items: [try makeFullEpisode()],
+            items: [makeFullEpisode()],
             itunesAuthor: "Atelier Socle",
             itunesCategories: [
                 .technology,
@@ -121,14 +121,14 @@ struct ParserShowcase {
             itunesOwner: ITunesOwner(name: "Wlad", email: "wlad@example.com"),
             itunesType: .episodic,
             atomLinks: [
-                AtomLink.selfLink(href: try #require(URL(string: "https://example.com/feed.xml")))
+                AtomLink.selfLink(href: makeURL("https://example.com/feed.xml"))
             ],
             dublinCore: DublinCore(creator: "Atelier Socle", language: "en"),
             podcastGuid: PodcastGuid(value: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1"),
             locked: Locked(isLocked: true, owner: "wlad@example.com"),
             funding: [
                 Funding(
-                    url: try #require(URL(string: "https://example.com/donate")),
+                    url: makeURL("https://example.com/donate"),
                     message: "Support the show"
                 )
             ],
@@ -139,7 +139,7 @@ struct ParserShowcase {
     }
 
     private static func generateAllNamespacesXML() throws -> String {
-        let channel = try makeAllNamespacesChannel()
+        let channel = makeAllNamespacesChannel()
         let feed = PodcastFeed(
             version: "2.0",
             namespaces: PodcastNamespace.allStandard,

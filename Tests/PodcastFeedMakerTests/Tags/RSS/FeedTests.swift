@@ -66,7 +66,7 @@ struct FeedTests {
         let feed = PodcastFeed(channel: channel)
 
         #expect(feed.channel?.title == "Test Podcast")
-        let expectedLink = try #require(URL(string: "https://example.com"))
+        let expectedLink = makeURL("https://example.com")
         #expect(feed.channel?.link == expectedLink)
         #expect(feed.channel?.description == "A test podcast")
         #expect(feed.version == "2.0")
@@ -201,7 +201,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with channel items")
     func feedXmlIncludesChannelItems() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Test",
             link: link,
@@ -277,8 +277,8 @@ struct FeedTests {
     }
 
     @Test("PodcastFeed channel is accessible across concurrency boundaries")
-    func feedChannelIsSendable() async throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func feedChannelIsSendable() async {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Concurrent Podcast",
             link: link,

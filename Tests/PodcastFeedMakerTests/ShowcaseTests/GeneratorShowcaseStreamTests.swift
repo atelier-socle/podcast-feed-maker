@@ -18,7 +18,7 @@ struct StreamingGeneratorShowcase {
         }
         let channel = Channel(
             title: "Streaming Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Streaming test.",
             items: items
         )
@@ -40,7 +40,7 @@ struct StreamingGeneratorShowcase {
             Item(
                 title: "Assembled Episode 1",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://cdn.example.com/a1.mp3")),
+                    url: makeURL("https://cdn.example.com/a1.mp3"),
                     length: 10_000_000,
                     type: "audio/mpeg"
                 )
@@ -48,7 +48,7 @@ struct StreamingGeneratorShowcase {
             Item(
                 title: "Assembled Episode 2",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://cdn.example.com/a2.mp3")),
+                    url: makeURL("https://cdn.example.com/a2.mp3"),
                     length: 12_000_000,
                     type: "audio/mpeg"
                 )
@@ -56,7 +56,7 @@ struct StreamingGeneratorShowcase {
         ]
         let channel = Channel(
             title: "Assembled Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Assembly test.",
             items: items
         )
@@ -82,7 +82,7 @@ struct StreamingGeneratorShowcase {
     func streamingPrettyPrintModes() async throws {
         let channel = Channel(
             title: "Mode Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Mode test."
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [], channel: channel)

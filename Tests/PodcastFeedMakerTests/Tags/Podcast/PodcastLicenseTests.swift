@@ -8,8 +8,8 @@ struct PodcastLicenseTests {
     // MARK: - Initialization
 
     @Test
-    func initWithIdentifierAndUrl() throws {
-        let url = try #require(URL(string: "https://creativecommons.org/licenses/by/4.0/"))
+    func initWithIdentifierAndUrl() {
+        let url = makeURL("https://creativecommons.org/licenses/by/4.0/")
         let license = PodcastLicense(identifier: "cc-by-4.0", url: url)
 
         #expect(license.identifier == "cc-by-4.0")
@@ -27,8 +27,8 @@ struct PodcastLicenseTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() throws {
-        let url = try #require(URL(string: "https://example.com/license"))
+    func equatableConformance() {
+        let url = makeURL("https://example.com/license")
         let a = PodcastLicense(identifier: "cc-by-4.0", url: url)
         let b = PodcastLicense(identifier: "cc-by-4.0", url: url)
         let c = PodcastLicense(identifier: "Public Domain")
@@ -38,8 +38,8 @@ struct PodcastLicenseTests {
     }
 
     @Test
-    func hashableConformance() throws {
-        let url = try #require(URL(string: "https://example.com/license"))
+    func hashableConformance() {
+        let url = makeURL("https://example.com/license")
         let a = PodcastLicense(identifier: "cc-by-4.0", url: url)
         let b = PodcastLicense(identifier: "cc-by-4.0", url: url)
         let c = PodcastLicense(identifier: "Public Domain")
@@ -52,8 +52,8 @@ struct PodcastLicenseTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithUrl() throws {
-        let url = try #require(URL(string: "https://creativecommons.org/licenses/by-nc-sa/4.0/"))
+    func xmlRepresentationWithUrl() {
+        let url = makeURL("https://creativecommons.org/licenses/by-nc-sa/4.0/")
         let license = PodcastLicense(identifier: "cc-by-nc-sa-4.0", url: url)
 
         var attrs: [(String, String)] = []

@@ -74,7 +74,7 @@ private func makeIntegrationFixturePath() throws -> String {
 /// Creates a temporary JSON feed file and returns the path.
 private func writeJSONFeed() throws -> String {
     let jsonPath = "/tmp/pfm_json_\(UUID().uuidString).json"
-    let url = try #require(URL(string: "https://example.com"))
+    let url = makeURL("https://example.com")
     let feed = PodcastFeed(
         version: "2.0",
         namespaces: PodcastNamespace.allStandard,

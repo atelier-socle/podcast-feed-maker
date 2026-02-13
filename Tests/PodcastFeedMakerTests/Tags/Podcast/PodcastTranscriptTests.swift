@@ -8,8 +8,8 @@ struct PodcastTranscriptTests {
     // MARK: - Initialization
 
     @Test
-    func initWithRequiredParameters() throws {
-        let url = try #require(URL(string: "https://example.com/transcript.vtt"))
+    func initWithRequiredParameters() {
+        let url = makeURL("https://example.com/transcript.vtt")
         let transcript = Transcript(url: url, type: "text/vtt")
 
         #expect(transcript.url == url)
@@ -19,8 +19,8 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func initWithAllParameters() throws {
-        let url = try #require(URL(string: "https://example.com/transcript.vtt"))
+    func initWithAllParameters() {
+        let url = makeURL("https://example.com/transcript.vtt")
         let transcript = Transcript(
             url: url,
             type: "text/vtt",
@@ -69,9 +69,9 @@ struct PodcastTranscriptTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() throws {
-        let url1 = try #require(URL(string: "https://example.com/a.vtt"))
-        let url2 = try #require(URL(string: "https://example.com/b.srt"))
+    func equatableConformance() {
+        let url1 = makeURL("https://example.com/a.vtt")
+        let url2 = makeURL("https://example.com/b.srt")
 
         let a = Transcript(url: url1, type: "text/vtt")
         let b = Transcript(url: url1, type: "text/vtt")
@@ -82,9 +82,9 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func hashableConformance() throws {
-        let url1 = try #require(URL(string: "https://example.com/a.vtt"))
-        let url2 = try #require(URL(string: "https://example.com/b.srt"))
+    func hashableConformance() {
+        let url1 = makeURL("https://example.com/a.vtt")
+        let url2 = makeURL("https://example.com/b.srt")
 
         let a = Transcript(url: url1, type: "text/vtt")
         let b = Transcript(url: url1, type: "text/vtt")
@@ -97,8 +97,8 @@ struct PodcastTranscriptTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithUrlAndType() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/subs.srt"))
+    func xmlRepresentationWithUrlAndType() {
+        let transcriptURL = makeURL("https://example.com/subs.srt")
         let transcript = Transcript(
             url: transcriptURL,
             type: "application/srt"
@@ -115,8 +115,8 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationWithLanguageAndRel() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
+    func xmlRepresentationWithLanguageAndRel() {
+        let transcriptURL = makeURL("https://example.com/ep1.vtt")
         let transcript = Transcript(
             url: transcriptURL,
             type: "text/vtt",
@@ -135,8 +135,8 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
+    func xmlRepresentationIsSelfClosingTag() {
+        let transcriptURL = makeURL("https://example.com/ep1.vtt")
         let transcript = Transcript(
             url: transcriptURL,
             type: "text/vtt"
@@ -151,8 +151,8 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationWithoutOptionalAttributes() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
+    func xmlRepresentationWithoutOptionalAttributes() {
+        let transcriptURL = makeURL("https://example.com/ep1.vtt")
         let transcript = Transcript(
             url: transcriptURL,
             type: "text/vtt"

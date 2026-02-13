@@ -260,7 +260,7 @@ struct GenerateCommandShowcaseTests {
         }
 
         // Create a feed model, encode to JSON
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Generated Podcast",
@@ -270,7 +270,7 @@ struct GenerateCommandShowcaseTests {
                     Item(
                         title: "Episode 1",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep1.mp3")),
+                            url: makeURL("https://example.com/ep1.mp3"),
                             length: 50_000_000,
                             type: "audio/mpeg"
                         ),
@@ -298,7 +298,7 @@ struct GenerateCommandShowcaseTests {
         let jsonPath = "/tmp/pfm_showcase_gen_validate_\(UUID()).json"
         defer { try? FileManager.default.removeItem(atPath: jsonPath) }
 
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Validated Podcast",
@@ -308,7 +308,7 @@ struct GenerateCommandShowcaseTests {
                     Item(
                         title: "Ep 1",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep.mp3")),
+                            url: makeURL("https://example.com/ep.mp3"),
                             length: 1000,
                             type: "audio/mpeg"
                         )
@@ -376,7 +376,7 @@ struct ConvertCommandShowcaseTests {
     @Test("Convert JSON feed to XML")
     func convertJSONToXML() throws {
         // First create a JSON feed file
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let feed = PodcastFeed(
             channel: Channel(
                 title: "JSON to XML Test",
@@ -386,7 +386,7 @@ struct ConvertCommandShowcaseTests {
                     Item(
                         title: "Converted Episode",
                         enclosure: Enclosure(
-                            url: try #require(URL(string: "https://example.com/ep.mp3")),
+                            url: makeURL("https://example.com/ep.mp3"),
                             length: 1000,
                             type: "audio/mpeg"
                         )

@@ -12,12 +12,12 @@ struct FeedValidatorCoreTests {
 
     // MARK: - Helpers
 
-    private func minimalValidFeed() throws -> PodcastFeed {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep1.mp3"))
-        let itemImageURL = try #require(URL(string: "https://example.com/ep1.jpg"))
-        let linkURL = try #require(URL(string: "https://example.com"))
-        let artworkURL = try #require(URL(string: "https://example.com/art.jpg"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    private func minimalValidFeed() -> PodcastFeed {
+        let enclosureURL = makeURL("https://example.com/ep1.mp3")
+        let itemImageURL = makeURL("https://example.com/ep1.jpg")
+        let linkURL = makeURL("https://example.com")
+        let artworkURL = makeURL("https://example.com/art.jpg")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let item = Item(
             title: "Episode 1",
             enclosure: Enclosure(
@@ -55,8 +55,8 @@ struct FeedValidatorCoreTests {
         PodcastFeed(channel: nil)
     }
 
-    private func minimalChannelFeed() throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
+    private func minimalChannelFeed() -> PodcastFeed {
+        let url = makeURL("https://example.com")
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -68,8 +68,8 @@ struct FeedValidatorCoreTests {
     // MARK: - Fully Compliant Feed
 
     @Test("Fully compliant feed passes all platforms")
-    func fullyCompliantFeedPassesAll() throws {
-        let feed = try minimalValidFeed()
+    func fullyCompliantFeedPassesAll() {
+        let feed = minimalValidFeed()
         let reports = validator.validateAll(feed)
         for report in reports {
             #expect(
@@ -94,8 +94,8 @@ struct FeedValidatorCoreTests {
     // MARK: - Single Platform
 
     @Test("Validate against single platform returns one report")
-    func singlePlatformReport() throws {
-        let feed = try minimalValidFeed()
+    func singlePlatformReport() {
+        let feed = minimalValidFeed()
         let report = validator.validate(feed, for: .apple)
         #expect(report.platform == .apple)
     }
@@ -103,8 +103,8 @@ struct FeedValidatorCoreTests {
     // MARK: - Multiple Platforms
 
     @Test("Validate against multiple platforms returns correct count")
-    func multiplePlatformReports() throws {
-        let feed = try minimalValidFeed()
+    func multiplePlatformReports() {
+        let feed = minimalValidFeed()
         let reports = validator.validate(
             feed, for: [.apple, .spotify, .psp1]
         )
@@ -117,8 +117,8 @@ struct FeedValidatorCoreTests {
     // MARK: - ValidateAll
 
     @Test("validateAll returns reports for all 5 platforms")
-    func validateAllReturns5Reports() throws {
-        let feed = try minimalValidFeed()
+    func validateAllReturns5Reports() {
+        let feed = minimalValidFeed()
         let reports = validator.validateAll(feed)
         #expect(reports.count == 5)
         let platforms = Set(reports.map(\.platform))
@@ -128,8 +128,8 @@ struct FeedValidatorCoreTests {
     // MARK: - Report Structure
 
     @Test("Results are sorted by severity (errors first)")
-    func resultsSortedBySeverity() throws {
-        let feed = try minimalChannelFeed()
+    func resultsSortedBySeverity() {
+        let feed = minimalChannelFeed()
         let report = validator.validate(feed, for: .apple)
         guard report.results.count >= 2 else { return }
         for i in 0..<(report.results.count - 1) {
@@ -140,8 +140,8 @@ struct FeedValidatorCoreTests {
     }
 
     @Test("isValid is true when no errors")
-    func isValidNoErrors() throws {
-        let feed = try minimalValidFeed()
+    func isValidNoErrors() {
+        let feed = minimalValidFeed()
         let report = validator.validate(feed, for: .apple)
         #expect(report.isValid)
     }
@@ -161,8 +161,8 @@ struct FeedValidatorPlatformTests {
 
     private let validator = FeedValidator()
 
-    private func minimalChannelFeed() throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
+    private func minimalChannelFeed() -> PodcastFeed {
+        let url = makeURL("https://example.com")
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -174,8 +174,8 @@ struct FeedValidatorPlatformTests {
     // MARK: - Apple Specific
 
     @Test("Missing itunes:image is error for Apple")
-    func missingItunesImageApple() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func missingItunesImageApple() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -189,9 +189,9 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("Missing itunes:category is error for Apple")
-    func missingItunesCategoryApple() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func missingItunesCategoryApple() {
+        let url = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/art.jpg")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -208,9 +208,9 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("Missing itunes:explicit is error for Apple")
-    func missingItunesExplicitApple() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func missingItunesExplicitApple() {
+        let url = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/art.jpg")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -227,9 +227,9 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("Feed with no items is error for Apple")
-    func noItemsApple() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func noItemsApple() {
+        let url = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/art.jpg")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -244,10 +244,10 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("HTTP enclosure URL is error for Apple")
-    func httpEnclosureApple() throws {
-        let enclosureURL = try #require(URL(string: "http://example.com/ep.mp3"))
-        let url = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+    func httpEnclosureApple() {
+        let enclosureURL = makeURL("http://example.com/ep.mp3")
+        let url = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/art.jpg")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -276,8 +276,8 @@ struct FeedValidatorPlatformTests {
     // MARK: - PSP-1 Specific
 
     @Test("Missing atom:link rel=self is error for PSP-1")
-    func missingAtomLinkSelfPSP1() throws {
-        let feed = try minimalChannelFeed()
+    func missingAtomLinkSelfPSP1() {
+        let feed = minimalChannelFeed()
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -286,15 +286,15 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("Missing podcast:locked is error for PSP-1")
-    func missingLockedPSP1() throws {
-        let feed = try minimalChannelFeed()
+    func missingLockedPSP1() {
+        let feed = minimalChannelFeed()
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.locked" })
     }
 
     @Test("Missing podcast:guid is error for PSP-1")
-    func missingGuidPSP1() throws {
-        let feed = try minimalChannelFeed()
+    func missingGuidPSP1() {
+        let feed = minimalChannelFeed()
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -305,9 +305,9 @@ struct FeedValidatorPlatformTests {
     // MARK: - Spotify Specific
 
     @Test("MP3 enclosure has no format warning for Spotify")
-    func mp3NoWarningSpotify() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
-        let url = try #require(URL(string: "https://example.com"))
+    func mp3NoWarningSpotify() {
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
+        let url = makeURL("https://example.com")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -331,9 +331,9 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("M4A enclosure generates warning for Spotify")
-    func m4aWarningSpotify() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.m4a"))
-        let url = try #require(URL(string: "https://example.com"))
+    func m4aWarningSpotify() {
+        let enclosureURL = makeURL("https://example.com/ep.m4a")
+        let url = makeURL("https://example.com")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -357,9 +357,9 @@ struct FeedValidatorPlatformTests {
     }
 
     @Test("Oversized enclosure generates warning for Spotify")
-    func oversizedEnclosureSpotify() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
-        let url = try #require(URL(string: "https://example.com"))
+    func oversizedEnclosureSpotify() {
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
+        let url = makeURL("https://example.com")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -385,8 +385,8 @@ struct FeedValidatorPlatformTests {
     // MARK: - Podcast Index Specific
 
     @Test("podcast:value without recipients is warning for Podcast Index")
-    func valueWithoutRecipients() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func valueWithoutRecipients() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -404,8 +404,8 @@ struct FeedValidatorPlatformTests {
     // MARK: - Cross-Cutting
 
     @Test("Duplicate GUIDs generate warning")
-    func duplicateGuids() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func duplicateGuids() {
+        let url = makeURL("https://example.com")
         let items = [
             Item(
                 title: "Ep 1",

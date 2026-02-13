@@ -27,8 +27,8 @@ struct PodcastNS20Phase1Showcase {
     // MARK: - Transcript
 
     @Test("Transcript with all properties")
-    func transcriptAllProperties() throws {
-        let url = try #require(URL(string: "https://example.com/ep1.vtt"))
+    func transcriptAllProperties() {
+        let url = makeURL("https://example.com/ep1.vtt")
         let transcript = Transcript(url: url, type: "text/vtt", language: "en", rel: "captions")
 
         #expect(transcript.url == url)
@@ -38,8 +38,8 @@ struct PodcastNS20Phase1Showcase {
     }
 
     @Test("Transcript with required properties only")
-    func transcriptRequiredOnly() throws {
-        let url = try #require(URL(string: "https://example.com/ep1.srt"))
+    func transcriptRequiredOnly() {
+        let url = makeURL("https://example.com/ep1.srt")
         let transcript = Transcript(url: url, type: "application/srt")
 
         #expect(transcript.language == nil)
@@ -60,8 +60,8 @@ struct PodcastNS20Phase1Showcase {
     // MARK: - Funding
 
     @Test("Funding links to a donation page")
-    func fundingAllProperties() throws {
-        let url = try #require(URL(string: "https://www.patreon.com/swifttalk"))
+    func fundingAllProperties() {
+        let url = makeURL("https://www.patreon.com/swifttalk")
         let funding = Funding(url: url, message: "Support us on Patreon")
 
         #expect(funding.url == url)
@@ -71,8 +71,8 @@ struct PodcastNS20Phase1Showcase {
     // MARK: - ChaptersLink
 
     @Test("ChaptersLink with default type")
-    func chaptersLinkDefaultType() throws {
-        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func chaptersLinkDefaultType() {
+        let url = makeURL("https://example.com/ep1/chapters.json")
         let chapters = ChaptersLink(url: url)
 
         #expect(chapters.url == url)
@@ -80,8 +80,8 @@ struct PodcastNS20Phase1Showcase {
     }
 
     @Test("ChaptersLink with explicit type")
-    func chaptersLinkExplicitType() throws {
-        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func chaptersLinkExplicitType() {
+        let url = makeURL("https://example.com/ep1/chapters.json")
         let chapters = ChaptersLink(url: url, type: "application/json")
 
         #expect(chapters.type == "application/json")
@@ -116,9 +116,9 @@ struct PodcastNS20Phase2Showcase {
     // MARK: - PodcastPerson
 
     @Test("PodcastPerson with all properties")
-    func personAllProperties() throws {
-        let href = try #require(URL(string: "https://janeswift.dev"))
-        let img = try #require(URL(string: "https://janeswift.dev/headshot.jpg"))
+    func personAllProperties() {
+        let href = makeURL("https://janeswift.dev")
+        let img = makeURL("https://janeswift.dev/headshot.jpg")
 
         let person = PodcastPerson(
             name: "Jane Swift",
@@ -257,8 +257,8 @@ struct PodcastNS20Phase3Showcase {
     // MARK: - Trailer
 
     @Test("Trailer with all properties")
-    func trailerAllProperties() throws {
-        let url = try #require(URL(string: "https://cdn.example.com/season2-trailer.mp3"))
+    func trailerAllProperties() {
+        let url = makeURL("https://cdn.example.com/season2-trailer.mp3")
         let pubDate = Date(timeIntervalSince1970: 1_700_000_000)
 
         let trailer = Trailer(
@@ -279,8 +279,8 @@ struct PodcastNS20Phase3Showcase {
     }
 
     @Test("Trailer with required properties only")
-    func trailerRequiredOnly() throws {
-        let url = try #require(URL(string: "https://cdn.example.com/preview.mp3"))
+    func trailerRequiredOnly() {
+        let url = makeURL("https://cdn.example.com/preview.mp3")
         let pubDate = Date(timeIntervalSince1970: 1_700_000_000)
 
         let trailer = Trailer(title: "Show Preview", url: url, pubDate: pubDate)
@@ -293,8 +293,8 @@ struct PodcastNS20Phase3Showcase {
     // MARK: - PodcastLicense
 
     @Test("PodcastLicense with URL")
-    func licenseWithURL() throws {
-        let url = try #require(URL(string: "https://creativecommons.org/licenses/by/4.0/"))
+    func licenseWithURL() {
+        let url = makeURL("https://creativecommons.org/licenses/by/4.0/")
         let license = PodcastLicense(identifier: "cc-by-4.0", url: url)
 
         #expect(license.identifier == "cc-by-4.0")

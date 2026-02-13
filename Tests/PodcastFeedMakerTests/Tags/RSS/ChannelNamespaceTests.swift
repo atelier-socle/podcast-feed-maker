@@ -12,8 +12,8 @@ struct ChannelNamespaceTests {
     // MARK: - iTunes Properties
 
     @Test("Channel iTunes properties default to nil")
-    func channelItunesPropertiesDefaultToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelItunesPropertiesDefaultToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(title: "T", link: link, description: "D")
 
         #expect(channel.itunesAuthor == nil)
@@ -31,9 +31,9 @@ struct ChannelNamespaceTests {
     }
 
     @Test("Channel can be initialized with iTunes fields")
-    func channelInitWithItunesFields() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let imageURL = try #require(URL(string: "https://example.com/image.png"))
+    func channelInitWithItunesFields() {
+        let link = makeURL("https://example.com")
+        let imageURL = makeURL("https://example.com/image.png")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -68,8 +68,8 @@ struct ChannelNamespaceTests {
     }
 
     @Test("Channel can be initialized with serial iTunes type")
-    func channelInitWithSerialType() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelInitWithSerialType() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -91,8 +91,8 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains iTunes tags when set")
     func channelXmlContainsItunesTags() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let artURL = try #require(URL(string: "https://example.com/art.jpg"))
+        let link = makeURL("https://example.com")
+        let artURL = makeURL("https://example.com/art.jpg")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -124,7 +124,7 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains itunes:explicit no when explicit is false")
     func channelXmlContainsItunesExplicitNo() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -138,7 +138,7 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains iTunes owner when set")
     func channelXmlContainsItunesOwner() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -156,8 +156,8 @@ struct ChannelNamespaceTests {
     // MARK: - Podcast NS 2.0
 
     @Test("Channel Podcast NS properties default to nil")
-    func channelPodcastNsPropertiesDefaultToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelPodcastNsPropertiesDefaultToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(title: "T", link: link, description: "D")
 
         #expect(channel.podcastGuid == nil)
@@ -174,9 +174,9 @@ struct ChannelNamespaceTests {
     }
 
     @Test("Channel can be initialized with Podcast NS 2.0 properties")
-    func channelInitWithPodcastNsProperties() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let donateURL = try #require(URL(string: "https://example.com/donate"))
+    func channelInitWithPodcastNsProperties() {
+        let link = makeURL("https://example.com")
+        let donateURL = makeURL("https://example.com/donate")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -195,7 +195,7 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains Podcast NS tags when set")
     func channelXmlContainsPodcastNsTags() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -211,7 +211,7 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains podcast:locked with owner attribute when set")
     func channelXmlContainsLockedWithOwner() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -225,8 +225,8 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains funding when set")
     func channelXmlContainsFunding() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let donateURL = try #require(URL(string: "https://example.com/donate"))
+        let link = makeURL("https://example.com")
+        let donateURL = makeURL("https://example.com/donate")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -243,8 +243,8 @@ struct ChannelNamespaceTests {
     // MARK: - Atom
 
     @Test("Channel Dublin Core and Atom properties default to nil or empty")
-    func channelDublinCoreAndAtomDefaults() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelDublinCoreAndAtomDefaults() {
+        let link = makeURL("https://example.com")
         let channel = Channel(title: "T", link: link, description: "D")
 
         #expect(channel.dublinCore == nil)
@@ -252,9 +252,9 @@ struct ChannelNamespaceTests {
     }
 
     @Test("Channel can be initialized with Atom links")
-    func channelInitWithAtomLinks() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+    func channelInitWithAtomLinks() {
+        let link = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let selfLink = AtomLink.selfLink(href: feedURL)
         let channel = Channel(
             title: "Title",
@@ -270,8 +270,8 @@ struct ChannelNamespaceTests {
 
     @Test("Channel XML contains Atom link when set")
     func channelXmlContainsAtomLink() throws {
-        let link = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let link = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -289,8 +289,8 @@ struct ChannelNamespaceTests {
     // MARK: - Sendable (Complex)
 
     @Test("Channel with complex properties is Sendable")
-    func channelWithComplexPropertiesIsSendable() async throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelWithComplexPropertiesIsSendable() async {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -306,16 +306,16 @@ struct ChannelNamespaceTests {
     // MARK: - Equatable (Namespace-specific)
 
     @Test("Channels with different iTunes types are not equal")
-    func channelsWithDifferentItunesTypesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentItunesTypesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "D", itunesType: .episodic)
         let channel2 = Channel(title: "T", link: url, description: "D", itunesType: .serial)
         #expect(channel1 != channel2)
     }
 
     @Test("Channels with different Podcast NS properties are not equal")
-    func channelsWithDifferentPodcastNsPropertiesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentPodcastNsPropertiesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(
             title: "T", link: url, description: "D",
             podcastGuid: PodcastGuid(value: "guid-1")
@@ -330,8 +330,8 @@ struct ChannelNamespaceTests {
     // MARK: - Hashable (Namespace-specific)
 
     @Test("Channels with different Podcast NS fields produce different hashes")
-    func channelHashDiffersWithPodcastNs() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelHashDiffersWithPodcastNs() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(
             title: "T", link: url, description: "D",
             locked: Locked(isLocked: true)

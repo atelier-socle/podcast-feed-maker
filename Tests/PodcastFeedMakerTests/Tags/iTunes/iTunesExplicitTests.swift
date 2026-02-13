@@ -8,10 +8,10 @@ struct ITunesExplicitTests {
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesExplicit_true() throws {
+    func test_channel_itunesExplicit_true() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesExplicit: true
         )
@@ -19,10 +19,10 @@ struct ITunesExplicitTests {
     }
 
     @Test
-    func test_channel_itunesExplicit_false() throws {
+    func test_channel_itunesExplicit_false() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesExplicit: false
         )
@@ -30,10 +30,10 @@ struct ITunesExplicitTests {
     }
 
     @Test
-    func test_channel_itunesExplicit_defaultsToNil() throws {
+    func test_channel_itunesExplicit_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesExplicit == nil)
@@ -62,8 +62,8 @@ struct ITunesExplicitTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameExplicit() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_sameExplicit() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,
@@ -80,8 +80,8 @@ struct ITunesExplicitTests {
     }
 
     @Test
-    func test_channel_equatable_differentExplicit() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func test_channel_equatable_differentExplicit() {
+        let link = makeURL("https://example.com")
         let channelA = Channel(
             title: "Podcast",
             link: link,

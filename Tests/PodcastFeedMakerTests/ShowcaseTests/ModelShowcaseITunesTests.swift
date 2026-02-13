@@ -321,8 +321,8 @@ struct ITunesModelShowcase {
     // MARK: - Item iTunes Properties
 
     @Test("Item initializes with all iTunes namespace properties")
-    func itemAllITunesProperties() throws {
-        let imageURL = try #require(URL(string: "https://example.com/ep1-art.jpg"))
+    func itemAllITunesProperties() {
+        let imageURL = makeURL("https://example.com/ep1-art.jpg")
 
         let item = Item(
             title: "Episode with Full iTunes Metadata",

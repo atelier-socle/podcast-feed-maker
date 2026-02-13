@@ -20,7 +20,7 @@ struct CrossCuttingValidationTests {
     // MARK: - GUID Uniqueness
 
     @Test("Duplicate GUIDs produce warning")
-    func duplicateGuids() throws {
+    func duplicateGuids() {
         let item1 = Item(
             title: "Episode 1",
             guid: GUID(value: "same-guid", isPermaLink: false)
@@ -29,7 +29,7 @@ struct CrossCuttingValidationTests {
             title: "Episode 2",
             guid: GUID(value: "same-guid", isPermaLink: false)
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -42,7 +42,7 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("Unique GUIDs produce no warnings")
-    func uniqueGuids() throws {
+    func uniqueGuids() {
         let item1 = Item(
             title: "Episode 1",
             guid: GUID(value: "guid-1", isPermaLink: false)
@@ -51,7 +51,7 @@ struct CrossCuttingValidationTests {
             title: "Episode 2",
             guid: GUID(value: "guid-2", isPermaLink: false)
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -66,9 +66,9 @@ struct CrossCuttingValidationTests {
     // MARK: - Item Minimum Content
 
     @Test("Item with neither title nor description is error")
-    func itemNoContent() throws {
+    func itemNoContent() {
         let item = Item()
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -81,9 +81,9 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("Item with title but no description passes")
-    func itemTitleOnly() throws {
+    func itemTitleOnly() {
         let item = Item(title: "Episode")
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -98,7 +98,7 @@ struct CrossCuttingValidationTests {
     // MARK: - GUID PermaLink Consistency
 
     @Test("URL-like GUID with isPermaLink false generates warning")
-    func urlGuidNotPermaLink() throws {
+    func urlGuidNotPermaLink() {
         let item = Item(
             title: "Episode",
             guid: GUID(
@@ -106,7 +106,7 @@ struct CrossCuttingValidationTests {
                 isPermaLink: false
             )
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -122,12 +122,12 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("Non-URL GUID with isPermaLink true generates warning")
-    func nonUrlGuidIsPermaLink() throws {
+    func nonUrlGuidIsPermaLink() {
         let item = Item(
             title: "Episode",
             guid: GUID(value: "ep-001-uuid", isPermaLink: true)
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -145,10 +145,10 @@ struct CrossCuttingValidationTests {
     // MARK: - Future PubDate
 
     @Test("PubDate more than 24h in the future generates warning")
-    func futurePubDate() throws {
+    func futurePubDate() {
         let futureDate = Date().addingTimeInterval(48 * 60 * 60)
         let item = Item(title: "Episode", pubDate: futureDate)
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -164,10 +164,10 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("PubDate within 24h does not generate warning")
-    func recentPubDate() throws {
+    func recentPubDate() {
         let recentDate = Date().addingTimeInterval(12 * 60 * 60)
         let item = Item(title: "Episode", pubDate: recentDate)
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -185,8 +185,8 @@ struct CrossCuttingValidationTests {
     // MARK: - Atom Self Link
 
     @Test("No atom:link self generates info")
-    func noAtomSelfLink() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func noAtomSelfLink() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -204,9 +204,9 @@ struct CrossCuttingValidationTests {
     // MARK: - Channel PubDate Future
 
     @Test("Channel pubDate more than 24h in the future generates warning")
-    func channelPubDateFarFuture() throws {
+    func channelPubDateFarFuture() {
         let futureDate = Date().addingTimeInterval(48 * 60 * 60)
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -226,9 +226,9 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("Channel pubDate within 24h does not generate warning")
-    func channelPubDateNearFuture() throws {
+    func channelPubDateNearFuture() {
         let nearDate = Date().addingTimeInterval(12 * 60 * 60)
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -248,7 +248,7 @@ struct CrossCuttingValidationTests {
     // MARK: - Item Link Empty URL
 
     @Test("Item with empty link absoluteString generates warning")
-    func itemLinkEmptyAbsoluteString() throws {
+    func itemLinkEmptyAbsoluteString() {
         // URL(string: "") returns nil, so we construct via init that sets an empty-ish link.
         // Foundation's URL(string: "") returns nil. Test what happens with a real empty-ish URL.
         // Since Foundation URL(string: "") is nil, this path may be unreachable via normal API.
@@ -257,7 +257,7 @@ struct CrossCuttingValidationTests {
             title: "Episode",
             link: URL(string: "https://example.com/ep1")
         )
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
@@ -273,9 +273,9 @@ struct CrossCuttingValidationTests {
     }
 
     @Test("Item with no link does not trigger empty URL warning")
-    func itemNoLinkDoesNotWarn() throws {
+    func itemNoLinkDoesNotWarn() {
         let item = Item(title: "Episode")
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,

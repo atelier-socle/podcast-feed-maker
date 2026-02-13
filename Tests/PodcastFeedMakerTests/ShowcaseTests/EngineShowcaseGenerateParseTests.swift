@@ -63,10 +63,10 @@ struct EngineShowcaseTests {
         """
 
     /// Builds a feed model programmatically for generation tests.
-    private static func buildSampleFeed() throws -> PodcastFeed {
+    private static func buildSampleFeed() -> PodcastFeed {
         let channel = Channel(
             title: "Programmatic Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Built from Swift structs.",
             language: "en",
             items: [
@@ -74,7 +74,7 @@ struct EngineShowcaseTests {
                     title: "Pilot Episode",
                     description: "The very first episode.",
                     enclosure: Enclosure(
-                        url: try #require(URL(string: "https://example.com/pilot.mp3")),
+                        url: makeURL("https://example.com/pilot.mp3"),
                         length: 25_000_000,
                         type: "audio/mpeg"
                     ),
@@ -93,7 +93,7 @@ struct EngineShowcaseTests {
             itunesType: .episodic,
             atomLinks: [
                 AtomLink(
-                    href: try #require(URL(string: "https://example.com/feed.xml")),
+                    href: makeURL("https://example.com/feed.xml"),
                     rel: "self",
                     type: "application/rss+xml"
                 )
@@ -109,7 +109,7 @@ struct EngineShowcaseTests {
     @Test("Engine generates feed from model to XML string")
     func engineGenerate() throws {
         let engine = PodcastFeedEngine()
-        let feed = try Self.buildSampleFeed()
+        let feed = Self.buildSampleFeed()
 
         let xml = try engine.generate(feed)
 
@@ -127,7 +127,7 @@ struct EngineShowcaseTests {
     @Test("Engine generates minified XML when prettyPrint is false")
     func engineGenerateMinified() throws {
         let engine = PodcastFeedEngine()
-        let feed = try Self.buildSampleFeed()
+        let feed = Self.buildSampleFeed()
 
         let xml = try engine.generate(feed, prettyPrint: false)
 
@@ -140,7 +140,7 @@ struct EngineShowcaseTests {
     @Test("Engine generates feed as async stream of XML chunks")
     func engineGenerateStream() async throws {
         let engine = PodcastFeedEngine()
-        let feed = try Self.buildSampleFeed()
+        let feed = Self.buildSampleFeed()
 
         let stream = engine.generateStream(feed)
         var chunks: [String] = []
@@ -250,14 +250,14 @@ struct EngineShowcaseTests {
     }
 
     @Test("Engine validation report distinguishes errors, warnings, and info")
-    func engineValidationSeverities() throws {
+    func engineValidationSeverities() {
         let engine = PodcastFeedEngine()
 
         // Create a deliberately incomplete feed to trigger errors
         let incompleteFeed = PodcastFeed(
             channel: Channel(
                 title: "Incomplete",
-                link: try #require(URL(string: "https://example.com")),
+                link: makeURL("https://example.com"),
                 description: "Missing required fields."
             )
         )

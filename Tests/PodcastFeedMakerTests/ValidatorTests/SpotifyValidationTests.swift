@@ -12,8 +12,8 @@ struct SpotifyValidationTests {
 
     // MARK: - Helpers
 
-    private func spotifyFeed(items: [Item] = []) throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
+    private func spotifyFeed(items: [Item] = []) -> PodcastFeed {
+        let url = makeURL("https://example.com")
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
@@ -23,8 +23,8 @@ struct SpotifyValidationTests {
             ))
     }
 
-    private func mp3Item(length: Int = 1024) throws -> Item {
-        let url = try #require(URL(string: "https://example.com/ep.mp3"))
+    private func mp3Item(length: Int = 1024) -> Item {
+        let url = makeURL("https://example.com/ep.mp3")
         return Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -38,8 +38,8 @@ struct SpotifyValidationTests {
     // MARK: - Valid Feed
 
     @Test("Valid Spotify feed passes")
-    func validFeedPasses() throws {
-        let feed = try spotifyFeed(items: [mp3Item()])
+    func validFeedPasses() {
+        let feed = spotifyFeed(items: [mp3Item()])
         let report = validator.validate(feed, for: .spotify)
         #expect(report.isValid)
     }
@@ -47,13 +47,13 @@ struct SpotifyValidationTests {
     // MARK: - Required Fields
 
     @Test("Missing title is error")
-    func missingTitle() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func missingTitle() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "",
             link: url,
             description: "desc",
-            items: [try mp3Item()]
+            items: [mp3Item()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .spotify)
@@ -61,13 +61,13 @@ struct SpotifyValidationTests {
     }
 
     @Test("Missing description is error")
-    func missingDescription() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func missingDescription() {
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
             description: "",
-            items: [try mp3Item()]
+            items: [mp3Item()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .spotify)
@@ -75,8 +75,8 @@ struct SpotifyValidationTests {
     }
 
     @Test("No items with enclosure is error")
-    func noEnclosureItems() throws {
-        let feed = try spotifyFeed(items: [])
+    func noEnclosureItems() {
+        let feed = spotifyFeed(items: [])
         let report = validator.validate(feed, for: .spotify)
         #expect(report.errors.contains { $0.field == "channel.items" })
     }
@@ -84,8 +84,8 @@ struct SpotifyValidationTests {
     // MARK: - Audio Format
 
     @Test("MP3 enclosure has no format warning")
-    func mp3Passes() throws {
-        let feed = try spotifyFeed(items: [mp3Item()])
+    func mp3Passes() {
+        let feed = spotifyFeed(items: [mp3Item()])
         let report = validator.validate(feed, for: .spotify)
         let typeWarnings = report.warnings.filter {
             $0.field.contains("enclosure.type")
@@ -94,8 +94,8 @@ struct SpotifyValidationTests {
     }
 
     @Test("Non-MP3 enclosure generates warning")
-    func nonMp3Warning() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.m4a"))
+    func nonMp3Warning() {
+        let enclosureURL = makeURL("https://example.com/ep.m4a")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -104,7 +104,7 @@ struct SpotifyValidationTests {
                 type: "audio/x-m4a"
             )
         )
-        let feed = try spotifyFeed(items: [item])
+        let feed = spotifyFeed(items: [item])
         let report = validator.validate(feed, for: .spotify)
         #expect(
             report.warnings.contains {
@@ -115,8 +115,8 @@ struct SpotifyValidationTests {
     // MARK: - Size Limits
 
     @Test("Enclosure under 200MB has no warning")
-    func normalSizePasses() throws {
-        let feed = try spotifyFeed(items: [mp3Item(length: 50_000_000)])
+    func normalSizePasses() {
+        let feed = spotifyFeed(items: [mp3Item(length: 50_000_000)])
         let report = validator.validate(feed, for: .spotify)
         let sizeWarnings = report.warnings.filter {
             $0.field.contains("enclosure.length")
@@ -125,8 +125,8 @@ struct SpotifyValidationTests {
     }
 
     @Test("Enclosure over 200MB generates warning")
-    func oversizedWarning() throws {
-        let feed = try spotifyFeed(items: [mp3Item(length: 250_000_000)])
+    func oversizedWarning() {
+        let feed = spotifyFeed(items: [mp3Item(length: 250_000_000)])
         let report = validator.validate(feed, for: .spotify)
         #expect(
             report.warnings.contains {
@@ -137,14 +137,14 @@ struct SpotifyValidationTests {
     // MARK: - Description Length
 
     @Test("Description over 4000 bytes generates warning")
-    func longDescriptionWarning() throws {
+    func longDescriptionWarning() {
         let longDesc = String(repeating: "a", count: 4500)
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let channel = Channel(
             title: "Podcast",
             link: url,
             description: longDesc,
-            items: [try mp3Item()]
+            items: [mp3Item()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .spotify)
@@ -168,9 +168,9 @@ struct SpotifyValidationTests {
     // MARK: - Missing Enclosure Per Item
 
     @Test("Item without enclosure is error")
-    func itemMissingEnclosure() throws {
+    func itemMissingEnclosure() {
         let item = Item(title: "Episode")
-        let feed = try spotifyFeed(items: [item])
+        let feed = spotifyFeed(items: [item])
         let report = validator.validate(feed, for: .spotify)
         #expect(
             report.errors.contains {
@@ -181,8 +181,8 @@ struct SpotifyValidationTests {
     // MARK: - Cross-Field Validation
 
     @Test("Non-MP3 large enclosure generates cross-field warning")
-    func nonMp3LargeEnclosure() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.m4a"))
+    func nonMp3LargeEnclosure() {
+        let enclosureURL = makeURL("https://example.com/ep.m4a")
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -191,7 +191,7 @@ struct SpotifyValidationTests {
                 type: "audio/x-m4a"
             )
         )
-        let feed = try spotifyFeed(items: [item])
+        let feed = spotifyFeed(items: [item])
         let report = validator.validate(feed, for: .spotify)
         #expect(
             report.warnings.contains {
@@ -200,13 +200,13 @@ struct SpotifyValidationTests {
     }
 
     @Test("Item with Podlove chapters generates info")
-    func podloveChaptersInfo() throws {
+    func podloveChaptersInfo() {
         let chapters = PodloveChapters(chapters: [
             PodloveChapter(start: "00:00:00", title: "Intro")
         ])
-        var item = try mp3Item()
+        var item = mp3Item()
         item.podloveChapters = chapters
-        let feed = try spotifyFeed(items: [item])
+        let feed = spotifyFeed(items: [item])
         let report = validator.validate(feed, for: .spotify)
         #expect(
             report.infos.contains {

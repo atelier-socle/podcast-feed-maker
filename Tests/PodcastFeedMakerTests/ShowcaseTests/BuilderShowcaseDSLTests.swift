@@ -10,7 +10,7 @@ struct BuilderDSLShowcase {
 
     @Test("Result builder creates feed from Channel and Items in closure")
     func resultBuilderBasic() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
+        let exampleURL = makeURL("https://example.com")
         let feed = PodcastFeed {
             Channel(
                 title: "Builder Show",
@@ -42,7 +42,7 @@ struct BuilderDSLShowcase {
 
     @Test("Result builder assembles items alongside existing channel items")
     func resultBuilderMergesItems() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
+        let exampleURL = makeURL("https://example.com")
         let existingItem = Item(title: "Pre-existing Episode")
         let feed = PodcastFeed {
             Channel(
@@ -70,8 +70,8 @@ struct BuilderDSLShowcase {
     }
 
     @Test("FeedComponent protocol conformance for Channel and Item")
-    func feedComponentConformance() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
+    func feedComponentConformance() {
+        let exampleURL = makeURL("https://example.com")
         let channel: FeedComponent = Channel(
             title: "T",
             link: exampleURL,
@@ -88,8 +88,8 @@ struct BuilderDSLShowcase {
 @Suite("Channel Fluent Modifiers Showcase")
 struct ChannelFluentModifiersShowcase {
 
-    private func baseChannel() throws -> Channel {
-        let exampleURL = try #require(URL(string: "https://example.com"))
+    private func baseChannel() -> Channel {
+        let exampleURL = makeURL("https://example.com")
         return Channel(
             title: "Fluent Show",
             link: exampleURL,
@@ -98,33 +98,33 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("author sets itunes:author")
-    func authorModifier() throws {
-        let channel = try baseChannel().author("Jane Doe")
+    func authorModifier() {
+        let channel = baseChannel().author("Jane Doe")
         #expect(channel.itunesAuthor == "Jane Doe")
     }
 
     @Test("language sets feed language")
-    func languageModifier() throws {
-        let channel = try baseChannel().language("fr-fr")
+    func languageModifier() {
+        let channel = baseChannel().language("fr-fr")
         #expect(channel.language == "fr-fr")
     }
 
     @Test("copyright sets copyright notice")
-    func copyrightModifier() throws {
-        let channel = try baseChannel().copyright("(c) 2025 Atelier Socle")
+    func copyrightModifier() {
+        let channel = baseChannel().copyright("(c) 2025 Atelier Socle")
         #expect(channel.copyright == "(c) 2025 Atelier Socle")
     }
 
     @Test("category appends a single iTunes category")
-    func categoryModifier() throws {
-        let channel = try baseChannel().category(.technology)
+    func categoryModifier() {
+        let channel = baseChannel().category(.technology)
         #expect(channel.itunesCategories.count == 1)
         #expect(channel.itunesCategories[0].text == "Technology")
     }
 
     @Test("categories replaces all iTunes categories")
-    func categoriesModifier() throws {
-        let channel = try baseChannel()
+    func categoriesModifier() {
+        let channel = baseChannel()
             .category(.technology)
             .categories([.arts(), .comedy()])
         #expect(channel.itunesCategories.count == 2)
@@ -133,46 +133,46 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("explicit sets itunes:explicit")
-    func explicitModifier() throws {
-        let channel = try baseChannel().explicit(true)
+    func explicitModifier() {
+        let channel = baseChannel().explicit(true)
         #expect(channel.itunesExplicit == true)
     }
 
     @Test("image sets itunes:image URL")
-    func imageModifier() throws {
-        let channel = try baseChannel().image("https://cdn.example.com/art.jpg")
+    func imageModifier() {
+        let channel = baseChannel().image("https://cdn.example.com/art.jpg")
         #expect(channel.itunesImage?.absoluteString == "https://cdn.example.com/art.jpg")
     }
 
     @Test("type sets itunes:type")
-    func typeModifier() throws {
-        let channel = try baseChannel().type("serial")
+    func typeModifier() {
+        let channel = baseChannel().type("serial")
         #expect(channel.itunesType == .serial)
     }
 
     @Test("owner sets itunes:owner name and email")
-    func ownerModifier() throws {
-        let channel = try baseChannel().owner(name: "Jane", email: "jane@example.com")
+    func ownerModifier() {
+        let channel = baseChannel().owner(name: "Jane", email: "jane@example.com")
         #expect(channel.itunesOwner?.name == "Jane")
         #expect(channel.itunesOwner?.email == "jane@example.com")
     }
 
     @Test("locked sets podcast:locked with owner")
-    func lockedModifier() throws {
-        let channel = try baseChannel().locked(owner: "jane@example.com")
+    func lockedModifier() {
+        let channel = baseChannel().locked(owner: "jane@example.com")
         #expect(channel.locked?.isLocked == true)
         #expect(channel.locked?.owner == "jane@example.com")
     }
 
     @Test("guid sets podcast:guid")
-    func guidModifier() throws {
-        let channel = try baseChannel().guid("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+    func guidModifier() {
+        let channel = baseChannel().guid("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
         #expect(channel.podcastGuid?.value == "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
     }
 
     @Test("funding appends a podcast:funding link")
-    func fundingModifier() throws {
-        let channel = try baseChannel()
+    func fundingModifier() {
+        let channel = baseChannel()
             .funding(url: "https://patreon.com/show", text: "Support on Patreon")
         #expect(channel.funding.count == 1)
         #expect(channel.funding[0].message == "Support on Patreon")
@@ -180,22 +180,22 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("atomLink appends an atom:link")
-    func atomLinkModifier() throws {
-        let channel = try baseChannel()
+    func atomLinkModifier() {
+        let channel = baseChannel()
             .atomLink(href: "https://example.com/feed.xml", rel: "self")
         #expect(channel.atomLinks.count == 1)
         #expect(channel.atomLinks[0].rel == "self")
     }
 
     @Test("medium sets podcast:medium")
-    func mediumModifier() throws {
-        let channel = try baseChannel().medium(.podcast)
+    func mediumModifier() {
+        let channel = baseChannel().medium(.podcast)
         #expect(channel.medium == .podcast)
     }
 
     @Test("publisher sets podcast:publisher with remoteItem")
-    func publisherModifier() throws {
-        let channel = try baseChannel()
+    func publisherModifier() {
+        let channel = baseChannel()
             .publisher(
                 feedGuid: "pub-guid-123",
                 feedUrl: "https://network.example.com/feed.xml"
@@ -208,8 +208,8 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("newFeedUrl sets itunes:new-feed-url")
-    func newFeedUrlModifier() throws {
-        let channel = try baseChannel()
+    func newFeedUrlModifier() {
+        let channel = baseChannel()
             .newFeedUrl("https://new.example.com/feed.xml")
         #expect(
             channel.itunesNewFeedUrl?.absoluteString == "https://new.example.com/feed.xml"
@@ -217,14 +217,14 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("complete sets itunes:complete")
-    func completeModifier() throws {
-        let channel = try baseChannel().complete(true)
+    func completeModifier() {
+        let channel = baseChannel().complete(true)
         #expect(channel.itunesComplete == true)
     }
 
     @Test("location appends a podcast:location")
-    func locationModifier() throws {
-        let channel = try baseChannel()
+    func locationModifier() {
+        let channel = baseChannel()
             .location(
                 name: "Paris",
                 geo: "geo:48.8566,2.3522",
@@ -239,8 +239,8 @@ struct ChannelFluentModifiersShowcase {
     }
 
     @Test("All modifiers can be chained fluently")
-    func chainingAll() throws {
-        let channel = try baseChannel()
+    func chainingAll() {
+        let channel = baseChannel()
             .author("Jane Doe")
             .language("en-us")
             .copyright("(c) 2025")

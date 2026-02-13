@@ -5,16 +5,16 @@ import Testing
 
 // MARK: - Helpers
 
-private func minimalChannel() throws -> Channel {
+private func minimalChannel() -> Channel {
     Channel(
         title: "Test Podcast",
-        link: try #require(URL(string: "https://example.com")),
+        link: makeURL("https://example.com"),
         description: "A test podcast"
     )
 }
 
-private func minimalFeed(channel: Channel? = nil) throws -> PodcastFeed {
-    PodcastFeed(channel: try channel ?? minimalChannel())
+private func minimalFeed(channel: Channel? = nil) -> PodcastFeed {
+    PodcastFeed(channel: channel ?? minimalChannel())
 }
 
 // MARK: - Content Module Tests
@@ -23,7 +23,7 @@ struct FeedGeneratorContentTests {
 
     @Test("content:encoded always uses CDATA")
     func contentEncodedCDATA() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = [Item(contentEncoded: ContentEncoded(value: "<p>Hello <strong>World</strong></p>"))]
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
         #expect(xml.contains("<content:encoded><![CDATA[<p>Hello <strong>World</strong></p>]]></content:encoded>"))
@@ -36,7 +36,7 @@ struct FeedGeneratorCDATATests {
 
     @Test("Description with HTML uses CDATA")
     func descriptionHTMLCDATA() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var ch = Channel(
             title: "Test",
             link: linkURL,
@@ -49,7 +49,7 @@ struct FeedGeneratorCDATATests {
 
     @Test("Description without HTML uses escaping")
     func descriptionPlainEscapes() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var ch = Channel(
             title: "Test",
             link: linkURL,
@@ -67,7 +67,7 @@ struct FeedGeneratorSpecialCharTests {
 
     @Test("Special characters in content are escaped")
     func specialCharsEscaped() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var ch = Channel(
             title: "Tom & Jerry \u{00A9} 2025",
             link: linkURL,
@@ -86,7 +86,7 @@ struct FeedGeneratorOmissionTests {
 
     @Test("Generate item with deprecated podcastImagesSrcset")
     func generateItemPodcastImagesSrcset() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         var item = Item(title: "Ep1")
         item.podcastImagesSrcset = PodcastImages(
             srcset: "https://example.com/img1.jpg 200w, https://example.com/img2.jpg 600w"
@@ -101,7 +101,7 @@ struct FeedGeneratorOmissionTests {
 
     @Test("Generate channel with deprecated podcastImagesSrcset")
     func generateChannelPodcastImagesSrcset() throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.podcastImagesSrcset = PodcastImages(
             srcset: "https://example.com/art-1500.jpg 1500w, https://example.com/art-600.jpg 600w"
         )
@@ -133,7 +133,7 @@ struct FeedGeneratorOmissionTests {
 
     @Test("Generate unknown element without text content produces self-closing tag")
     func generateUnknownSelfClosing() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var channel = Channel(
             title: "Test",
             link: linkURL,

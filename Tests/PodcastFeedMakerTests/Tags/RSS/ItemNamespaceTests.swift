@@ -42,8 +42,8 @@ struct ItemITunesTests {
     // MARK: - Initialization
 
     @Test("Item can be initialized with iTunes properties")
-    func itemInitWithItunesProperties() throws {
-        let imageURL = try #require(URL(string: "https://example.com/ep1.jpg"))
+    func itemInitWithItunesProperties() {
+        let imageURL = makeURL("https://example.com/ep1.jpg")
         let item = Item(
             title: "Episode 1",
             itunesAuthor: "John Doe",
@@ -90,8 +90,8 @@ struct ItemITunesTests {
     // MARK: - XML Generation
 
     @Test("Item XML contains iTunes tags when set")
-    func itemXmlContainsItunesTags() throws {
-        let imageURL = try #require(URL(string: "https://example.com/ep1.jpg"))
+    func itemXmlContainsItunesTags() {
+        let imageURL = makeURL("https://example.com/ep1.jpg")
         let item = Item(
             title: "Episode 1",
             itunesAuthor: "John Doe",
@@ -122,7 +122,7 @@ struct ItemITunesTests {
     }
 
     @Test("Item XML contains iTunes episode types correctly")
-    func itemXmlContainsEpisodeTypes() throws {
+    func itemXmlContainsEpisodeTypes() {
         let fullItem = Item(itunesEpisodeType: .full)
         let trailerItem = Item(itunesEpisodeType: .trailer)
         let bonusItem = Item(itunesEpisodeType: .bonus)
@@ -137,7 +137,7 @@ struct ItemITunesTests {
     }
 
     @Test("Item XML contains content:encoded when set")
-    func itemXmlContainsContentEncoded() throws {
+    func itemXmlContainsContentEncoded() {
         let item = Item(
             contentEncoded: ContentEncoded(value: "<p>Show notes</p>")
         )
@@ -176,9 +176,9 @@ struct ItemPodcastNSTests {
     // MARK: - Initialization
 
     @Test("Item can be initialized with Podcast NS 2.0 properties")
-    func itemInitWithPodcastNsProperties() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
-        let chaptersURL = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func itemInitWithPodcastNsProperties() {
+        let transcriptURL = makeURL("https://example.com/ep1.vtt")
+        let chaptersURL = makeURL("https://example.com/ep1/chapters.json")
         let transcript = Transcript(
             url: transcriptURL,
             type: "text/vtt",
@@ -207,9 +207,9 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item can be initialized with multiple transcripts")
-    func itemInitWithMultipleTranscripts() throws {
-        let vttURL = try #require(URL(string: "https://example.com/ep1.vtt"))
-        let srtURL = try #require(URL(string: "https://example.com/ep1.srt"))
+    func itemInitWithMultipleTranscripts() {
+        let vttURL = makeURL("https://example.com/ep1.vtt")
+        let srtURL = makeURL("https://example.com/ep1.srt")
         let vttTranscript = Transcript(url: vttURL, type: "text/vtt", language: "en", rel: "captions")
         let srtTranscript = Transcript(url: srtURL, type: "application/srt", language: "fr")
 
@@ -223,21 +223,21 @@ struct ItemPodcastNSTests {
     // MARK: - XML Generation
 
     @Test("Item XML contains soundbite when set")
-    func itemXmlContainsSoundbite() throws {
+    func itemXmlContainsSoundbite() {
         let item = Item(soundbites: [Soundbite(startTime: 0.0, duration: 10.0, title: "Best Part")])
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"<podcast:soundbite startTime="0.0" duration="10.0">Best Part</podcast:soundbite>"#))
     }
 
     @Test("Item XML contains soundbite without title")
-    func itemXmlContainsSoundbiteWithoutTitle() throws {
+    func itemXmlContainsSoundbiteWithoutTitle() {
         let item = Item(soundbites: [Soundbite(startTime: 73.0, duration: 60.0)])
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains(#"<podcast:soundbite startTime="73.0" duration="60.0" />"#))
     }
 
     @Test("Item XML contains multiple soundbites")
-    func itemXmlContainsMultipleSoundbites() throws {
+    func itemXmlContainsMultipleSoundbites() {
         let item = Item(
             soundbites: [
                 Soundbite(startTime: 0.0, duration: 10.0, title: "Intro"),
@@ -250,8 +250,8 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item XML contains transcript when set")
-    func itemXmlContainsTranscript() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
+    func itemXmlContainsTranscript() {
+        let transcriptURL = makeURL("https://example.com/ep1.vtt")
         let item = Item(
             transcripts: [Transcript(url: transcriptURL, type: "text/vtt", language: "en", rel: "captions")]
         )
@@ -264,8 +264,8 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item XML contains transcript without optional attributes")
-    func itemXmlContainsTranscriptMinimal() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep1.srt"))
+    func itemXmlContainsTranscriptMinimal() {
+        let transcriptURL = makeURL("https://example.com/ep1.srt")
         let item = Item(transcripts: [Transcript(url: transcriptURL, type: "application/srt")])
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:transcript"))
@@ -276,8 +276,8 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item XML contains chapters link when set")
-    func itemXmlContainsChaptersLink() throws {
-        let chaptersURL = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func itemXmlContainsChaptersLink() {
+        let chaptersURL = makeURL("https://example.com/ep1/chapters.json")
         let item = Item(chaptersLink: ChaptersLink(url: chaptersURL))
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<podcast:chapters"))
@@ -286,9 +286,9 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item XML contains person when set")
-    func itemXmlContainsPerson() throws {
-        let hrefURL = try #require(URL(string: "https://jane.example.com"))
-        let imgURL = try #require(URL(string: "https://example.com/jane.jpg"))
+    func itemXmlContainsPerson() {
+        let hrefURL = makeURL("https://jane.example.com")
+        let imgURL = makeURL("https://example.com/jane.jpg")
         let item = Item(
             persons: [PodcastPerson(name: "Jane Doe", role: "host", group: "cast", href: hrefURL, img: imgURL)]
         )
@@ -300,9 +300,9 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Item XML contains all Podcast NS 2.0 tags together")
-    func itemXmlContainsAllPodcastNsTags() throws {
-        let transcriptURL = try #require(URL(string: "https://example.com/ep.vtt"))
-        let chaptersURL = try #require(URL(string: "https://example.com/chapters.json"))
+    func itemXmlContainsAllPodcastNsTags() {
+        let transcriptURL = makeURL("https://example.com/ep.vtt")
+        let chaptersURL = makeURL("https://example.com/chapters.json")
         let item = Item(
             title: "Episode With Everything",
             transcripts: [Transcript(url: transcriptURL, type: "text/vtt")],
@@ -328,9 +328,9 @@ struct ItemPodcastNSTests {
     }
 
     @Test("Items with different transcripts are not equal")
-    func itemsWithDifferentTranscriptsAreNotEqual() throws {
-        let urlA = try #require(URL(string: "https://example.com/a.vtt"))
-        let urlB = try #require(URL(string: "https://example.com/b.vtt"))
+    func itemsWithDifferentTranscriptsAreNotEqual() {
+        let urlA = makeURL("https://example.com/a.vtt")
+        let urlB = makeURL("https://example.com/b.vtt")
         let item1 = Item(transcripts: [Transcript(url: urlA, type: "text/vtt")])
         let item2 = Item(transcripts: [Transcript(url: urlB, type: "text/vtt")])
         #expect(item1 != item2)

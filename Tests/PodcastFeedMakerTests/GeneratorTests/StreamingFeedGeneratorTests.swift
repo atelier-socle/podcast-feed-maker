@@ -7,16 +7,16 @@ struct StreamingFeedGeneratorTests {
 
     // MARK: - Helpers
 
-    private func minimalChannel() throws -> Channel {
+    private func minimalChannel() -> Channel {
         Channel(
             title: "Test Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A test podcast"
         )
     }
 
     private func feedWithItems(_ count: Int) throws -> PodcastFeed {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.items = try (0..<count).map { i in
             Item(
                 title: "Episode \(i)",
@@ -123,7 +123,7 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Streaming with complex items")
     func streamingComplexItems() async throws {
-        var ch = try minimalChannel()
+        var ch = minimalChannel()
         ch.itunesAuthor = "Host"
         ch.items = [
             Item(

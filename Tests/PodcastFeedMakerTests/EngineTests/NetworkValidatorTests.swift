@@ -22,14 +22,14 @@ struct NetworkValidatorTests {
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: try #require(URL(string: "https://example.com")),
+                link: makeURL("https://example.com"),
                 description: "Desc",
                 items: items,
                 itunesImage: channelImage
             ))
     }
 
-    private func feedWithEnclosures(_ enclosures: [(URL, String)]) throws -> PodcastFeed {
+    private func feedWithEnclosures(_ enclosures: [(URL, String)]) -> PodcastFeed {
         let items = enclosures.enumerated().map { idx, pair in
             Item(
                 title: "Episode \(idx)",
@@ -43,7 +43,7 @@ struct NetworkValidatorTests {
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: try #require(URL(string: "https://example.com")),
+                link: makeURL("https://example.com"),
                 description: "Desc",
                 items: items
             ))
@@ -53,7 +53,7 @@ struct NetworkValidatorTests {
 
     @Test("Extracts channel artwork URL")
     func extractChannelArtwork() throws {
-        let url = try #require(URL(string: "https://example.com/art.jpg"))
+        let url = makeURL("https://example.com/art.jpg")
         let feed = try feedWithArtwork(channelImage: url)
         let entries = validator.extractArtworkURLs(from: feed)
         #expect(entries.count == 1)
@@ -63,8 +63,8 @@ struct NetworkValidatorTests {
 
     @Test("Extracts item artwork URLs")
     func extractItemArtwork() throws {
-        let url1 = try #require(URL(string: "https://example.com/ep1.jpg"))
-        let url2 = try #require(URL(string: "https://example.com/ep2.jpg"))
+        let url1 = makeURL("https://example.com/ep1.jpg")
+        let url2 = makeURL("https://example.com/ep2.jpg")
         let feed = try feedWithArtwork(itemImages: [url1, url2])
         let entries = validator.extractArtworkURLs(from: feed)
         #expect(entries.count == 2)
@@ -75,9 +75,9 @@ struct NetworkValidatorTests {
     // MARK: - URL Extraction: Enclosures
 
     @Test("Extracts enclosure URLs with expected types")
-    func extractEnclosures() throws {
-        let url = try #require(URL(string: "https://example.com/ep.mp3"))
-        let feed = try feedWithEnclosures([(url, "audio/mpeg")])
+    func extractEnclosures() {
+        let url = makeURL("https://example.com/ep.mp3")
+        let feed = feedWithEnclosures([(url, "audio/mpeg")])
         let entries = validator.extractEnclosureEntries(from: feed)
         #expect(entries.count == 1)
         #expect(entries[0].url == url)
@@ -88,12 +88,12 @@ struct NetworkValidatorTests {
     // MARK: - URL Extraction: All URLs
 
     @Test("extractAllURLEntries includes artwork, enclosures, atom links, and funding")
-    func extractAllURLs() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
-        let itemImageURL = try #require(URL(string: "https://example.com/ep.jpg"))
-        let atomLinkURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let fundingURL = try #require(URL(string: "https://example.com/fund"))
+    func extractAllURLs() {
+        let linkURL = makeURL("https://example.com")
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
+        let itemImageURL = makeURL("https://example.com/ep.jpg")
+        let atomLinkURL = makeURL("https://example.com/feed.xml")
+        let fundingURL = makeURL("https://example.com/fund")
         let channel = Channel(
             title: "Podcast",
             link: linkURL,

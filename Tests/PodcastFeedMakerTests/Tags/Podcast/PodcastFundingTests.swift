@@ -8,8 +8,8 @@ struct PodcastFundingTests {
     // MARK: - Initialization
 
     @Test
-    func initSetsPropertiesCorrectly() throws {
-        let url = try #require(URL(string: "https://patreon.com/myshow"))
+    func initSetsPropertiesCorrectly() {
+        let url = makeURL("https://patreon.com/myshow")
         let funding = Funding(url: url, message: "Support us on Patreon")
 
         #expect(funding.url == url)
@@ -19,9 +19,9 @@ struct PodcastFundingTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() throws {
-        let urlA = try #require(URL(string: "https://a.com"))
-        let urlB = try #require(URL(string: "https://b.com"))
+    func equatableConformance() {
+        let urlA = makeURL("https://a.com")
+        let urlB = makeURL("https://b.com")
 
         let a = Funding(url: urlA, message: "A")
         let b = Funding(url: urlA, message: "A")
@@ -32,9 +32,9 @@ struct PodcastFundingTests {
     }
 
     @Test
-    func hashableConformance() throws {
-        let urlA = try #require(URL(string: "https://a.com"))
-        let urlB = try #require(URL(string: "https://b.com"))
+    func hashableConformance() {
+        let urlA = makeURL("https://a.com")
+        let urlB = makeURL("https://b.com")
 
         let a = Funding(url: urlA, message: "A")
         let b = Funding(url: urlA, message: "A")
@@ -48,8 +48,8 @@ struct PodcastFundingTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndMessage() throws {
-        let fundingURL = try #require(URL(string: "https://patreon.com/myshow"))
+    func xmlRepresentationContainsUrlAndMessage() {
+        let fundingURL = makeURL("https://patreon.com/myshow")
         let funding = Funding(
             url: fundingURL,
             message: "Support us on Patreon"
@@ -67,8 +67,8 @@ struct PodcastFundingTests {
     }
 
     @Test
-    func xmlRepresentationWrapsMessageAsElementContent() throws {
-        let donateURL = try #require(URL(string: "https://example.com/donate"))
+    func xmlRepresentationWrapsMessageAsElementContent() {
+        let donateURL = makeURL("https://example.com/donate")
         let funding = Funding(
             url: donateURL,
             message: "Donate here"

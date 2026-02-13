@@ -31,11 +31,11 @@ struct ITunesOwnerTests {
     // MARK: - Channel Integration
 
     @Test
-    func test_channel_itunesOwner_shouldStoreOwner() throws {
+    func test_channel_itunesOwner_shouldStoreOwner() {
         let owner = ITunesOwner(name: "Jane Doe", email: "jane@domain.com")
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast",
             itunesOwner: owner
         )
@@ -44,10 +44,10 @@ struct ITunesOwnerTests {
     }
 
     @Test
-    func test_channel_itunesOwner_defaultsToNil() throws {
+    func test_channel_itunesOwner_defaultsToNil() {
         let channel = Channel(
             title: "My Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A great podcast"
         )
         #expect(channel.itunesOwner == nil)

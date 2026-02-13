@@ -15,7 +15,7 @@ struct GeneratorPodcastNSShowcase {
     ) throws -> PodcastFeed {
         let channel = Channel(
             title: "Minimal Podcast",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "A minimal test feed.",
             items: items
         )
@@ -28,7 +28,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorPodcastGuid() throws {
         let channel = Channel(
             title: "GUID Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "GUID test.",
             podcastGuid: PodcastGuid(value: "917393e3-1b1e-5cef-ace4-edaa54e1f3e1")
         )
@@ -42,7 +42,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorPodcastLocked() throws {
         let channel = Channel(
             title: "Locked Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Locked test.",
             locked: Locked(isLocked: true, owner: "lock@example.com")
         )
@@ -58,9 +58,9 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorFunding() throws {
         let channel = Channel(
             title: "Funded Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Funding test.",
-            funding: [Funding(url: try #require(URL(string: "https://example.com/donate")), message: "Buy us a coffee")]
+            funding: [Funding(url: makeURL("https://example.com/donate"), message: "Buy us a coffee")]
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -74,7 +74,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorPodcastPerson() throws {
         let channel = Channel(
             title: "Person Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Person test.",
             persons: [
                 PodcastPerson(
@@ -100,9 +100,9 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorAtomSelfLink() throws {
         let channel = Channel(
             title: "Atom Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Atom test.",
-            atomLinks: [AtomLink.selfLink(href: try #require(URL(string: "https://example.com/feed.xml")))]
+            atomLinks: [AtomLink.selfLink(href: makeURL("https://example.com/feed.xml"))]
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [.atom], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -119,7 +119,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorDublinCore() throws {
         let channel = Channel(
             title: "DC Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Dublin Core test.",
             dublinCore: DublinCore(
                 creator: "Author One",
@@ -167,7 +167,7 @@ struct GeneratorPodcastNSShowcase {
         let item = Item(
             title: "Enclosure Test",
             enclosure: Enclosure(
-                url: try #require(URL(string: "https://cdn.example.com/ep.mp3")),
+                url: makeURL("https://cdn.example.com/ep.mp3"),
                 length: 24_576_000,
                 type: "audio/mpeg"
             )
@@ -198,7 +198,7 @@ struct GeneratorPodcastNSShowcase {
             title: "Transcript Test",
             transcripts: [
                 Transcript(
-                    url: try #require(URL(string: "https://example.com/captions.vtt")),
+                    url: makeURL("https://example.com/captions.vtt"),
                     type: "text/vtt",
                     language: "en",
                     rel: "captions"
@@ -237,7 +237,7 @@ struct GeneratorPodcastNSShowcase {
         let item = Item(
             title: "Chapters Test",
             chaptersLink: ChaptersLink(
-                url: try #require(URL(string: "https://example.com/ch.json")),
+                url: makeURL("https://example.com/ch.json"),
                 type: "application/json+chapters"
             )
         )
@@ -255,7 +255,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorUnknownElements() throws {
         let channel = Channel(
             title: "Unknown Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Unknown element test.",
             unknownElements: [
                 UnknownElement(
@@ -275,7 +275,7 @@ struct GeneratorPodcastNSShowcase {
     func feedGeneratorXMLComments() throws {
         let channel = Channel(
             title: "Comment Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Comment test.",
             xmlComments: ["This is a preserved comment"]
         )

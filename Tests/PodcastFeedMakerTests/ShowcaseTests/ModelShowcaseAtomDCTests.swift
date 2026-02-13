@@ -9,8 +9,8 @@ import Testing
 struct AtomNamespaceShowcase {
 
     @Test("AtomLink with all properties")
-    func atomLinkFull() throws {
-        let href = try #require(URL(string: "https://example.com/alternate-feed.xml"))
+    func atomLinkFull() {
+        let href = makeURL("https://example.com/alternate-feed.xml")
 
         let link = AtomLink(
             href: href,
@@ -30,8 +30,8 @@ struct AtomNamespaceShowcase {
     }
 
     @Test("AtomLink self-link factory creates properly typed self reference")
-    func atomLinkSelfFactory() throws {
-        let feedURL = try #require(URL(string: "https://swifttalk.dev/feed.xml"))
+    func atomLinkSelfFactory() {
+        let feedURL = makeURL("https://swifttalk.dev/feed.xml")
         let selfLink = AtomLink.selfLink(href: feedURL)
 
         #expect(selfLink.href == feedURL)
@@ -43,8 +43,8 @@ struct AtomNamespaceShowcase {
     }
 
     @Test("AtomLink with href only")
-    func atomLinkHrefOnly() throws {
-        let href = try #require(URL(string: "https://example.com/related"))
+    func atomLinkHrefOnly() {
+        let href = makeURL("https://example.com/related")
         let link = AtomLink(href: href)
 
         #expect(link.href == href)
@@ -56,8 +56,8 @@ struct AtomNamespaceShowcase {
     }
 
     @Test("AtomLink enclosure relation for media")
-    func atomLinkEnclosure() throws {
-        let href = try #require(URL(string: "https://cdn.example.com/episode.mp3"))
+    func atomLinkEnclosure() {
+        let href = makeURL("https://cdn.example.com/episode.mp3")
 
         let link = AtomLink(
             href: href,
@@ -194,9 +194,9 @@ struct ContentModuleShowcase {
 struct PodloveChaptersShowcase {
 
     @Test("PodloveChapters container with multiple chapters")
-    func podloveChaptersContainer() throws {
-        let chapterURL = try #require(URL(string: "https://example.com/topic"))
-        let imageURL = try #require(URL(string: "https://example.com/chapter-img.jpg"))
+    func podloveChaptersContainer() {
+        let chapterURL = makeURL("https://example.com/topic")
+        let imageURL = makeURL("https://example.com/chapter-img.jpg")
 
         let chapters = PodloveChapters(
             version: "1.2",
@@ -232,9 +232,9 @@ struct PodloveChaptersShowcase {
     }
 
     @Test("PodloveChapter with all properties")
-    func podloveChapterFull() throws {
-        let href = try #require(URL(string: "https://swift.org"))
-        let img = try #require(URL(string: "https://example.com/swift-logo.png"))
+    func podloveChapterFull() {
+        let href = makeURL("https://swift.org")
+        let img = makeURL("https://example.com/swift-logo.png")
 
         let chapter = PodloveChapter(
             start: "01:23:45.678",
@@ -266,9 +266,9 @@ struct PodloveChaptersShowcase {
 struct JSONChaptersShowcase {
 
     @Test("JSONChapterList with all metadata and chapters")
-    func jsonChapterListFull() throws {
-        let chapterURL = try #require(URL(string: "https://example.com/topic"))
-        let chapterImg = try #require(URL(string: "https://example.com/chapter1.jpg"))
+    func jsonChapterListFull() {
+        let chapterURL = makeURL("https://example.com/topic")
+        let chapterImg = makeURL("https://example.com/chapter1.jpg")
 
         let list = JSONChapterList(
             version: "1.2.0",

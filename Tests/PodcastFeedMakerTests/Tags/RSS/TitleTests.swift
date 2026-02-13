@@ -16,8 +16,8 @@ struct TitleTests {
     // MARK: - Channel Title
 
     @Test("Channel requires a title at initialization")
-    func channelTitleIsRequired() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelTitleIsRequired() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "My Podcast",
             link: link,
@@ -28,8 +28,8 @@ struct TitleTests {
     }
 
     @Test("Channel title is mutable")
-    func channelTitleIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelTitleIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Original",
             link: link,
@@ -42,7 +42,7 @@ struct TitleTests {
 
     @Test("Channel XML contains title tag")
     func channelXmlContainsTitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Episode 1: Getting Started",
             link: link,
@@ -55,7 +55,7 @@ struct TitleTests {
 
     @Test("Channel XML escapes special characters in title")
     func channelXmlEscapesSpecialCharsInTitle() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Swift & XML <Guide>",
             link: link,
@@ -88,14 +88,14 @@ struct TitleTests {
     }
 
     @Test("Item XML contains title tag when set")
-    func itemXmlContainsTitleWhenSet() throws {
+    func itemXmlContainsTitleWhenSet() {
         let item = Item(title: "Episode 1")
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<title>Episode 1</title>"))
     }
 
     @Test("Item XML omits title tag when nil")
-    func itemXmlOmitsTitleWhenNil() throws {
+    func itemXmlOmitsTitleWhenNil() {
         let item = Item()
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<title>"))
@@ -104,16 +104,16 @@ struct TitleTests {
     // MARK: - Equatable / Hashable via Channel
 
     @Test("Channels with same title are equal (given same required fields)")
-    func channelsWithSameTitleAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameTitleAreEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "A", link: url, description: "D")
         let channel2 = Channel(title: "A", link: url, description: "D")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different titles are not equal")
-    func channelsWithDifferentTitlesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentTitlesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "A", link: url, description: "D")
         let channel2 = Channel(title: "B", link: url, description: "D")
         #expect(channel1 != channel2)
@@ -134,8 +134,8 @@ struct TitleTests {
     }
 
     @Test("Channel is Hashable and title contributes to hash")
-    func channelHashableWithTitle() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelHashableWithTitle() {
+        let url = makeURL("https://example.com")
         let channel = Channel(title: "Hello", link: url, description: "D")
         let set: Set = [channel]
         #expect(set.contains(Channel(title: "Hello", link: url, description: "D")))

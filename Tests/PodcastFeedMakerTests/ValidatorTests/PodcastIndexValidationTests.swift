@@ -20,12 +20,12 @@ struct PodcastIndexValidationTests {
         txtRecords: [PodcastTxt] = [PodcastTxt(value: "abc", purpose: "verify")],
         value: PodcastValue? = nil
     ) throws -> PodcastFeed {
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let resolvedFunding: [Funding]
         if let funding {
             resolvedFunding = funding
         } else {
-            let fundURL = try #require(URL(string: "https://example.com/fund"))
+            let fundURL = makeURL("https://example.com/fund")
             resolvedFunding = [Funding(url: fundURL, message: "Support us")]
         }
         return PodcastFeed(
@@ -181,9 +181,9 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("Item with alternate enclosures generates info")
-    func alternateEnclosuresInfo() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let fundURL = try #require(URL(string: "https://example.com/fund"))
+    func alternateEnclosuresInfo() {
+        let url = makeURL("https://example.com")
+        let fundURL = makeURL("https://example.com/fund")
         let item = Item(
             title: "Episode",
             alternateEnclosures: [

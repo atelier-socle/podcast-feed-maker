@@ -34,11 +34,11 @@ struct ItemTests {
     // MARK: - Initialization with Values
 
     @Test("Item can be initialized with RSS core properties")
-    func itemInitWithRssCoreProperties() throws {
-        let url = try #require(URL(string: "https://example.com/ep1"))
+    func itemInitWithRssCoreProperties() {
+        let url = makeURL("https://example.com/ep1")
         let date = Date(timeIntervalSince1970: 1_000_000)
         let guid = GUID(value: "ep-001", isPermaLink: false)
-        let enclosureURL = try #require(URL(string: "https://example.com/ep1.mp3"))
+        let enclosureURL = makeURL("https://example.com/ep1.mp3")
         let enclosure = Enclosure(
             url: enclosureURL,
             length: 50000,
@@ -68,8 +68,8 @@ struct ItemTests {
     }
 
     @Test("Item can be initialized with title and enclosure using string MIME type")
-    func itemInitWithStringMimeType() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep1.m4a"))
+    func itemInitWithStringMimeType() {
+        let enclosureURL = makeURL("https://example.com/ep1.m4a")
         let enclosure = Enclosure(
             url: enclosureURL,
             length: 30000,
@@ -84,10 +84,10 @@ struct ItemTests {
     // MARK: - Mutability
 
     @Test("Item properties are mutable")
-    func itemPropertiesAreMutable() throws {
+    func itemPropertiesAreMutable() {
         var item = Item()
 
-        let linkURL = try #require(URL(string: "https://example.com/ep1"))
+        let linkURL = makeURL("https://example.com/ep1")
         item.title = "New Title"
         item.link = linkURL
         item.description = "Updated description"
@@ -108,7 +108,7 @@ struct ItemTests {
     // MARK: - XML Generation
 
     @Test("Item XML wraps content in item tags")
-    func itemXmlWrapsInItemTags() throws {
+    func itemXmlWrapsInItemTags() {
         let item = Item(title: "Episode 1")
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
@@ -117,8 +117,8 @@ struct ItemTests {
     }
 
     @Test("Item XML contains RSS core tags when set")
-    func itemXmlContainsRssCoreTags() throws {
-        let linkURL = try #require(URL(string: "https://example.com/ep1"))
+    func itemXmlContainsRssCoreTags() {
+        let linkURL = makeURL("https://example.com/ep1")
         let item = Item(
             title: "Episode 1",
             link: linkURL,
@@ -134,8 +134,8 @@ struct ItemTests {
     }
 
     @Test("Item XML contains enclosure when set")
-    func itemXmlContainsEnclosure() throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep1.mp3"))
+    func itemXmlContainsEnclosure() {
+        let enclosureURL = makeURL("https://example.com/ep1.mp3")
         let enclosure = Enclosure(
             url: enclosureURL,
             length: 50000,
@@ -152,7 +152,7 @@ struct ItemTests {
     }
 
     @Test("Item XML contains guid when set")
-    func itemXmlContainsGuid() throws {
+    func itemXmlContainsGuid() {
         let guid = GUID(value: "ep-001", isPermaLink: false)
         let item = Item(guid: guid)
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
@@ -161,7 +161,7 @@ struct ItemTests {
     }
 
     @Test("Item XML contains guid with isPermaLink true")
-    func itemXmlContainsGuidPermaLink() throws {
+    func itemXmlContainsGuidPermaLink() {
         let guid = GUID(value: "https://example.com/ep1")
         let item = Item(guid: guid)
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
@@ -170,7 +170,7 @@ struct ItemTests {
     }
 
     @Test("Item XML omits all tags when no properties are set")
-    func itemXmlOmitsAllTagsWhenEmpty() throws {
+    func itemXmlOmitsAllTagsWhenEmpty() {
         let item = Item()
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
 
@@ -198,8 +198,8 @@ struct ItemTests {
     }
 
     @Test("Item with complex properties is Sendable")
-    func itemWithComplexPropertiesIsSendable() async throws {
-        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+    func itemWithComplexPropertiesIsSendable() async {
+        let enclosureURL = makeURL("https://example.com/ep.mp3")
         let item = Item(
             title: "Episode 1",
             enclosure: Enclosure(url: enclosureURL, length: 100, mimeType: .mpeg),

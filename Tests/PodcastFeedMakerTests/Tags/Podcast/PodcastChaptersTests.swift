@@ -8,8 +8,8 @@ struct PodcastChaptersTests {
     // MARK: - Initialization
 
     @Test
-    func initWithDefaultType() throws {
-        let url = try #require(URL(string: "https://example.com/chapters.json"))
+    func initWithDefaultType() {
+        let url = makeURL("https://example.com/chapters.json")
         let chapters = ChaptersLink(url: url)
 
         #expect(chapters.url == url)
@@ -17,8 +17,8 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func initWithCustomType() throws {
-        let url = try #require(URL(string: "https://example.com/chapters.json"))
+    func initWithCustomType() {
+        let url = makeURL("https://example.com/chapters.json")
         let chapters = ChaptersLink(url: url, type: "application/json")
 
         #expect(chapters.url == url)
@@ -28,9 +28,9 @@ struct PodcastChaptersTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() throws {
-        let url1 = try #require(URL(string: "https://example.com/chapters1.json"))
-        let url2 = try #require(URL(string: "https://example.com/chapters2.json"))
+    func equatableConformance() {
+        let url1 = makeURL("https://example.com/chapters1.json")
+        let url2 = makeURL("https://example.com/chapters2.json")
 
         let a = ChaptersLink(url: url1)
         let b = ChaptersLink(url: url1)
@@ -41,9 +41,9 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func hashableConformance() throws {
-        let url1 = try #require(URL(string: "https://example.com/chapters1.json"))
-        let url2 = try #require(URL(string: "https://example.com/chapters2.json"))
+    func hashableConformance() {
+        let url1 = makeURL("https://example.com/chapters1.json")
+        let url2 = makeURL("https://example.com/chapters2.json")
 
         let a = ChaptersLink(url: url1)
         let b = ChaptersLink(url: url1)
@@ -56,8 +56,8 @@ struct PodcastChaptersTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndType() throws {
-        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func xmlRepresentationContainsUrlAndType() {
+        let url = makeURL("https://example.com/ep1/chapters.json")
         let chapters = ChaptersLink(url: url)
 
         let xml = XMLBuilder().selfClosingElement(
@@ -71,8 +71,8 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func xmlRepresentationWithCustomType() throws {
-        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
+    func xmlRepresentationWithCustomType() {
+        let url = makeURL("https://example.com/ep1/chapters.json")
         let chapters = ChaptersLink(url: url, type: "application/json")
 
         let xml = XMLBuilder().selfClosingElement(
@@ -84,8 +84,8 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() throws {
-        let url = try #require(URL(string: "https://example.com/chapters.json"))
+    func xmlRepresentationIsSelfClosingTag() {
+        let url = makeURL("https://example.com/chapters.json")
         let chapters = ChaptersLink(url: url)
 
         let xml = XMLBuilder().selfClosingElement(

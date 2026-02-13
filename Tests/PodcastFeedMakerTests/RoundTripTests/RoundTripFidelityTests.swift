@@ -108,7 +108,7 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits unknown channel elements")
     func generatorEmitsChannelUnknowns() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Desc",
@@ -124,7 +124,7 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits unknown item elements")
     func generatorEmitsItemUnknowns() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Desc",
@@ -144,7 +144,7 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits attributes on unknown elements")
     func generatorEmitsAttrs() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Desc",
@@ -211,7 +211,7 @@ struct XMLCommentPreservationTests {
     @Test("Generator emits channel comments")
     func generatorEmitsChannelComments() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Desc",
@@ -225,7 +225,7 @@ struct XMLCommentPreservationTests {
     @Test("Generator emits item comments")
     func generatorEmitsItemComments() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Desc",
@@ -313,7 +313,7 @@ struct CDATATrackingTests {
     @Test("Generator uses CDATA for tracked fields")
     func generatorUsesCDATA() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Plain text description",
@@ -327,7 +327,7 @@ struct CDATATrackingTests {
     @Test("Generator does not use CDATA for non-tracked fields")
     func generatorDoesNotUseCDATAForNonTracked() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Plain text"
@@ -372,7 +372,7 @@ struct CDATATrackingTests {
     @Test("Default behavior unchanged (no cdataFields uses smartElement logic)")
     func defaultBehaviorUnchanged() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         feed.channel = Channel(
             title: "Test", link: linkURL,
             description: "Contains <b>HTML</b> content"
@@ -441,7 +441,7 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .parsed mode uses stored prefixes")
     func generatorParsedModeUsesPrefixes() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var feed = PodcastFeed(
             namespaces: [.itunes],
             namespacePrefixes: ["apple": "http://www.itunes.com/dtds/podcast-1.0.dtd"]
@@ -457,7 +457,7 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .parsed mode with empty prefixes falls back to standard")
     func generatorParsedFallback() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var feed = PodcastFeed(namespaces: [.itunes])
         feed.channel = Channel(
             title: "Test", link: linkURL,
@@ -470,7 +470,7 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .feedDefined mode ignores stored prefixes (no regression)")
     func generatorFeedDefinedIgnoresPrefixes() throws {
-        let linkURL = try #require(URL(string: "https://example.com"))
+        let linkURL = makeURL("https://example.com")
         var feed = PodcastFeed(
             namespaces: [.itunes],
             namespacePrefixes: ["apple": "http://www.itunes.com/dtds/podcast-1.0.dtd"]

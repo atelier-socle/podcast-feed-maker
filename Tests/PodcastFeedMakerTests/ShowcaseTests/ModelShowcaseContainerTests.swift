@@ -21,8 +21,8 @@ struct PodcastFeedContainerShowcase {
     }
 
     @Test("PodcastFeed with channel and custom namespaces")
-    func podcastFeedWithChannel() throws {
-        let url = try #require(URL(string: "https://swifttalk.dev"))
+    func podcastFeedWithChannel() {
+        let url = makeURL("https://swifttalk.dev")
 
         let feed = PodcastFeed(
             version: "2.0",
@@ -42,8 +42,8 @@ struct PodcastFeedContainerShowcase {
     }
 
     @Test("PodcastFeed is Equatable")
-    func podcastFeedEquatable() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func podcastFeedEquatable() {
+        let url = makeURL("https://example.com")
         let feed1 = PodcastFeed(
             namespaces: [.itunes],
             channel: Channel(title: "Test", link: url, description: "Desc")
@@ -63,7 +63,7 @@ struct PodcastFeedContainerShowcase {
 
     @Test("PodcastFeed round-trips through Codable")
     func podcastFeedCodable() throws {
-        let url = try #require(URL(string: "https://example.com"))
+        let url = makeURL("https://example.com")
         let original = PodcastFeed(
             version: "2.0",
             namespaces: [.itunes, .podcast],
@@ -224,8 +224,8 @@ struct PodcastFeedContainerShowcase {
     // MARK: - Sendable, Hashable, Equatable Conformance
 
     @Test("All model types conform to Sendable and Hashable")
-    func modelConformances() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func modelConformances() {
+        let url = makeURL("https://example.com")
 
         // These compile-time checks verify conformance.
         // We instantiate and insert into a Set to confirm Hashable.
@@ -268,9 +268,9 @@ struct PodcastFeedContainerShowcase {
 
     @Test("Complex model types round-trip through Codable")
     func complexCodableRoundTrip() throws {
-        let url = try #require(URL(string: "https://example.com"))
-        let artworkURL = try #require(URL(string: "https://example.com/art.jpg"))
-        let enclosureURL = try #require(URL(string: "https://cdn.example.com/ep1.mp3"))
+        let url = makeURL("https://example.com")
+        let artworkURL = makeURL("https://example.com/art.jpg")
+        let enclosureURL = makeURL("https://cdn.example.com/ep1.mp3")
         let pubDate = Date(timeIntervalSince1970: 1_700_000_000)
 
         let feed = PodcastFeed(

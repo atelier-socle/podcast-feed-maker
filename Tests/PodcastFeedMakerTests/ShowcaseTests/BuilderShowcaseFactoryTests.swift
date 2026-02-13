@@ -59,8 +59,8 @@ struct EnclosureFactoryShowcase {
     }
 
     @Test("Enclosure can be created with typed MIMEType")
-    func typedMimeInit() throws {
-        let opusURL = try #require(URL(string: "https://cdn.example.com/ep.opus"))
+    func typedMimeInit() {
+        let opusURL = makeURL("https://cdn.example.com/ep.opus")
         let enc = Enclosure(
             url: opusURL,
             length: 5_000_000,
@@ -103,10 +103,10 @@ struct PodcastPersonRoleShowcase {
 struct PSP1ComplianceShowcase {
 
     @Test("PSP1Configuration holds all required fields")
-    func configurationFields() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://cdn.example.com/art.jpg"))
+    func configurationFields() {
+        let exampleURL = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://cdn.example.com/art.jpg")
         let config = PSP1Configuration(
             title: "PSP-1 Show",
             link: exampleURL,
@@ -128,10 +128,10 @@ struct PSP1ComplianceShowcase {
     }
 
     @Test("PSP1Configuration defaults language to en")
-    func configurationDefaultLanguage() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/f"))
-        let imageURL = try #require(URL(string: "https://e.com/a.jpg"))
+    func configurationDefaultLanguage() {
+        let exampleURL = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/f")
+        let imageURL = makeURL("https://e.com/a.jpg")
         let config = PSP1Configuration(
             title: "T", link: exampleURL,
             description: "D", feedURL: feedURL,
@@ -145,9 +145,9 @@ struct PSP1ComplianceShowcase {
 
     @Test("psp1Compliant factory produces a feed with all PSP-1 required fields")
     func psp1CompliantFactory() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://cdn.example.com/art.jpg"))
+        let exampleURL = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://cdn.example.com/art.jpg")
         let config = PSP1Configuration(
             title: "PSP-1 Show",
             link: exampleURL,
@@ -182,11 +182,11 @@ struct PSP1ComplianceShowcase {
     }
 
     @Test("PSP-1 compliant feed passes PSP-1 validation with no errors")
-    func psp1FeedPassesValidation() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://cdn.example.com/art.jpg"))
-        let enclosureURL = try #require(URL(string: "https://cdn.example.com/ep1.mp3"))
+    func psp1FeedPassesValidation() {
+        let exampleURL = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://cdn.example.com/art.jpg")
+        let enclosureURL = makeURL("https://cdn.example.com/ep1.mp3")
         let config = PSP1Configuration(
             title: "Validated Show",
             link: exampleURL,
@@ -220,11 +220,11 @@ struct PSP1ComplianceShowcase {
     }
 
     @Test("PSP-1 feed also passes Apple validation")
-    func psp1FeedPassesApple() throws {
-        let exampleURL = try #require(URL(string: "https://example.com"))
-        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
-        let imageURL = try #require(URL(string: "https://cdn.example.com/art.jpg"))
-        let enclosureURL = try #require(URL(string: "https://cdn.example.com/ep1.mp3"))
+    func psp1FeedPassesApple() {
+        let exampleURL = makeURL("https://example.com")
+        let feedURL = makeURL("https://example.com/feed.xml")
+        let imageURL = makeURL("https://cdn.example.com/art.jpg")
+        let enclosureURL = makeURL("https://cdn.example.com/ep1.mp3")
         let config = PSP1Configuration(
             title: "Cross-Platform Show",
             link: exampleURL,

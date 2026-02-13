@@ -15,8 +15,8 @@ struct PubDateTests {
     // MARK: - Channel PubDate
 
     @Test("Channel pubDate defaults to nil")
-    func channelPubDateDefaultsToNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelPubDateDefaultsToNil() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -27,9 +27,9 @@ struct PubDateTests {
     }
 
     @Test("Channel pubDate can be set at initialization")
-    func channelPubDateCanBeSet() throws {
+    func channelPubDateCanBeSet() {
         let date = Date(timeIntervalSince1970: 1_000_000)
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -41,8 +41,8 @@ struct PubDateTests {
     }
 
     @Test("Channel pubDate is mutable")
-    func channelPubDateIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelPubDateIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -61,7 +61,7 @@ struct PubDateTests {
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         let date = try #require(formatter.date(from: "2025-03-24 18:30:00"))
 
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -77,7 +77,7 @@ struct PubDateTests {
 
     @Test("Channel XML omits pubDate tag when nil")
     func channelXmlOmitsPubDateWhenNil() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -117,7 +117,7 @@ struct PubDateTests {
     }
 
     @Test("Item XML omits pubDate tag when nil")
-    func itemXmlOmitsPubDateWhenNil() throws {
+    func itemXmlOmitsPubDateWhenNil() {
         let item = Item()
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<pubDate>"))
@@ -126,8 +126,8 @@ struct PubDateTests {
     // MARK: - Equatable
 
     @Test("Channels with same pubDate are equal")
-    func channelsWithSamePubDateAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSamePubDateAreEqual() {
+        let url = makeURL("https://example.com")
         let date = Date(timeIntervalSince1970: 100)
         let channel1 = Channel(title: "T", link: url, description: "D", pubDate: date)
         let channel2 = Channel(title: "T", link: url, description: "D", pubDate: date)
@@ -135,8 +135,8 @@ struct PubDateTests {
     }
 
     @Test("Channels with different pubDates are not equal")
-    func channelsWithDifferentPubDatesAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentPubDatesAreNotEqual() {
+        let url = makeURL("https://example.com")
         let date1 = Date(timeIntervalSince1970: 100)
         let date2 = Date(timeIntervalSince1970: 200)
         let channel1 = Channel(title: "T", link: url, description: "D", pubDate: date1)
@@ -147,8 +147,8 @@ struct PubDateTests {
     // MARK: - Hashable
 
     @Test("Channel pubDate contributes to hash value")
-    func channelPubDateHashable() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelPubDateHashable() {
+        let url = makeURL("https://example.com")
         let date = Date(timeIntervalSince1970: 100)
         let channel = Channel(title: "T", link: url, description: "D", pubDate: date)
         let set: Set = [channel]

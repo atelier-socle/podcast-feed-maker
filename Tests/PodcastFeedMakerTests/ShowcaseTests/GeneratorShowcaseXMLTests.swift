@@ -65,8 +65,8 @@ struct XMLBuilderShowcase {
     }
 
     @Test("XMLBuilder.encodeURL — handles standard URLs")
-    func encodeURL() throws {
-        let url = try #require(URL(string: "https://example.com/path?q=hello&lang=en"))
+    func encodeURL() {
+        let url = makeURL("https://example.com/path?q=hello&lang=en")
         let result = XMLBuilder.encodeURL(url)
         #expect(result.contains("https://example.com/path"))
         #expect(result.contains("q=hello"))
@@ -74,13 +74,13 @@ struct XMLBuilderShowcase {
 
     @Test("XMLBuilder.validateURL — accepts valid HTTP/HTTPS URLs")
     func validateURLValid() throws {
-        try XMLBuilder.validateURL(try #require(URL(string: "https://example.com/feed.xml")), context: "test")
-        try XMLBuilder.validateURL(try #require(URL(string: "http://example.com/feed.xml")), context: "test")
+        try XMLBuilder.validateURL(makeURL("https://example.com/feed.xml"), context: "test")
+        try XMLBuilder.validateURL(makeURL("http://example.com/feed.xml"), context: "test")
     }
 
     @Test("XMLBuilder.validateURL — rejects file URLs")
     func validateURLFile() throws {
-        let fileURL = try #require(URL(string: "file:///etc/passwd"))
+        let fileURL = makeURL("file:///etc/passwd")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(fileURL, context: "link")
         }
@@ -88,7 +88,7 @@ struct XMLBuilderShowcase {
 
     @Test("XMLBuilder.validateURL — rejects non-HTTP schemes")
     func validateURLScheme() throws {
-        let ftpURL = try #require(URL(string: "ftp://example.com/file"))
+        let ftpURL = makeURL("ftp://example.com/file")
         #expect(throws: GeneratorError.self) {
             try XMLBuilder.validateURL(ftpURL, context: "enclosure")
         }
@@ -235,10 +235,10 @@ struct XMLBuilderShowcase {
 struct NamespaceResolverShowcase {
 
     @Test("NamespaceResolver — detects iTunes namespace from channel properties")
-    func resolveITunes() throws {
+    func resolveITunes() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             itunesAuthor: "Host"
         )
@@ -249,11 +249,11 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects iTunes namespace from item properties")
-    func resolveITunesFromItem() throws {
+    func resolveITunesFromItem() {
         let item = Item(title: "Ep", itunesDuration: 600)
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             items: [item]
         )
@@ -264,12 +264,12 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects Atom namespace from atomLinks")
-    func resolveAtom() throws {
+    func resolveAtom() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
-            atomLinks: [AtomLink.selfLink(href: try #require(URL(string: "https://example.com/feed")))]
+            atomLinks: [AtomLink.selfLink(href: makeURL("https://example.com/feed"))]
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [], channel: channel)
         let resolved = NamespaceResolver.resolve(feed)
@@ -278,10 +278,10 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects Podcast NS 2.0 from channel fields")
-    func resolvePodcast() throws {
+    func resolvePodcast() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             podcastGuid: PodcastGuid(value: "some-guid")
         )
@@ -292,10 +292,10 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects Dublin Core namespace")
-    func resolveDublinCore() throws {
+    func resolveDublinCore() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             dublinCore: DublinCore(creator: "Author")
         )
@@ -306,11 +306,11 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects Content namespace from item contentEncoded")
-    func resolveContent() throws {
+    func resolveContent() {
         let item = Item(title: "Ep", contentEncoded: ContentEncoded(value: "<p>Notes</p>"))
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             items: [item]
         )
@@ -321,7 +321,7 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — detects Podlove namespace from item chapters")
-    func resolvePodlove() throws {
+    func resolvePodlove() {
         let item = Item(
             title: "Ep",
             podloveChapters: PodloveChapters(chapters: [
@@ -330,7 +330,7 @@ struct NamespaceResolverShowcase {
         )
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test.",
             items: [item]
         )
@@ -341,10 +341,10 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — empty channel produces no namespaces")
-    func resolveEmpty() throws {
+    func resolveEmpty() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Plain RSS only."
         )
         let feed = PodcastFeed(version: "2.0", namespaces: [], channel: channel)
@@ -362,10 +362,10 @@ struct NamespaceResolverShowcase {
     }
 
     @Test("NamespaceResolver — preserves custom namespaces from feed")
-    func resolveCustom() throws {
+    func resolveCustom() {
         let channel = Channel(
             title: "Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Test."
         )
         let customNS = PodcastNamespace.custom("xmlns:custom=\"https://custom.example.com\"")

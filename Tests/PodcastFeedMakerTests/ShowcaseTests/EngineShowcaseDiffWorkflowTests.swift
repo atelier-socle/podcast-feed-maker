@@ -58,10 +58,10 @@ struct EngineDiffWorkflowShowcase {
         """
 
     /// Builds a feed model programmatically for generation tests.
-    private static func buildSampleFeed() throws -> PodcastFeed {
+    private static func buildSampleFeed() -> PodcastFeed {
         let channel = Channel(
             title: "Programmatic Show",
-            link: try #require(URL(string: "https://example.com")),
+            link: makeURL("https://example.com"),
             description: "Built from Swift structs.",
             language: "en",
             items: [
@@ -69,7 +69,7 @@ struct EngineDiffWorkflowShowcase {
                     title: "Pilot Episode",
                     description: "The very first episode.",
                     enclosure: Enclosure(
-                        url: try #require(URL(string: "https://example.com/pilot.mp3")),
+                        url: makeURL("https://example.com/pilot.mp3"),
                         length: 25_000_000,
                         type: "audio/mpeg"
                     ),
@@ -88,7 +88,7 @@ struct EngineDiffWorkflowShowcase {
             itunesType: .episodic,
             atomLinks: [
                 AtomLink(
-                    href: try #require(URL(string: "https://example.com/feed.xml")),
+                    href: makeURL("https://example.com/feed.xml"),
                     rel: "self",
                     type: "application/rss+xml"
                 )
@@ -247,7 +247,7 @@ struct EngineDiffWorkflowShowcase {
         let engine = PodcastFeedEngine()
 
         // Step 1: Create a feed model
-        let feed = try Self.buildSampleFeed()
+        let feed = Self.buildSampleFeed()
 
         // Step 2: Generate XML
         let xml = try engine.generate(feed)
@@ -292,7 +292,7 @@ struct EngineDiffWorkflowShowcase {
                 title: "Episode 3 — Fresh Start",
                 description: "Under new management.",
                 enclosure: Enclosure(
-                    url: try #require(URL(string: "https://example.com/ep3.mp3")),
+                    url: makeURL("https://example.com/ep3.mp3"),
                     length: 45_000_000,
                     type: "audio/mpeg"
                 ),

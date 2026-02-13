@@ -16,8 +16,8 @@ struct DescriptionTests {
     // MARK: - Channel Description
 
     @Test("Channel requires a description at initialization")
-    func channelDescriptionIsRequired() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelDescriptionIsRequired() {
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -28,8 +28,8 @@ struct DescriptionTests {
     }
 
     @Test("Channel description is mutable")
-    func channelDescriptionIsMutable() throws {
-        let link = try #require(URL(string: "https://example.com"))
+    func channelDescriptionIsMutable() {
+        let link = makeURL("https://example.com")
         var channel = Channel(
             title: "Title",
             link: link,
@@ -42,7 +42,7 @@ struct DescriptionTests {
 
     @Test("Channel XML contains description tag")
     func channelXmlContainsDescription() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -55,7 +55,7 @@ struct DescriptionTests {
 
     @Test("Channel XML wraps HTML-containing description in CDATA")
     func channelXmlWrapsHtmlDescriptionInCDATA() throws {
-        let link = try #require(URL(string: "https://example.com"))
+        let link = makeURL("https://example.com")
         let channel = Channel(
             title: "Title",
             link: link,
@@ -88,21 +88,21 @@ struct DescriptionTests {
     }
 
     @Test("Item XML contains description tag when set")
-    func itemXmlContainsDescriptionWhenSet() throws {
+    func itemXmlContainsDescriptionWhenSet() {
         let item = Item(description: "Episode summary text")
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<description>Episode summary text</description>"))
     }
 
     @Test("Item XML omits description tag when nil")
-    func itemXmlOmitsDescriptionWhenNil() throws {
+    func itemXmlOmitsDescriptionWhenNil() {
         let item = Item()
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(!xml.contains("<description>"))
     }
 
     @Test("Item XML wraps HTML-containing description in CDATA")
-    func itemXmlWrapsHtmlDescriptionInCDATA() throws {
+    func itemXmlWrapsHtmlDescriptionInCDATA() {
         let item = Item(description: "Swift & Objective-C <comparison>")
         let xml = FeedGenerator().generateItem(item, builder: XMLBuilder(depth: 1)).joined(separator: "\n")
         #expect(xml.contains("<![CDATA[Swift & Objective-C <comparison>]]>"))
@@ -111,16 +111,16 @@ struct DescriptionTests {
     // MARK: - Equatable
 
     @Test("Channels with same description are equal")
-    func channelsWithSameDescriptionAreEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithSameDescriptionAreEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "Same")
         let channel2 = Channel(title: "T", link: url, description: "Same")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different descriptions are not equal")
-    func channelsWithDifferentDescriptionsAreNotEqual() throws {
-        let url = try #require(URL(string: "https://example.com"))
+    func channelsWithDifferentDescriptionsAreNotEqual() {
+        let url = makeURL("https://example.com")
         let channel1 = Channel(title: "T", link: url, description: "A")
         let channel2 = Channel(title: "T", link: url, description: "B")
         #expect(channel1 != channel2)
