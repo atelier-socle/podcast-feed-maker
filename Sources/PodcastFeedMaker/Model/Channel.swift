@@ -10,7 +10,7 @@ import Foundation
 /// by separate ``FeedGenerator`` and ``FeedParser`` types.
 ///
 /// - SeeAlso: [RSS 2.0 — channel](https://www.rssboard.org/rss-specification#requiredChannelElements)
-public struct Channel: Sendable, Hashable, Equatable {
+public struct Channel: Sendable, Hashable, Equatable, Codable {
 
     // MARK: - RSS 2.0 Core (Required)
 

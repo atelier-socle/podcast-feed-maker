@@ -19,7 +19,7 @@ import Foundation
 /// ```
 ///
 /// - SeeAlso: [RSS 2.0 Specification](https://www.rssboard.org/rss-specification)
-public struct PodcastFeed: Sendable, Hashable, Equatable {
+public struct PodcastFeed: Sendable, Hashable, Equatable, Codable {
 
     /// The RSS specification version (default: `"2.0"`).
     public var version: String

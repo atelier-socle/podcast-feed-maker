@@ -7,7 +7,7 @@
 /// Example XML: `<custom:tag attr="val">text</custom:tag>`
 ///
 /// - SeeAlso: ``Channel/unknownElements``, ``Item/unknownElements``
-public struct UnknownElement: Sendable, Hashable, Equatable {
+public struct UnknownElement: Sendable, Hashable, Equatable, Codable {
 
     /// The full element name including any namespace prefix (e.g., `"custom:tag"`).
     public var name: String

@@ -10,7 +10,7 @@ import Foundation
 /// by separate ``FeedGenerator`` and ``FeedParser`` types.
 ///
 /// - SeeAlso: [RSS 2.0 — item](https://www.rssboard.org/rss-specification#hrelementsOfLtitemgt)
-public struct Item: Sendable, Hashable, Equatable {
+public struct Item: Sendable, Hashable, Equatable, Codable {
 
     // MARK: - RSS 2.0 Core
 

@@ -8,7 +8,7 @@ import Foundation
 /// Each namespace contributes an `xmlns:prefix="uri"` declaration to the root `<rss>` element.
 ///
 /// - SeeAlso: [RSS 2.0 Specification](https://www.rssboard.org/rss-specification)
-public enum PodcastNamespace: Hashable, Equatable, Sendable {
+public enum PodcastNamespace: Hashable, Equatable, Sendable, Codable {
 
     /// iTunes/Apple Podcasts namespace.
     ///
@@ -95,6 +95,30 @@ public enum PodcastNamespace: Hashable, Equatable, Sendable {
     public static let allStandard: [PodcastNamespace] = [
         .itunes, .atom, .podcast, .dublinCore, .content, .podloveSimpleChapters
     ]
+}
+
+// MARK: - Codable
+
+extension PodcastNamespace {
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let uri = try container.decode(String.self)
+        switch uri {
+        case "http://www.itunes.com/dtds/podcast-1.0.dtd": self = .itunes
+        case "http://www.w3.org/2005/Atom": self = .atom
+        case "https://podcastindex.org/namespace/1.0": self = .podcast
+        case "http://purl.org/dc/elements/1.1/": self = .dublinCore
+        case "http://purl.org/rss/1.0/modules/content/": self = .content
+        case "http://podlove.org/simple-chapters": self = .podloveSimpleChapters
+        default: self = .custom(uri)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(uri)
+    }
 }
 
 // MARK: - Comparable

@@ -16,18 +16,38 @@ let package = Package(
     products: [
         .library(
             name: "PodcastFeedMaker",
-            targets: ["PodcastFeedMaker"])
+            targets: ["PodcastFeedMaker"]),
+        .library(
+            name: "PodcastFeedCommands",
+            targets: ["PodcastFeedCommands"]),
+        .executable(
+            name: "podcastfeed",
+            targets: ["PodcastFeedCLI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3")
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.3"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0")
     ],
     targets: [
         .target(
             name: "PodcastFeedMaker"),
+        .target(
+            name: "PodcastFeedCommands",
+            dependencies: [
+                "PodcastFeedMaker",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ]),
+        .executableTarget(
+            name: "PodcastFeedCLI",
+            dependencies: ["PodcastFeedCommands"]),
         .testTarget(
             name: "PodcastFeedMakerTests",
             dependencies: ["PodcastFeedMaker"],
             resources: [.copy("Fixtures")]
+        ),
+        .testTarget(
+            name: "PodcastFeedCommandsTests",
+            dependencies: ["PodcastFeedCommands", "PodcastFeedMaker"]
         )
     ]
 )
