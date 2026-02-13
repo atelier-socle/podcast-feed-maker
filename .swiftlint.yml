@@ -57,3 +57,8 @@ nesting:
 
 vertical_whitespace:
   max_empty_lines: 2
+
+# RSS 2.0 spec uses "webMaster" — cannot be renamed
+inclusive_language:
+  override_allowed_terms:
+    - webMaster
