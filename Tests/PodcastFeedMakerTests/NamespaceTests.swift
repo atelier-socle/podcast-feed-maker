@@ -1,5 +1,6 @@
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct NamespaceTests {
 
@@ -23,7 +24,7 @@ struct NamespaceTests {
             (.atom, #"xmlns:atom="http://www.w3.org/2005/Atom""#),
             (.dublinCore, #"xmlns:dc="http://purl.org/dc/elements/1.1/""#),
             (.content, #"xmlns:content="http://purl.org/rss/1.0/modules/content/""#),
-            (.podloveSimpleChapters, #"xmlns:psc="http://podlove.org/simple-chapters""#),
+            (.podloveSimpleChapters, #"xmlns:psc="http://podlove.org/simple-chapters""#)
         ]
 
         for (namespace, expected) in cases {

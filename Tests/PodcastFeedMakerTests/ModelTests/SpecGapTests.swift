@@ -11,20 +11,20 @@ struct ChannelRatingTests {
     // MARK: - Model
 
     @Test("Channel rating defaults to nil")
-    func ratingDefaultsNil() {
+    func ratingDefaultsNil() throws {
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "desc"
         )
         #expect(channel.rating == nil)
     }
 
     @Test("Channel rating can be set via init")
-    func ratingViaInit() {
+    func ratingViaInit() throws {
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "desc",
             rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
         )
@@ -32,10 +32,10 @@ struct ChannelRatingTests {
     }
 
     @Test("Channel rating is mutable")
-    func ratingMutable() {
+    func ratingMutable() throws {
         var channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "desc"
         )
         channel.rating = "some rating"
@@ -49,7 +49,7 @@ struct ChannelRatingTests {
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "desc",
                 rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
             ))
@@ -64,7 +64,7 @@ struct ChannelRatingTests {
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "desc"
             ))
         let xml = try FeedGenerator().generate(feed)
@@ -73,17 +73,19 @@ struct ChannelRatingTests {
 
     @Test("Generator places rating between ttl and image")
     func generatorRatingOrdering() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
+        let imgURL = try #require(URL(string: "https://example.com/img.jpg"))
         let feed = PodcastFeed(
             channel: Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: linkURL,
                 description: "desc",
                 ttl: 60,
                 rating: "test-rating",
                 image: RSSImage(
-                    url: URL(string: "https://example.com/img.jpg")!,
+                    url: imgURL,
                     title: "Art",
-                    link: URL(string: "https://example.com")!
+                    link: linkURL
                 )
             ))
         let xml = try FeedGenerator().generate(feed)
@@ -132,12 +134,12 @@ struct ChannelRatingTests {
 
     // MARK: - Round-Trip
 
-    @Test("Rating survives round-trip: generate → parse")
+    @Test("Rating survives round-trip: generate -> parse")
     func ratingRoundTrip() throws {
         let original = PodcastFeed(
             channel: Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "desc",
                 rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
             ))
@@ -258,7 +260,7 @@ struct JSONChapterListMetadataTests {
 
     // MARK: - Round-Trip
 
-    @Test("Metadata survives encode → decode round-trip")
+    @Test("Metadata survives encode -> decode round-trip")
     func metadataRoundTrip() throws {
         let original = JSONChapterList(
             version: "1.2.0",
@@ -352,7 +354,7 @@ struct PodcastMediumTests {
         for medium in [PodcastMedium.course, .mixed, .podcastL, .musicL, .courseL] {
             var channel = Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "desc"
             )
             channel.medium = medium
@@ -399,7 +401,7 @@ struct PodcastMediumTests {
         for medium in PodcastMedium.allCases {
             var channel = Channel(
                 title: "Test",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "desc"
             )
             channel.medium = medium

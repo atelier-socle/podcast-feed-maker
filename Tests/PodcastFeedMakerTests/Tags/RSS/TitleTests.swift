@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - TitleTests
 
@@ -15,10 +16,11 @@ struct TitleTests {
     // MARK: - Channel Title
 
     @Test("Channel requires a title at initialization")
-    func channelTitleIsRequired() {
+    func channelTitleIsRequired() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "A great podcast"
         )
 
@@ -26,10 +28,11 @@ struct TitleTests {
     }
 
     @Test("Channel title is mutable")
-    func channelTitleIsMutable() {
+    func channelTitleIsMutable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         var channel = Channel(
             title: "Original",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -39,9 +42,10 @@ struct TitleTests {
 
     @Test("Channel XML contains title tag")
     func channelXmlContainsTitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Episode 1: Getting Started",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -51,9 +55,10 @@ struct TitleTests {
 
     @Test("Channel XML escapes special characters in title")
     func channelXmlEscapesSpecialCharsInTitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Swift & XML <Guide>",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -99,16 +104,16 @@ struct TitleTests {
     // MARK: - Equatable / Hashable via Channel
 
     @Test("Channels with same title are equal (given same required fields)")
-    func channelsWithSameTitleAreEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithSameTitleAreEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "A", link: url, description: "D")
         let channel2 = Channel(title: "A", link: url, description: "D")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different titles are not equal")
-    func channelsWithDifferentTitlesAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithDifferentTitlesAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "A", link: url, description: "D")
         let channel2 = Channel(title: "B", link: url, description: "D")
         #expect(channel1 != channel2)
@@ -129,8 +134,8 @@ struct TitleTests {
     }
 
     @Test("Channel is Hashable and title contributes to hash")
-    func channelHashableWithTitle() {
-        let url = URL(string: "https://example.com")!
+    func channelHashableWithTitle() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel = Channel(title: "Hello", link: url, description: "D")
         let set: Set = [channel]
         #expect(set.contains(Channel(title: "Hello", link: url, description: "D")))

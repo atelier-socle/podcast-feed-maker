@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - Escaping Tests
 
@@ -235,36 +236,39 @@ struct XMLBuilderBoolTests {
 struct XMLBuilderURLTests {
 
     @Test("encodeURL encodes special characters")
-    func encodeURLBasic() {
-        let url = URL(string: "https://swift.org/search?query=école+swift&lang=fr")!
+    func encodeURLBasic() throws {
+        let url = try #require(URL(string: "https://swift.org/search?query=école+swift&lang=fr"))
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
     }
 
     @Test("encodeURL returns string or fallback")
-    func encodeURLFallback() {
-        let url = URL(string: "https://example.com/query?param=ç©🎉")!
+    func encodeURLFallback() throws {
+        let url = try #require(URL(string: "https://example.com/query?param=ç©🎉"))
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.starts(with: "https://example.com"))
     }
 
     @Test("validateURL accepts valid HTTPS")
     func validateURLValid() throws {
-        try XMLBuilder.validateURL(URL(string: "https://swift.org")!, context: "test")
+        let url = try #require(URL(string: "https://swift.org"))
+        try XMLBuilder.validateURL(url, context: "test")
     }
 
     @Test("validateURL rejects file URL")
-    func validateURLFile() {
+    func validateURLFile() throws {
+        let url = try #require(URL(string: "file://path"))
         #expect(throws: GeneratorError.self) {
-            try XMLBuilder.validateURL(URL(string: "file://path")!, context: "test")
+            try XMLBuilder.validateURL(url, context: "test")
         }
     }
 
     @Test("validateURL rejects invalid scheme")
-    func validateURLScheme() {
+    func validateURLScheme() throws {
+        let url = try #require(URL(string: "ftp://example.com"))
         #expect(throws: GeneratorError.self) {
-            try XMLBuilder.validateURL(URL(string: "ftp://example.com")!, context: "test")
+            try XMLBuilder.validateURL(url, context: "test")
         }
     }
 

@@ -1,14 +1,15 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastFundingTests {
 
     // MARK: - Initialization
 
     @Test
-    func initSetsPropertiesCorrectly() {
-        let url = URL(string: "https://patreon.com/myshow")!
+    func initSetsPropertiesCorrectly() throws {
+        let url = try #require(URL(string: "https://patreon.com/myshow"))
         let funding = Funding(url: url, message: "Support us on Patreon")
 
         #expect(funding.url == url)
@@ -18,20 +19,26 @@ struct PodcastFundingTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() {
-        let a = Funding(url: URL(string: "https://a.com")!, message: "A")
-        let b = Funding(url: URL(string: "https://a.com")!, message: "A")
-        let c = Funding(url: URL(string: "https://b.com")!, message: "B")
+    func equatableConformance() throws {
+        let urlA = try #require(URL(string: "https://a.com"))
+        let urlB = try #require(URL(string: "https://b.com"))
+
+        let a = Funding(url: urlA, message: "A")
+        let b = Funding(url: urlA, message: "A")
+        let c = Funding(url: urlB, message: "B")
 
         #expect(a == b)
         #expect(a != c)
     }
 
     @Test
-    func hashableConformance() {
-        let a = Funding(url: URL(string: "https://a.com")!, message: "A")
-        let b = Funding(url: URL(string: "https://a.com")!, message: "A")
-        let c = Funding(url: URL(string: "https://b.com")!, message: "B")
+    func hashableConformance() throws {
+        let urlA = try #require(URL(string: "https://a.com"))
+        let urlB = try #require(URL(string: "https://b.com"))
+
+        let a = Funding(url: urlA, message: "A")
+        let b = Funding(url: urlA, message: "A")
+        let c = Funding(url: urlB, message: "B")
 
         let set: Set = [a, b, c]
         #expect(set.count == 2)
@@ -41,13 +48,18 @@ struct PodcastFundingTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndMessage() {
+    func xmlRepresentationContainsUrlAndMessage() throws {
+        let fundingURL = try #require(URL(string: "https://patreon.com/myshow"))
         let funding = Funding(
-            url: URL(string: "https://patreon.com/myshow")!,
+            url: fundingURL,
             message: "Support us on Patreon"
         )
 
-        let xml = XMLBuilder().element("podcast:funding", content: funding.message, attributes: [("url", XMLBuilder.encodeURL(funding.url))])
+        let xml = XMLBuilder().element(
+            "podcast:funding",
+            content: funding.message,
+            attributes: [("url", XMLBuilder.encodeURL(funding.url))]
+        )
 
         #expect(xml.contains("podcast:funding"))
         #expect(xml.contains(#"url="https://patreon.com/myshow""#))
@@ -55,13 +67,18 @@ struct PodcastFundingTests {
     }
 
     @Test
-    func xmlRepresentationWrapsMessageAsElementContent() {
+    func xmlRepresentationWrapsMessageAsElementContent() throws {
+        let donateURL = try #require(URL(string: "https://example.com/donate"))
         let funding = Funding(
-            url: URL(string: "https://example.com/donate")!,
+            url: donateURL,
             message: "Donate here"
         )
 
-        let xml = XMLBuilder().element("podcast:funding", content: funding.message, attributes: [("url", XMLBuilder.encodeURL(funding.url))])
+        let xml = XMLBuilder().element(
+            "podcast:funding",
+            content: funding.message,
+            attributes: [("url", XMLBuilder.encodeURL(funding.url))]
+        )
 
         #expect(xml.contains(">Donate here</podcast:funding>"))
     }

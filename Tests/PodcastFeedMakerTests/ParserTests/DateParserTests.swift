@@ -40,7 +40,7 @@ struct DateParserTests {
         let components = calendar.dateComponents(
             [.hour], from: date ?? Date()
         )
-        #expect(components.hour == 15) // EST = -5h → 10:00 + 5 = 15:00 UTC
+        #expect(components.hour == 15)  // EST = -5h → 10:00 + 5 = 15:00 UTC
     }
 
     @Test("Parses RFC 2822 date with negative offset")
@@ -52,7 +52,7 @@ struct DateParserTests {
         let components = calendar.dateComponents(
             [.hour], from: date ?? Date()
         )
-        #expect(components.hour == 5) // -0500 → 00:00 + 5 = 05:00 UTC
+        #expect(components.hour == 5)  // -0500 → 00:00 + 5 = 05:00 UTC
     }
 
     @Test("Parses RFC 2822 date with 2-digit year")
@@ -88,7 +88,7 @@ struct DateParserTests {
         let components = calendar.dateComponents(
             [.hour], from: date ?? Date()
         )
-        #expect(components.hour == 19) // +01:00 → 20:00 - 1 = 19:00 UTC
+        #expect(components.hour == 19)  // +01:00 → 20:00 - 1 = 19:00 UTC
     }
 
     @Test("Parses ISO 8601 with milliseconds")
@@ -172,7 +172,7 @@ struct DateParserTests {
         let components = calendar.dateComponents(
             [.hour], from: date ?? Date()
         )
-        #expect(components.hour == 1) // -05:00 → 20:00 + 5 = 01:00 next day UTC
+        #expect(components.hour == 1)  // -05:00 → 20:00 + 5 = 01:00 next day UTC
     }
 
     @Test("Parses ISO 8601 with offset without colon")
@@ -182,7 +182,7 @@ struct DateParserTests {
         let components = calendar.dateComponents(
             [.hour], from: date ?? Date()
         )
-        #expect(components.hour == 19) // +0100 → 20:00 - 1 = 19:00 UTC
+        #expect(components.hour == 19)  // +0100 → 20:00 - 1 = 19:00 UTC
     }
 
     @Test("Parses long month format without comma")

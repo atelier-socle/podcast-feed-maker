@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesTitleTests {
+@testable import PodcastFeedMaker
+
+struct ITunesTitleTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesTitle_shouldStoreValue() {
+    func test_channel_itunesTitle_shouldStoreValue() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesTitle: "This is my show title"
         )
@@ -18,20 +19,20 @@ struct iTunesTitleTests {
     }
 
     @Test
-    func test_channel_itunesTitle_defaultsToNil() {
+    func test_channel_itunesTitle_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesTitle == nil)
     }
 
     @Test
-    func test_channel_itunesTitle_withEmptyString() {
+    func test_channel_itunesTitle_withEmptyString() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesTitle: ""
         )
@@ -39,10 +40,10 @@ struct iTunesTitleTests {
     }
 
     @Test
-    func test_channel_itunesTitle_withSpecialCharacters() {
+    func test_channel_itunesTitle_withSpecialCharacters() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesTitle: #"Swift & Friends "Live""#
         )
@@ -72,16 +73,17 @@ struct iTunesTitleTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameTitle() {
+    func test_channel_equatable_sameTitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Title"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Title"
         )
@@ -89,16 +91,17 @@ struct iTunesTitleTests {
     }
 
     @Test
-    func test_channel_equatable_differentTitle() {
+    func test_channel_equatable_differentTitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Title"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Another"
         )
@@ -122,22 +125,23 @@ struct iTunesTitleTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Title"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Title"
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesTitle: "Another"
         )

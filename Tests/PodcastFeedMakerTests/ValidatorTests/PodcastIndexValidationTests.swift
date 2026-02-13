@@ -15,24 +15,27 @@ struct PodcastIndexValidationTests {
     private func baseFeed(
         locked: Locked? = Locked(isLocked: false),
         podcastGuid: PodcastGuid? = PodcastGuid(value: "abc-123"),
-        funding: [Funding] = [
-            Funding(
-                url: URL(string: "https://example.com/fund")!,
-                message: "Support us"
-            )
-        ],
+        funding: [Funding]? = nil,
         medium: PodcastMedium? = .podcast,
         txtRecords: [PodcastTxt] = [PodcastTxt(value: "abc", purpose: "verify")],
         value: PodcastValue? = nil
-    ) -> PodcastFeed {
-        PodcastFeed(
+    ) throws -> PodcastFeed {
+        let url = try #require(URL(string: "https://example.com"))
+        let resolvedFunding: [Funding]
+        if let funding {
+            resolvedFunding = funding
+        } else {
+            let fundURL = try #require(URL(string: "https://example.com/fund"))
+            resolvedFunding = [Funding(url: fundURL, message: "Support us")]
+        }
+        return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: URL(string: "https://example.com")!,
+                link: url,
                 description: "desc",
                 podcastGuid: podcastGuid,
                 locked: locked,
-                funding: funding,
+                funding: resolvedFunding,
                 value: value,
                 medium: medium,
                 txtRecords: txtRecords
@@ -42,8 +45,8 @@ struct PodcastIndexValidationTests {
     // MARK: - Clean Feed
 
     @Test("Feed with all podcast namespace tags is clean")
-    func cleanFeed() {
-        let feed = baseFeed()
+    func cleanFeed() throws {
+        let feed = try baseFeed()
         let report = validator.validate(feed, for: .podcastIndex)
         let warnings = report.warnings.filter {
             $0.platform == .podcastIndex
@@ -56,15 +59,15 @@ struct PodcastIndexValidationTests {
     // MARK: - Missing Tags
 
     @Test("Missing podcast:locked is warning")
-    func missingLocked() {
-        let feed = baseFeed(locked: nil)
+    func missingLocked() throws {
+        let feed = try baseFeed(locked: nil)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.warnings.contains { $0.field == "channel.locked" })
     }
 
     @Test("Missing podcast:guid is warning")
-    func missingGuid() {
-        let feed = baseFeed(podcastGuid: nil)
+    func missingGuid() throws {
+        let feed = try baseFeed(podcastGuid: nil)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
             report.warnings.contains {
@@ -73,22 +76,22 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("Missing podcast:funding is warning")
-    func missingFunding() {
-        let feed = baseFeed(funding: [])
+    func missingFunding() throws {
+        let feed = try baseFeed(funding: [])
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.warnings.contains { $0.field == "channel.funding" })
     }
 
     @Test("Missing podcast:medium is info")
-    func missingMedium() {
-        let feed = baseFeed(medium: nil)
+    func missingMedium() throws {
+        let feed = try baseFeed(medium: nil)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.infos.contains { $0.field == "channel.medium" })
     }
 
     @Test("Missing podcast:txt verify is info")
-    func missingTxtVerify() {
-        let feed = baseFeed(txtRecords: [])
+    func missingTxtVerify() throws {
+        let feed = try baseFeed(txtRecords: [])
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.infos.contains { $0.field == "channel.txtRecords" })
     }
@@ -96,9 +99,9 @@ struct PodcastIndexValidationTests {
     // MARK: - Value (V4V)
 
     @Test("Value without recipients is warning")
-    func valueNoRecipients() {
+    func valueNoRecipients() throws {
         let value = PodcastValue(type: "lightning", method: "keysend")
-        let feed = baseFeed(value: value)
+        let feed = try baseFeed(value: value)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
             report.warnings.contains {
@@ -108,13 +111,13 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("Value with splits not summing to 100 is warning")
-    func valueSplitsMismatch() {
+    func valueSplitsMismatch() throws {
         var value = PodcastValue(type: "lightning", method: "keysend")
         value.recipients = [
             ValueRecipient(type: "node", address: "abc", split: 60),
             ValueRecipient(type: "node", address: "def", split: 30)
         ]
-        let feed = baseFeed(value: value)
+        let feed = try baseFeed(value: value)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
             report.warnings.contains {
@@ -124,13 +127,13 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("Value with splits summing to 100 passes")
-    func valueSplitsCorrect() {
+    func valueSplitsCorrect() throws {
         var value = PodcastValue(type: "lightning", method: "keysend")
         value.recipients = [
             ValueRecipient(type: "node", address: "abc", split: 70),
             ValueRecipient(type: "node", address: "def", split: 30)
         ]
-        let feed = baseFeed(value: value)
+        let feed = try baseFeed(value: value)
         let report = validator.validate(feed, for: .podcastIndex)
         let splitWarnings = report.warnings.filter {
             $0.field == "channel.value.recipients"
@@ -139,8 +142,8 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("No value is info (V4V encouraged)")
-    func noValueInfo() {
-        let feed = baseFeed()
+    func noValueInfo() throws {
+        let feed = try baseFeed()
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(report.infos.contains { $0.field == "channel.value" })
     }
@@ -157,7 +160,7 @@ struct PodcastIndexValidationTests {
     // MARK: - Cross-Field Validation
 
     @Test("ValueTimeSplit with empty feedGuid generates warning")
-    func timeSplitEmptyFeedGuid() {
+    func timeSplitEmptyFeedGuid() throws {
         var value = PodcastValue(type: "lightning", method: "keysend")
         value.recipients = [
             ValueRecipient(type: "node", address: "abc", split: 100)
@@ -169,7 +172,7 @@ struct PodcastIndexValidationTests {
                 remoteItem: RemoteItem(feedGuid: "")
             )
         ]
-        let feed = baseFeed(value: value)
+        let feed = try baseFeed(value: value)
         let report = validator.validate(feed, for: .podcastIndex)
         #expect(
             report.warnings.contains {
@@ -178,7 +181,9 @@ struct PodcastIndexValidationTests {
     }
 
     @Test("Item with alternate enclosures generates info")
-    func alternateEnclosuresInfo() {
+    func alternateEnclosuresInfo() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let fundURL = try #require(URL(string: "https://example.com/fund"))
         let item = Item(
             title: "Episode",
             alternateEnclosures: [
@@ -190,14 +195,14 @@ struct PodcastIndexValidationTests {
         )
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
             items: [item],
             podcastGuid: PodcastGuid(value: "abc"),
             locked: Locked(isLocked: false),
             funding: [
                 Funding(
-                    url: URL(string: "https://example.com/fund")!,
+                    url: fundURL,
                     message: "Support"
                 )
             ],

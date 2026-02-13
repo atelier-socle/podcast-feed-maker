@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - CustomValidationRuleTests
 
@@ -31,18 +32,22 @@ struct CustomValidationRuleTests {
 
         func validate(_ feed: PodcastFeed) -> [ValidationResult] {
             guard let channel = feed.channel else {
-                return [ValidationResult(
-                    severity: .error,
-                    message: "Channel is required",
-                    field: "channel"
-                )]
+                return [
+                    ValidationResult(
+                        severity: .error,
+                        message: "Channel is required",
+                        field: "channel"
+                    )
+                ]
             }
             if channel.items.count < minimum {
-                return [ValidationResult(
-                    severity: .error,
-                    message: "Feed must have at least \(minimum) episodes",
-                    field: "channel.items"
-                )]
+                return [
+                    ValidationResult(
+                        severity: .error,
+                        message: "Feed must have at least \(minimum) episodes",
+                        field: "channel.items"
+                    )
+                ]
             }
             return []
         }
@@ -51,14 +56,16 @@ struct CustomValidationRuleTests {
     // MARK: - Tests
 
     @Test("Custom rule produces results")
-    func customRuleResults() {
+    func customRuleResults() throws {
         let item = Item(title: "Episode")
-        let feed = PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            items: [item]
-        ))
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "desc",
+                items: [item]
+            ))
         let results = validator.validate(
             feed, rules: [RequireTranscriptsRule()]
         )
@@ -67,20 +74,25 @@ struct CustomValidationRuleTests {
     }
 
     @Test("Custom rule returns empty for compliant feed")
-    func customRuleCompliant() {
+    func customRuleCompliant() throws {
+        let transcriptURL = try #require(URL(string: "https://example.com/t.vtt"))
         let item = Item(
             title: "Episode",
-            transcripts: [Transcript(
-                url: URL(string: "https://example.com/t.vtt")!,
-                type: "text/vtt"
-            )]
+            transcripts: [
+                Transcript(
+                    url: transcriptURL,
+                    type: "text/vtt"
+                )
+            ]
         )
-        let feed = PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            items: [item]
-        ))
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "desc",
+                items: [item]
+            ))
         let results = validator.validate(
             feed, rules: [RequireTranscriptsRule()]
         )
@@ -88,32 +100,40 @@ struct CustomValidationRuleTests {
     }
 
     @Test("Multiple custom rules compose")
-    func multipleRulesCompose() {
-        let feed = PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            items: [Item(title: "Ep")]
-        ))
-        let results = validator.validate(feed, rules: [
-            RequireTranscriptsRule(),
-            RequireMinimumEpisodesRule(minimum: 5),
-        ])
+    func multipleRulesCompose() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "desc",
+                items: [Item(title: "Ep")]
+            ))
+        let results = validator.validate(
+            feed,
+            rules: [
+                RequireTranscriptsRule(),
+                RequireMinimumEpisodesRule(minimum: 5)
+            ])
         #expect(results.count == 2)
     }
 
     @Test("Custom rule results are sorted by severity")
-    func resultsSorted() {
-        let feed = PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            items: [Item(title: "Ep")]
-        ))
-        let results = validator.validate(feed, rules: [
-            RequireTranscriptsRule(),
-            RequireMinimumEpisodesRule(minimum: 5),
-        ])
+    func resultsSorted() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "desc",
+                items: [Item(title: "Ep")]
+            ))
+        let results = validator.validate(
+            feed,
+            rules: [
+                RequireTranscriptsRule(),
+                RequireMinimumEpisodesRule(minimum: 5)
+            ])
         // error from MinEpisodes should be first, warning from Transcripts second
         #expect(results[0].severity == .error)
         #expect(results[1].severity == .warning)

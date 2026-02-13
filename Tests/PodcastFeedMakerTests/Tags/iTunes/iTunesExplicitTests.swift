@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesExplicitTests {
+@testable import PodcastFeedMaker
+
+struct ITunesExplicitTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesExplicit_true() {
+    func test_channel_itunesExplicit_true() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesExplicit: true
         )
@@ -18,10 +19,10 @@ struct iTunesExplicitTests {
     }
 
     @Test
-    func test_channel_itunesExplicit_false() {
+    func test_channel_itunesExplicit_false() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesExplicit: false
         )
@@ -29,10 +30,10 @@ struct iTunesExplicitTests {
     }
 
     @Test
-    func test_channel_itunesExplicit_defaultsToNil() {
+    func test_channel_itunesExplicit_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesExplicit == nil)
@@ -61,16 +62,17 @@ struct iTunesExplicitTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameExplicit() {
+    func test_channel_equatable_sameExplicit() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesExplicit: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesExplicit: true
         )
@@ -78,16 +80,17 @@ struct iTunesExplicitTests {
     }
 
     @Test
-    func test_channel_equatable_differentExplicit() {
+    func test_channel_equatable_differentExplicit() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesExplicit: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesExplicit: false
         )

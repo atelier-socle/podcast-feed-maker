@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct ITunesOwnerTests {
 
@@ -30,11 +31,11 @@ struct ITunesOwnerTests {
     // MARK: - Channel Integration
 
     @Test
-    func test_channel_itunesOwner_shouldStoreOwner() {
+    func test_channel_itunesOwner_shouldStoreOwner() throws {
         let owner = ITunesOwner(name: "Jane Doe", email: "jane@domain.com")
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesOwner: owner
         )
@@ -43,10 +44,10 @@ struct ITunesOwnerTests {
     }
 
     @Test
-    func test_channel_itunesOwner_defaultsToNil() {
+    func test_channel_itunesOwner_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesOwner == nil)

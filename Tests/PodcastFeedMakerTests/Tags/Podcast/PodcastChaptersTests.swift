@@ -1,14 +1,15 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastChaptersTests {
 
     // MARK: - Initialization
 
     @Test
-    func initWithDefaultType() {
-        let url = URL(string: "https://example.com/chapters.json")!
+    func initWithDefaultType() throws {
+        let url = try #require(URL(string: "https://example.com/chapters.json"))
         let chapters = ChaptersLink(url: url)
 
         #expect(chapters.url == url)
@@ -16,8 +17,8 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func initWithCustomType() {
-        let url = URL(string: "https://example.com/chapters.json")!
+    func initWithCustomType() throws {
+        let url = try #require(URL(string: "https://example.com/chapters.json"))
         let chapters = ChaptersLink(url: url, type: "application/json")
 
         #expect(chapters.url == url)
@@ -27,9 +28,9 @@ struct PodcastChaptersTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() {
-        let url1 = URL(string: "https://example.com/chapters1.json")!
-        let url2 = URL(string: "https://example.com/chapters2.json")!
+    func equatableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/chapters1.json"))
+        let url2 = try #require(URL(string: "https://example.com/chapters2.json"))
 
         let a = ChaptersLink(url: url1)
         let b = ChaptersLink(url: url1)
@@ -40,9 +41,9 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func hashableConformance() {
-        let url1 = URL(string: "https://example.com/chapters1.json")!
-        let url2 = URL(string: "https://example.com/chapters2.json")!
+    func hashableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/chapters1.json"))
+        let url2 = try #require(URL(string: "https://example.com/chapters2.json"))
 
         let a = ChaptersLink(url: url1)
         let b = ChaptersLink(url: url1)
@@ -55,11 +56,14 @@ struct PodcastChaptersTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationContainsUrlAndType() {
-        let url = URL(string: "https://example.com/ep1/chapters.json")!
+    func xmlRepresentationContainsUrlAndType() throws {
+        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
         let chapters = ChaptersLink(url: url)
 
-        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
+        let xml = XMLBuilder().selfClosingElement(
+            "podcast:chapters",
+            attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)]
+        )
 
         #expect(xml.contains("podcast:chapters"))
         #expect(xml.contains(#"url="https://example.com/ep1/chapters.json""#))
@@ -67,21 +71,27 @@ struct PodcastChaptersTests {
     }
 
     @Test
-    func xmlRepresentationWithCustomType() {
-        let url = URL(string: "https://example.com/ep1/chapters.json")!
+    func xmlRepresentationWithCustomType() throws {
+        let url = try #require(URL(string: "https://example.com/ep1/chapters.json"))
         let chapters = ChaptersLink(url: url, type: "application/json")
 
-        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
+        let xml = XMLBuilder().selfClosingElement(
+            "podcast:chapters",
+            attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)]
+        )
 
         #expect(xml.contains(#"type="application/json""#))
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() {
-        let url = URL(string: "https://example.com/chapters.json")!
+    func xmlRepresentationIsSelfClosingTag() throws {
+        let url = try #require(URL(string: "https://example.com/chapters.json"))
         let chapters = ChaptersLink(url: url)
 
-        let xml = XMLBuilder().selfClosingElement("podcast:chapters", attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)])
+        let xml = XMLBuilder().selfClosingElement(
+            "podcast:chapters",
+            attributes: [("url", XMLBuilder.encodeURL(chapters.url)), ("type", chapters.type)]
+        )
 
         #expect(xml.contains("/>"))
     }

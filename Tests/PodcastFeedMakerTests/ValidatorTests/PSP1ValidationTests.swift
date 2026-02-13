@@ -15,9 +15,7 @@ struct PSP1ValidationTests {
     private func psp1Feed(
         title: String = "Podcast",
         description: String = "A podcast",
-        atomLinks: [AtomLink] = [
-            .selfLink(href: URL(string: "https://example.com/feed.xml")!)
-        ],
+        atomLinks: [AtomLink]? = nil,
         locked: Locked? = Locked(isLocked: false),
         podcastGuid: PodcastGuid? = PodcastGuid(value: "abc-123"),
         itunesImage: URL? = URL(string: "https://example.com/art.jpg"),
@@ -26,11 +24,19 @@ struct PSP1ValidationTests {
         language: String? = "en",
         itunesAuthor: String? = "Host",
         items: [Item] = []
-    ) -> PodcastFeed {
-        PodcastFeed(
+    ) throws -> PodcastFeed {
+        let url = try #require(URL(string: "https://example.com"))
+        let resolvedAtomLinks: [AtomLink]
+        if let atomLinks {
+            resolvedAtomLinks = atomLinks
+        } else {
+            let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+            resolvedAtomLinks = [.selfLink(href: feedURL)]
+        }
+        return PodcastFeed(
             channel: Channel(
                 title: title,
-                link: URL(string: "https://example.com")!,
+                link: url,
                 description: description,
                 language: language,
                 items: items,
@@ -38,17 +44,18 @@ struct PSP1ValidationTests {
                 itunesCategories: itunesCategories,
                 itunesExplicit: itunesExplicit,
                 itunesImage: itunesImage,
-                atomLinks: atomLinks,
+                atomLinks: resolvedAtomLinks,
                 podcastGuid: podcastGuid,
                 locked: locked
             ))
     }
 
-    private func validItem() -> Item {
-        Item(
+    private func validItem() throws -> Item {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        return Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             ),
@@ -59,8 +66,8 @@ struct PSP1ValidationTests {
     // MARK: - Full Compliance
 
     @Test("Fully compliant PSP-1 feed passes")
-    func fullyCompliant() {
-        let feed = psp1Feed(items: [validItem()])
+    func fullyCompliant() throws {
+        let feed = try psp1Feed(items: [validItem()])
         let report = validator.validate(feed, for: .psp1)
         #expect(report.isValid)
     }
@@ -68,53 +75,54 @@ struct PSP1ValidationTests {
     // MARK: - Missing Required Fields
 
     @Test("Missing title is error")
-    func missingTitle() {
-        let feed = psp1Feed(title: "")
+    func missingTitle() throws {
+        let feed = try psp1Feed(title: "")
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.title" })
     }
 
     @Test("Missing description is error")
-    func missingDescription() {
-        let feed = psp1Feed(description: "")
+    func missingDescription() throws {
+        let feed = try psp1Feed(description: "")
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.description" })
     }
 
     @Test("Missing atom:link rel=self is error")
-    func missingAtomLinkSelf() {
-        let feed = psp1Feed(atomLinks: [])
+    func missingAtomLinkSelf() throws {
+        let feed = try psp1Feed(atomLinks: [])
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.atomLinks" })
     }
 
     @Test("atom:link without rel=self is error")
-    func atomLinkNoSelf() {
+    func atomLinkNoSelf() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
         let link = AtomLink(
-            href: URL(string: "https://example.com")!, rel: "alternate"
+            href: linkURL, rel: "alternate"
         )
-        let feed = psp1Feed(atomLinks: [link])
+        let feed = try psp1Feed(atomLinks: [link])
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.atomLinks" })
     }
 
     @Test("Missing podcast:locked is error")
-    func missingLocked() {
-        let feed = psp1Feed(locked: nil)
+    func missingLocked() throws {
+        let feed = try psp1Feed(locked: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.locked" })
     }
 
     @Test("Missing podcast:guid is error")
-    func missingGuid() {
-        let feed = psp1Feed(podcastGuid: nil)
+    func missingGuid() throws {
+        let feed = try psp1Feed(podcastGuid: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.podcastGuid" })
     }
 
     @Test("Missing itunes:image is error")
-    func missingImage() {
-        let feed = psp1Feed(itunesImage: nil)
+    func missingImage() throws {
+        let feed = try psp1Feed(itunesImage: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -123,8 +131,8 @@ struct PSP1ValidationTests {
     }
 
     @Test("Missing itunes:category is error")
-    func missingCategory() {
-        let feed = psp1Feed(itunesCategories: [])
+    func missingCategory() throws {
+        let feed = try psp1Feed(itunesCategories: [])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -133,8 +141,8 @@ struct PSP1ValidationTests {
     }
 
     @Test("Missing itunes:explicit is error")
-    func missingExplicit() {
-        let feed = psp1Feed(itunesExplicit: nil)
+    func missingExplicit() throws {
+        let feed = try psp1Feed(itunesExplicit: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -145,15 +153,15 @@ struct PSP1ValidationTests {
     // MARK: - Recommended Fields
 
     @Test("Missing language is error")
-    func missingLanguage() {
-        let feed = psp1Feed(language: nil)
+    func missingLanguage() throws {
+        let feed = try psp1Feed(language: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(report.errors.contains { $0.field == "channel.language" })
     }
 
     @Test("Missing itunes:author is warning")
-    func missingAuthor() {
-        let feed = psp1Feed(itunesAuthor: nil)
+    func missingAuthor() throws {
+        let feed = try psp1Feed(itunesAuthor: nil)
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {
@@ -164,9 +172,9 @@ struct PSP1ValidationTests {
     // MARK: - Item Checks
 
     @Test("Item without title or description is error")
-    func itemNoTitleOrDesc() {
+    func itemNoTitleOrDesc() throws {
         let item = Item()
-        let feed = psp1Feed(items: [item])
+        let feed = try psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -175,9 +183,9 @@ struct PSP1ValidationTests {
     }
 
     @Test("Item without enclosure is error")
-    func itemNoEnclosure() {
+    func itemNoEnclosure() throws {
         let item = Item(title: "Episode")
-        let feed = psp1Feed(items: [item])
+        let feed = try psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -186,16 +194,17 @@ struct PSP1ValidationTests {
     }
 
     @Test("Item without GUID is error")
-    func itemNoGuid() {
+    func itemNoGuid() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             )
         )
-        let feed = psp1Feed(items: [item])
+        let feed = try psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.errors.contains {
@@ -206,8 +215,8 @@ struct PSP1ValidationTests {
     // MARK: - Whitespace
 
     @Test("Leading whitespace in title is warning")
-    func leadingWhitespaceTitle() {
-        let feed = psp1Feed(title: " My Podcast")
+    func leadingWhitespaceTitle() throws {
+        let feed = try psp1Feed(title: " My Podcast")
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {
@@ -216,8 +225,8 @@ struct PSP1ValidationTests {
     }
 
     @Test("Trailing whitespace in description is warning")
-    func trailingWhitespaceDescription() {
-        let feed = psp1Feed(description: "A podcast ")
+    func trailingWhitespaceDescription() throws {
+        let feed = try psp1Feed(description: "A podcast ")
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {
@@ -229,9 +238,9 @@ struct PSP1ValidationTests {
     // MARK: - Text Length
 
     @Test("Title over 255 chars is warning")
-    func longTitle() {
+    func longTitle() throws {
         let longTitle = String(repeating: "x", count: 300)
-        let feed = psp1Feed(title: longTitle)
+        let feed = try psp1Feed(title: longTitle)
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {
@@ -251,16 +260,17 @@ struct PSP1ValidationTests {
     // MARK: - Item-Level Whitespace
 
     @Test("Item title with leading whitespace is warning")
-    func itemTitleWhitespace() {
+    func itemTitleWhitespace() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: " Episode Title",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024, type: "audio/mpeg"
             ),
             guid: GUID(value: "ep-1", isPermaLink: false)
         )
-        let feed = psp1Feed(items: [item])
+        let feed = try psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {
@@ -272,17 +282,18 @@ struct PSP1ValidationTests {
     // MARK: - Item-Level Title Length
 
     @Test("Item title over 255 chars is warning")
-    func itemLongTitle() {
+    func itemLongTitle() throws {
         let longTitle = String(repeating: "x", count: 300)
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: longTitle,
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024, type: "audio/mpeg"
             ),
             guid: GUID(value: "ep-1", isPermaLink: false)
         )
-        let feed = psp1Feed(items: [item])
+        let feed = try psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
         #expect(
             report.warnings.contains {

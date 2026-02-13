@@ -7,28 +7,39 @@ import Testing
 struct TemplateValidatorTests {
 
     private let validator = TemplateValidator()
-    private let testURL = URL(string: "https://example.com")!
-    private let imageURL = URL(string: "https://example.com/art.jpg")!
 
     // MARK: - Helpers
 
-    private func makeMinimalFeed() -> PodcastFeed {
+    private static func makeTestURL() throws -> URL {
+        try #require(URL(string: "https://example.com"))
+    }
+
+    private static func makeImageURL() throws -> URL {
+        try #require(URL(string: "https://example.com/art.jpg"))
+    }
+
+    private func makeMinimalFeed() throws -> PodcastFeed {
+        let testURL = try Self.makeTestURL()
         let channel = Channel(
             title: "Test", link: testURL, description: "A test podcast"
         )
         return PodcastFeed(channel: channel)
     }
 
-    private func makeBasicCompliantFeed() -> PodcastFeed {
-        PodcastFeed.basic(
+    private func makeBasicCompliantFeed() throws -> PodcastFeed {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
+        return PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
-            ch.category(.technology).explicit(false).image(self.imageURL.absoluteString)
+            ch.category(.technology).explicit(false).image(imageURL.absoluteString)
         }
     }
 
-    private func makeStandardCompliantFeed() -> PodcastFeed {
-        PodcastFeed.standard(
+    private func makeStandardCompliantFeed() throws -> PodcastFeed {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
+        return PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
             ch.author("Host")
@@ -38,7 +49,7 @@ struct TemplateValidatorTests {
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
                 .atomLink(href: "https://example.com/feed.xml", rel: "self")
-                .image(self.imageURL.absoluteString)
+                .image(imageURL.absoluteString)
                 .language("en")
         }
     }
@@ -46,14 +57,15 @@ struct TemplateValidatorTests {
     // MARK: - Basic Validation
 
     @Test("compliant basic feed has no errors")
-    func basicCompliant() {
-        let feed = makeBasicCompliantFeed()
+    func basicCompliant() throws {
+        let feed = try makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
         #expect(report.isCompliant)
     }
 
     @Test("missing itunesImage produces error")
-    func missingItunesImage() {
+    func missingItunesImage() throws {
+        let testURL = try Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -66,11 +78,13 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing itunesCategory produces error")
-    func missingCategory() {
+    func missingCategory() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
-            ch.explicit(false).image(self.imageURL.absoluteString)
+            ch.explicit(false).image(imageURL.absoluteString)
         }
         let report = validator.validate(feed, against: BasicTemplate())
         let categoryError = report.errors.first { $0.tag == .itunesCategory }
@@ -78,11 +92,13 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing itunesExplicit produces error")
-    func missingExplicit() {
+    func missingExplicit() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
-            ch.category(.technology).image(self.imageURL.absoluteString)
+            ch.category(.technology).image(imageURL.absoluteString)
         }
         let report = validator.validate(feed, against: BasicTemplate())
         let explicitError = report.errors.first { $0.tag == .itunesExplicit }
@@ -90,10 +106,10 @@ struct TemplateValidatorTests {
     }
 
     @Test("missing recommended tags produce warnings not errors")
-    func recommendedWarnings() {
-        let feed = makeBasicCompliantFeed()
+    func recommendedWarnings() throws {
+        let feed = try makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
-        // language is recommended for basic — should be a warning
+        // language is recommended for basic -- should be a warning
         let languageWarning = report.warnings.first { $0.tag == .language }
         #expect(languageWarning != nil)
         // Still compliant because warnings don't affect compliance
@@ -103,14 +119,16 @@ struct TemplateValidatorTests {
     // MARK: - Standard Validation
 
     @Test("standard compliant feed has no errors")
-    func standardCompliant() {
-        let feed = makeStandardCompliantFeed()
+    func standardCompliant() throws {
+        let feed = try makeStandardCompliantFeed()
         let report = validator.validate(feed, against: StandardTemplate())
         #expect(report.isCompliant)
     }
 
     @Test("standard template detects missing podcastGuid")
-    func missingPodcastGuid() {
+    func missingPodcastGuid() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -120,7 +138,7 @@ struct TemplateValidatorTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .atomLink(href: "https://example.com/feed.xml", rel: "self")
-                .image(self.imageURL.absoluteString)
+                .image(imageURL.absoluteString)
                 .language("en")
         }
         let report = validator.validate(feed, against: StandardTemplate())
@@ -131,8 +149,8 @@ struct TemplateValidatorTests {
     // MARK: - Item Validation
 
     @Test("missing required item tags produce errors")
-    func missingItemTags() {
-        var feed = makeBasicCompliantFeed()
+    func missingItemTags() throws {
+        var feed = try makeBasicCompliantFeed()
         // Add an item without title or enclosure
         feed.channel?.items = [Item()]
         let report = validator.validate(feed, against: BasicTemplate())
@@ -143,8 +161,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("item with all required basic tags passes")
-    func itemWithRequiredTags() {
-        var feed = makeBasicCompliantFeed()
+    func itemWithRequiredTags() throws {
+        var feed = try makeBasicCompliantFeed()
         feed.channel?.items = [
             Item(
                 title: "Episode 1",
@@ -172,19 +190,22 @@ struct TemplateValidatorTests {
     // MARK: - Level Detection
 
     @Test("detectLevel returns basic for minimal feed")
-    func detectBasic() {
-        let feed = makeBasicCompliantFeed()
+    func detectBasic() throws {
+        let feed = try makeBasicCompliantFeed()
         let level = validator.detectLevel(feed)
         #expect(level == .basic)
     }
 
     @Test("detectLevel returns standard for PSP-1 compliant feed")
-    func detectStandard() {
+    func detectStandard() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
+        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
         let config = PSP1Configuration(
             title: "Show",
             link: testURL,
             description: "About",
-            feedURL: URL(string: "https://example.com/feed.xml")!,
+            feedURL: feedURL,
             author: "Host",
             ownerName: "Host",
             ownerEmail: "h@example.com",
@@ -202,8 +223,8 @@ struct TemplateValidatorTests {
     // MARK: - Level Mismatch Detection
 
     @Test("expert tag in basic feed produces info")
-    func levelMismatch() {
-        var feed = makeBasicCompliantFeed()
+    func levelMismatch() throws {
+        var feed = try makeBasicCompliantFeed()
         feed.channel?.value = PodcastValue(
             type: "lightning", method: "keysend", recipients: []
         )
@@ -213,8 +234,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("level mismatch info has suggestedLevel populated")
-    func levelMismatchSuggestedLevel() {
-        var feed = makeBasicCompliantFeed()
+    func levelMismatchSuggestedLevel() throws {
+        var feed = try makeBasicCompliantFeed()
         feed.channel?.value = PodcastValue(
             type: "lightning", method: "keysend", recipients: []
         )
@@ -224,7 +245,8 @@ struct TemplateValidatorTests {
     }
 
     @Test("error results have nil suggestedLevel")
-    func errorResultsNilSuggestedLevel() {
+    func errorResultsNilSuggestedLevel() throws {
+        let testURL = try Self.makeTestURL()
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -237,18 +259,20 @@ struct TemplateValidatorTests {
     }
 
     @Test("warning results have nil suggestedLevel")
-    func warningResultsNilSuggestedLevel() {
-        let feed = makeBasicCompliantFeed()
+    func warningResultsNilSuggestedLevel() throws {
+        let feed = try makeBasicCompliantFeed()
         let report = validator.validate(feed, against: BasicTemplate())
         for warning in report.warnings {
             #expect(warning.suggestedLevel == nil)
         }
     }
 
-    // MARK: - Standard ≡ PSP1Configuration
+    // MARK: - Standard = PSP1Configuration
 
     @Test("standard template + PSP-1 fields passes PSP-1 validation")
-    func standardMatchesPSP1() {
+    func standardMatchesPSP1() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -259,7 +283,7 @@ struct TemplateValidatorTests {
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
                 .atomLink(href: "https://example.com/feed.xml", rel: "self")
-                .image(self.imageURL.absoluteString)
+                .image(imageURL.absoluteString)
                 .language("en")
         }
         let report = FeedValidator().validate(feed, for: .psp1)

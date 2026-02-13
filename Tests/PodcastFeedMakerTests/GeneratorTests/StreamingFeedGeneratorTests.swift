@@ -1,27 +1,30 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct StreamingFeedGeneratorTests {
 
     // MARK: - Helpers
 
-    private func minimalChannel() -> Channel {
+    private func minimalChannel() throws -> Channel {
         Channel(
             title: "Test Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A test podcast"
         )
     }
 
-    private func feedWithItems(_ count: Int) -> PodcastFeed {
-        var ch = minimalChannel()
-        ch.items = (0..<count).map { i in
-            Item(title: "Episode \(i)", enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep\(i).mp3")!,
-                length: 12345,
-                type: "audio/mpeg"
-            ))
+    private func feedWithItems(_ count: Int) throws -> PodcastFeed {
+        var ch = try minimalChannel()
+        ch.items = try (0..<count).map { i in
+            Item(
+                title: "Episode \(i)",
+                enclosure: Enclosure(
+                    url: try #require(URL(string: "https://example.com/ep\(i).mp3")),
+                    length: 12345,
+                    type: "audio/mpeg"
+                ))
         }
         return PodcastFeed(channel: ch)
     }
@@ -38,7 +41,7 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Streaming output matches sync output")
     func streamingMatchesSync() async throws {
-        let feed = feedWithItems(3)
+        let feed = try feedWithItems(3)
         let syncGen = FeedGenerator()
         let streamGen = StreamingFeedGenerator()
 
@@ -51,26 +54,26 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Chunk count: N items yields N+2 chunks")
     func chunkCount() async throws {
-        let feed = feedWithItems(5)
+        let feed = try feedWithItems(5)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
-        #expect(chunks.count == 7) // 5 items + header + footer
+        #expect(chunks.count == 7)  // 5 items + header + footer
     }
 
     @Test("Empty items yields 2 chunks")
     func emptyItems() async throws {
-        let feed = feedWithItems(0)
+        let feed = try feedWithItems(0)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
-        #expect(chunks.count == 2) // header + footer
+        #expect(chunks.count == 2)  // header + footer
     }
 
     @Test("Single item yields 3 chunks")
     func singleItem() async throws {
-        let feed = feedWithItems(1)
+        let feed = try feedWithItems(1)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
-        #expect(chunks.count == 3) // header + 1 item + footer
+        #expect(chunks.count == 3)  // header + 1 item + footer
     }
 
     @Test("Missing channel throws error")
@@ -87,7 +90,7 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Header chunk contains XML declaration and channel open")
     func headerChunkContent() async throws {
-        let feed = feedWithItems(1)
+        let feed = try feedWithItems(1)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
         let header = chunks[0]
@@ -99,7 +102,7 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Item chunks contain item content")
     func itemChunkContent() async throws {
-        let feed = feedWithItems(2)
+        let feed = try feedWithItems(2)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
         #expect(chunks[1].contains("<item>"))
@@ -110,17 +113,17 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Footer chunk closes channel and rss")
     func footerChunkContent() async throws {
-        let feed = feedWithItems(1)
+        let feed = try feedWithItems(1)
         let streamGen = StreamingFeedGenerator()
         let chunks = try await collectChunks(streamGen.generate(feed))
-        let footer = chunks.last!
+        let footer = try #require(chunks.last)
         #expect(footer.contains("</channel>"))
         #expect(footer.contains("</rss>"))
     }
 
     @Test("Streaming with complex items")
     func streamingComplexItems() async throws {
-        var ch = minimalChannel()
+        var ch = try minimalChannel()
         ch.itunesAuthor = "Host"
         ch.items = [
             Item(
@@ -143,7 +146,7 @@ struct StreamingFeedGeneratorTests {
 
     @Test("Minified streaming matches sync")
     func minifiedStreaming() async throws {
-        let feed = feedWithItems(2)
+        let feed = try feedWithItems(2)
         let syncGen = FeedGenerator(prettyPrint: false)
         let streamGen = StreamingFeedGenerator(prettyPrint: false)
 

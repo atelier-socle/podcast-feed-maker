@@ -1,12 +1,13 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastFeedFileTests {
 
     @Test
     func test_writeFeedToTemporaryFile_andDeleteAfter() throws {
-        let maker = PodcastFeedMaker(MockFeed.applePodcasts)
+        let maker = try PodcastFeedMaker(MockFeed.applePodcasts())
         let xml = try maker.generate()
 
         let fileManager = FileManager.default
@@ -26,7 +27,7 @@ struct PodcastFeedFileTests {
 
     @Test
     func test_writeAndCleanTemporaryFeedFile() throws {
-        let maker = PodcastFeedMaker(MockFeed.applePodcasts)
+        let maker = try PodcastFeedMaker(MockFeed.applePodcasts())
         let xml = try maker.generate()
 
         let tempDir = FileManager.default.temporaryDirectory

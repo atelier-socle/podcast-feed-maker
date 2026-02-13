@@ -11,7 +11,7 @@ struct PodcastFeedEngineTests {
 
     @Test("generate produces valid RSS XML")
     func generateValidFeed() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts)
+        let xml = try engine.generate(MockFeed.applePodcasts())
         #expect(xml.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
         #expect(xml.contains("<rss version=\"2.0\""))
         #expect(xml.contains("<channel>"))
@@ -30,7 +30,7 @@ struct PodcastFeedEngineTests {
 
     @Test("generate with prettyPrint false produces minified output")
     func generateMinified() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts, prettyPrint: false)
+        let xml = try engine.generate(MockFeed.applePodcasts(), prettyPrint: false)
         #expect(!xml.contains("\t"))
         #expect(!xml.contains("\n"))
     }
@@ -38,10 +38,11 @@ struct PodcastFeedEngineTests {
     @Test("generateStream yields N+2 chunks")
     func generateStreamChunkCount() async throws {
         var chunks: [String] = []
-        for try await chunk in engine.generateStream(MockFeed.applePodcasts) {
+        let mockFeed = try MockFeed.applePodcasts()
+        for try await chunk in engine.generateStream(mockFeed) {
             chunks.append(chunk)
         }
-        let itemCount = MockFeed.applePodcasts.channel?.items.count ?? 0
+        let itemCount = mockFeed.channel?.items.count ?? 0
         #expect(chunks.count == itemCount + 2)
     }
 
@@ -49,7 +50,7 @@ struct PodcastFeedEngineTests {
 
     @Test("parse round-trips a generated feed")
     func parseRoundTrip() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts)
+        let xml = try engine.generate(MockFeed.applePodcasts())
         let parsed = try engine.parse(xml)
         #expect(parsed.channel != nil)
         #expect(parsed.channel?.title == "CHANNEL TITLE")
@@ -58,8 +59,8 @@ struct PodcastFeedEngineTests {
 
     @Test("parse from Data works")
     func parseFromData() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts)
-        let data = xml.data(using: .utf8)!
+        let xml = try engine.generate(MockFeed.applePodcasts())
+        let data = try #require(xml.data(using: .utf8))
         let parsed = try engine.parse(data: data)
         #expect(parsed.channel?.title == "CHANNEL TITLE")
     }
@@ -75,14 +76,14 @@ struct PodcastFeedEngineTests {
 
     @Test("validate returns report for a platform")
     func validateSinglePlatform() throws {
-        let report = engine.validate(MockFeed.applePodcasts, for: .apple)
+        let report = try engine.validate(MockFeed.applePodcasts(), for: .apple)
         #expect(report.platform == .apple)
         #expect(report.isValid)
     }
 
     @Test("validateAll returns reports for all platforms")
     func validateAllPlatforms() throws {
-        let reports = engine.validateAll(MockFeed.applePodcasts)
+        let reports = try engine.validateAll(MockFeed.applePodcasts())
         #expect(reports.count == ValidationPlatform.allCases.count)
         for report in reports {
             #expect(ValidationPlatform.allCases.contains(report.platform))
@@ -93,7 +94,7 @@ struct PodcastFeedEngineTests {
     func validateMissingTitle() throws {
         let channel = Channel(
             title: "",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -105,7 +106,7 @@ struct PodcastFeedEngineTests {
 
     @Test("parseAndValidate returns both feed and report")
     func parseAndValidate() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts)
+        let xml = try engine.generate(MockFeed.applePodcasts())
         let (feed, report) = try engine.parseAndValidate(xml, for: .apple)
         #expect(feed.channel != nil)
         #expect(report.platform == .apple)
@@ -122,7 +123,7 @@ struct PodcastFeedEngineTests {
 
     @Test("normalize produces consistent output")
     func normalizeProducesConsistentOutput() throws {
-        let xml = try engine.generate(MockFeed.applePodcasts)
+        let xml = try engine.generate(MockFeed.applePodcasts())
         let normalized = try engine.normalize(xml)
         let normalizedAgain = try engine.normalize(normalized)
         #expect(normalized == normalizedAgain)
@@ -134,7 +135,7 @@ struct PodcastFeedEngineTests {
     func isEquivalentIdentical() throws {
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A test podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -146,7 +147,7 @@ struct PodcastFeedEngineTests {
     func isEquivalentDifferentFormatting() throws {
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A test podcast"
         )
         let feed = PodcastFeed(channel: channel)
@@ -159,12 +160,12 @@ struct PodcastFeedEngineTests {
     func isEquivalentDifferent() throws {
         let channel1 = Channel(
             title: "Podcast A",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "First podcast"
         )
         let channel2 = Channel(
             title: "Podcast B",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "Second podcast"
         )
         let xml1 = try engine.generate(PodcastFeed(channel: channel1))
@@ -218,7 +219,8 @@ struct PodcastFeedEngineAsyncTests {
             MockResponse(data: Data(), statusCode: 200),
             for: artURL
         )
-        for item in MockFeed.applePodcasts.channel?.items ?? [] {
+        let mockFeed = try MockFeed.applePodcasts()
+        for item in mockFeed.channel?.items ?? [] {
             MockResponseStore.shared.set(
                 MockResponse(
                     data: Data(),
@@ -236,9 +238,9 @@ struct PodcastFeedEngineAsyncTests {
         }
         MockResponseStore.shared.set(
             MockResponse(data: Data(), statusCode: 200),
-            for: MockFeed.applePodcasts.channel?.itunesImage?.absoluteString ?? ""
+            for: mockFeed.channel?.itunesImage?.absoluteString ?? ""
         )
-        for atomLink in MockFeed.applePodcasts.channel?.atomLinks ?? [] {
+        for atomLink in mockFeed.channel?.atomLinks ?? [] {
             MockResponseStore.shared.set(
                 MockResponse(data: Data(), statusCode: 200),
                 for: atomLink.href.absoluteString
@@ -247,7 +249,7 @@ struct PodcastFeedEngineAsyncTests {
 
         let session = makeMockSession()
         let results = try await engine.validateNetwork(
-            MockFeed.applePodcasts, session: session)
+            mockFeed, session: session)
         // Should not crash, results may contain warnings but no network errors
         #expect(results.count >= 0)
     }
@@ -276,15 +278,17 @@ struct PodcastFeedEngineAsyncTests {
             for: url
         )
 
+        let linkURL = try #require(URL(string: "https://example.com"))
+        let enclosureURL = try #require(URL(string: url))
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: linkURL,
             description: "Desc",
             items: [
                 Item(
                     title: "Episode",
                     enclosure: Enclosure(
-                        url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                        url: enclosureURL, length: 1024, type: "audio/mpeg"
                     )
                 )
             ]
@@ -327,9 +331,10 @@ struct PodcastFeedEngineAsyncTests {
             for: url
         )
 
+        let dimsLinkURL = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: dimsLinkURL,
             description: "Desc",
             itunesImage: URL(string: url)
         )
@@ -354,9 +359,10 @@ struct PodcastFeedEngineAsyncTests {
 
     @Test("generateStream yields header, items, and footer")
     func generateStreamYieldsChunks() async throws {
+        let streamLinkURL = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: streamLinkURL,
             description: "A test podcast",
             items: [
                 Item(title: "Ep 1"),
@@ -377,9 +383,10 @@ struct PodcastFeedEngineAsyncTests {
 
     @Test("generateStream with prettyPrint false")
     func generateStreamMinified() async throws {
+        let minLinkURL = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: minLinkURL,
             description: "A test"
         )
         let feed = PodcastFeed(channel: channel)

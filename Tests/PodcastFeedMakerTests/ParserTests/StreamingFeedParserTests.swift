@@ -159,10 +159,12 @@ struct StreamingFeedParserTests {
     }
 
     private func maximalFixture() throws -> String {
-        guard let url = Bundle.module.url(
-            forResource: "maximal", withExtension: "xml",
-            subdirectory: "Fixtures"
-        ) else {
+        guard
+            let url = Bundle.module.url(
+                forResource: "maximal", withExtension: "xml",
+                subdirectory: "Fixtures"
+            )
+        else {
             throw ParserError.encodingError("Fixture maximal.xml not found in bundle")
         }
         return try String(contentsOf: url, encoding: .utf8)
@@ -234,7 +236,7 @@ struct StreamingFeedParserTests {
 
     @Test("Data variant invalid XML throws ParserError")
     func dataVariantInvalidXML() async {
-        let data = "<<<not xml>>>".data(using: .utf8) ?? Data()
+        let data = Data("<<<not xml>>>".utf8)
         let parser = StreamingFeedParser()
         let stream = parser.parseItems(from: data)
         do {

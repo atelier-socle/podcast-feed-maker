@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct CleanSpecialCharsTests {
 
@@ -8,8 +9,8 @@ struct CleanSpecialCharsTests {
     func test_escape_shouldReplaceStandardXMLChars() {
         let input = "\"Test\" & \"Quotes\" <Tags> > Out &copy; © ™ ℗ \u{2019}"
         let expected = """
-        &quot;Test&quot; &amp; &quot;Quotes&quot; &lt;Tags&gt; &gt; Out &#xA9; &#xA9; &#x2122; &#x2117; &apos;
-        """
+            &quot;Test&quot; &amp; &quot;Quotes&quot; &lt;Tags&gt; &gt; Out &#xA9; &#xA9; &#x2122; &#x2117; &apos;
+            """
         let result = XMLBuilder.escape(input)
         #expect(result == expected)
     }

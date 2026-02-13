@@ -6,9 +6,19 @@ import Testing
 @Suite("Template Composition Scenarios")
 struct TemplateCompositionTests {
 
-    private let testURL = URL(string: "https://example.com")!
-    private let imageURL = URL(string: "https://example.com/art.jpg")!
-    private let feedURL = URL(string: "https://example.com/feed.xml")!
+    // MARK: - Helpers
+
+    private static func makeTestURL() throws -> URL {
+        try #require(URL(string: "https://example.com"))
+    }
+
+    private static func makeImageURL() throws -> URL {
+        try #require(URL(string: "https://example.com/art.jpg"))
+    }
+
+    private static func makeFeedURL() throws -> URL {
+        try #require(URL(string: "https://example.com/feed.xml"))
+    }
 
     // MARK: - Real-World Composition Scenarios
 
@@ -21,7 +31,7 @@ struct TemplateCompositionTests {
         #expect(template.name == "Radio France")
         #expect(template.level == .expert)
         #expect(template.requiredChannelTags.contains(.podcastPerson))
-        // podcastTranscript is item-level — requiring() adds it to channel,
+        // podcastTranscript is item-level -- requiring() adds it to channel,
         // but it's present in the overall allTags
         #expect(template.allTags.contains(.podcastChapters))
         #expect(template.platformPreset.platforms == Set([.apple, .spotify, .podcastIndex]))
@@ -57,24 +67,27 @@ struct TemplateCompositionTests {
     // MARK: - Validation with Composed Templates
 
     @Test("Composed template validates correctly")
-    func composedValidation() {
+    func composedValidation() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let template = BasicTemplate()
             .requiring(.podcastGuid)
 
         let feed = PodcastFeed.basic(
             title: "Show", link: testURL, description: "About"
         ) { ch in
-            ch.category(.technology).explicit(false).image(self.imageURL.absoluteString)
+            ch.category(.technology).explicit(false).image(imageURL.absoluteString)
         }
 
         let report = TemplateValidator().validate(feed, against: template)
-        // podcastGuid is required but not present → error
+        // podcastGuid is required but not present -> error
         let guidError = report.errors.first { $0.tag == .podcastGuid }
         #expect(guidError != nil)
     }
 
     @Test("Composed template factory: PodcastFeed.template() works")
-    func composedFactory() {
+    func composedFactory() throws {
+        let testURL = try Self.makeTestURL()
         let template = StandardTemplate().named("Custom")
         let feed = PodcastFeed.template(
             template,
@@ -88,7 +101,10 @@ struct TemplateCompositionTests {
     }
 
     @Test("detectLevel works on feed built from composed template")
-    func detectLevelComposed() {
+    func detectLevelComposed() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Show", link: testURL, description: "About"
         ) { ch in
@@ -98,8 +114,8 @@ struct TemplateCompositionTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
         }
         let level = TemplateValidator().detectLevel(feed)

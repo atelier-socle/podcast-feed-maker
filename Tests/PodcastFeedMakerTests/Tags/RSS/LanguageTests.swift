@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - LanguageTests
 
@@ -15,10 +16,11 @@ struct LanguageTests {
     // MARK: - Initialization
 
     @Test("Channel language defaults to nil")
-    func channelLanguageDefaultsToNil() {
+    func channelLanguageDefaultsToNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -26,10 +28,11 @@ struct LanguageTests {
     }
 
     @Test("Channel language can be set at initialization")
-    func channelLanguageCanBeSet() {
+    func channelLanguageCanBeSet() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             language: "en-us"
         )
@@ -38,10 +41,11 @@ struct LanguageTests {
     }
 
     @Test("Channel language is mutable")
-    func channelLanguageIsMutable() {
+    func channelLanguageIsMutable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         var channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             language: "en-us"
         )
@@ -51,10 +55,11 @@ struct LanguageTests {
     }
 
     @Test("Channel language accepts BCP 47 language tags")
-    func channelLanguageAcceptsBcp47() {
+    func channelLanguageAcceptsBcp47() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             language: "pt-BR"
         )
@@ -66,9 +71,10 @@ struct LanguageTests {
 
     @Test("Channel XML contains language tag when set")
     func channelXmlContainsLanguage() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             language: "en-us"
         )
@@ -79,9 +85,10 @@ struct LanguageTests {
 
     @Test("Channel XML omits language tag when nil")
     func channelXmlOmitsLanguageWhenNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -91,9 +98,10 @@ struct LanguageTests {
 
     @Test("Channel XML preserves language string as-is")
     func channelXmlPreservesLanguageString() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             language: "fr"
         )
@@ -105,16 +113,16 @@ struct LanguageTests {
     // MARK: - Equatable
 
     @Test("Channels with same language are equal")
-    func channelsWithSameLanguageAreEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithSameLanguageAreEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", language: "en")
         let channel2 = Channel(title: "T", link: url, description: "D", language: "en")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different languages are not equal")
-    func channelsWithDifferentLanguagesAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithDifferentLanguagesAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", language: "en")
         let channel2 = Channel(title: "T", link: url, description: "D", language: "fr")
         #expect(channel1 != channel2)

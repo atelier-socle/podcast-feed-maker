@@ -19,8 +19,7 @@ struct RoundTripTests {
 
         #expect(original.channel?.title == reparsed.channel?.title)
         #expect(original.channel?.link == reparsed.channel?.link)
-        #expect(original.channel?.description ==
-            reparsed.channel?.description)
+        #expect(original.channel?.description == reparsed.channel?.description)
     }
 
     // MARK: - Full Feed Round Trip
@@ -95,8 +94,7 @@ struct RoundTripTests {
         let xml = try generator.generate(original)
         let reparsed = try feedParser.parse(xml)
 
-        #expect(original.channel?.items.count ==
-            reparsed.channel?.items.count)
+        #expect(original.channel?.items.count == reparsed.channel?.items.count)
     }
 
     @Test("Item core elements survive round-trip")
@@ -129,8 +127,7 @@ struct RoundTripTests {
         #expect(origItem.itunesAuthor == reItem.itunesAuthor)
         #expect(origItem.itunesDuration == reItem.itunesDuration)
         #expect(origItem.itunesEpisode == reItem.itunesEpisode)
-        #expect(origItem.itunesEpisodeType ==
-            reItem.itunesEpisodeType)
+        #expect(origItem.itunesEpisodeType == reItem.itunesEpisodeType)
         #expect(origItem.itunesExplicit == reItem.itunesExplicit)
         #expect(origItem.itunesSeason == reItem.itunesSeason)
     }
@@ -151,8 +148,7 @@ struct RoundTripTests {
         #expect(origItem.persons == reItem.persons)
         #expect(origItem.location == reItem.location)
         #expect(origItem.license == reItem.license)
-        #expect(origItem.socialInteractions ==
-            reItem.socialInteractions)
+        #expect(origItem.socialInteractions == reItem.socialInteractions)
         #expect(origItem.txtRecords == reItem.txtRecords)
         #expect(origItem.podcastSeason == reItem.podcastSeason)
         #expect(origItem.podcastEpisode == reItem.podcastEpisode)
@@ -235,10 +231,12 @@ struct RoundTripTests {
     }
 
     private func maximalFixture() throws -> String {
-        guard let url = Bundle.module.url(
-            forResource: "maximal", withExtension: "xml",
-            subdirectory: "Fixtures"
-        ) else {
+        guard
+            let url = Bundle.module.url(
+                forResource: "maximal", withExtension: "xml",
+                subdirectory: "Fixtures"
+            )
+        else {
             throw ParserError.encodingError("Fixture maximal.xml not found in bundle")
         }
         return try String(contentsOf: url, encoding: .utf8)

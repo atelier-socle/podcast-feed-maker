@@ -5,58 +5,65 @@ import Testing
 
 @testable import PodcastFeedCommands
 
-@Suite("Template CLI Integration Tests")
-struct TemplateIntegrationTests {
+// MARK: - Shared Fixture
 
-    // MARK: - Shared Fixture
-
-    private static let fixtureXML = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0"
-             xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-             xmlns:podcast="https://podcastindex.org/namespace/1.0"
-             xmlns:atom="http://www.w3.org/2005/Atom">
-        <channel>
-            <title>Template Test Podcast</title>
-            <link>https://example.com</link>
-            <description>A test podcast for template integration tests.</description>
-            <language>en</language>
-            <itunes:author>Test Author</itunes:author>
-            <itunes:image href="https://example.com/artwork.jpg"/>
+private let sharedFixtureXML = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0"
+         xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+         xmlns:podcast="https://podcastindex.org/namespace/1.0"
+         xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Template Test Podcast</title>
+        <link>https://example.com</link>
+        <description>A test podcast for template integration tests.</description>
+        <language>en</language>
+        <itunes:author>Test Author</itunes:author>
+        <itunes:image href="https://example.com/artwork.jpg"/>
+        <itunes:explicit>false</itunes:explicit>
+        <itunes:category text="Technology"/>
+        <itunes:owner>
+            <itunes:name>Test Owner</itunes:name>
+            <itunes:email>test@example.com</itunes:email>
+        </itunes:owner>
+        <podcast:locked>yes</podcast:locked>
+        <podcast:guid>aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</podcast:guid>
+        <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title>Episode 1</title>
+            <guid isPermaLink="false">ep-001</guid>
+            <pubDate>Mon, 10 Feb 2026 12:00:00 +0000</pubDate>
+            <enclosure url="https://example.com/ep1.mp3" length="5000000" type="audio/mpeg"/>
+            <itunes:duration>1800</itunes:duration>
             <itunes:explicit>false</itunes:explicit>
-            <itunes:category text="Technology"/>
-            <itunes:owner>
-                <itunes:name>Test Owner</itunes:name>
-                <itunes:email>test@example.com</itunes:email>
-            </itunes:owner>
-            <podcast:locked>yes</podcast:locked>
-            <podcast:guid>aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</podcast:guid>
-            <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"/>
-            <item>
-                <title>Episode 1</title>
-                <guid isPermaLink="false">ep-001</guid>
-                <pubDate>Mon, 10 Feb 2026 12:00:00 +0000</pubDate>
-                <enclosure url="https://example.com/ep1.mp3" length="5000000" type="audio/mpeg"/>
-                <itunes:duration>1800</itunes:duration>
-                <itunes:explicit>false</itunes:explicit>
-            </item>
-        </channel>
-        </rss>
-        """
+        </item>
+    </channel>
+    </rss>
+    """
+
+private func writeFixture() throws -> String {
+    let path = "/tmp/pfm_template_\(UUID().uuidString).xml"
+    try sharedFixtureXML.write(toFile: path, atomically: true, encoding: .utf8)
+    return path
+}
+
+private func runAllowingExitCode(_ command: inout some ParsableCommand) throws {
+    do {
+        try command.run()
+    } catch is ExitCode {
+        // Expected: command signals status via ExitCode
+    }
+}
+
+// MARK: - Lint and Validate Integration
+
+@Suite("Template CLI Lint and Validate Integration")
+struct TemplateLintValidateTests {
 
     private let fixturePath: String
 
     init() throws {
-        fixturePath = "/tmp/pfm_template_\(UUID().uuidString).xml"
-        try Self.fixtureXML.write(toFile: fixturePath, atomically: true, encoding: .utf8)
-    }
-
-    private func runAllowingExitCode(_ command: inout some ParsableCommand) throws {
-        do {
-            try command.run()
-        } catch is ExitCode {
-            // Expected: command signals status via ExitCode
-        }
+        fixturePath = try writeFixture()
     }
 
     // MARK: - Lint with --template
@@ -155,6 +162,95 @@ struct TemplateIntegrationTests {
             fixturePath, "--format", "json", "--template", "standard"
         ])
         try runAllowingExitCode(&command)
+    }
+
+    // MARK: - Lint JSON with template warnings
+
+    @Test("Lint JSON format with basic template produces template warnings for missing recommended tags")
+    func lintJsonBasicTemplateWarnings() throws {
+        var command = try LintCommand.parse([
+            fixturePath, "--format", "json", "--template", "basic"
+        ])
+        do {
+            try command.run()
+        } catch is ExitCode {
+            // Expected: exit code for warnings (template warnings for missing recommended tags)
+        }
+    }
+
+    // MARK: - Lint JSON with template errors
+
+    @Test("Lint JSON format with basic template errors for feed missing required tags")
+    func lintJsonTemplateErrors() throws {
+        let minimalXML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Bare Minimum</title>
+                <link>https://example.com</link>
+                <description>No iTunes tags at all.</description>
+                <item>
+                    <title>Ep</title>
+                </item>
+            </channel>
+            </rss>
+            """
+        let errorPath = "/tmp/pfm_template_error_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: errorPath) }
+        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
+
+        var command = try LintCommand.parse([
+            errorPath, "--format", "json", "--template", "basic"
+        ])
+        do {
+            try command.run()
+            Issue.record("Expected ExitCode for feed with template errors")
+        } catch is ExitCode {
+            // Expected: exit code 1 for template errors
+        }
+    }
+
+    // MARK: - Validate JSON with errors and template
+
+    @Test("Validate JSON format with errors and template entries")
+    func validateJsonWithErrorsAndTemplate() throws {
+        let minimalXML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Minimal</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+                <item>
+                    <title>Ep</title>
+                </item>
+            </channel>
+            </rss>
+            """
+        let errorPath = "/tmp/pfm_validate_json_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: errorPath) }
+        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
+
+        var command = try ValidateCommand.parse([
+            errorPath, "--platform", "apple", "--format", "json", "--template", "standard"
+        ])
+        do {
+            try command.run()
+        } catch is ExitCode {
+            // Expected: errors for missing Apple and standard template requirements
+        }
+    }
+}
+
+// MARK: - Generate, Init, and TemplateName Integration
+
+@Suite("Template CLI Generate and Init Integration")
+struct TemplateGenerateInitTests {
+
+    private let fixturePath: String
+
+    init() throws {
+        fixturePath = try writeFixture()
     }
 
     // MARK: - Generate with --template
@@ -267,32 +363,10 @@ struct TemplateIntegrationTests {
         #expect(platforms.contains(.podcastIndex))
     }
 
-    // MARK: - Lint JSON with template warnings
-
-    @Test("Lint JSON format with basic template produces template warnings for missing recommended tags")
-    func lintJsonBasicTemplateWarnings() throws {
-        // The fixture feed has required basic tags (title, link, description,
-        // itunesCategory, itunesExplicit, itunesImage, itemTitle, itemEnclosure)
-        // but is missing recommended tags like itunesType (channel) and
-        // itemDescription (item) — producing template warnings.
-        var command = try LintCommand.parse([
-            fixturePath, "--format", "json", "--template", "basic"
-        ])
-        do {
-            try command.run()
-        } catch is ExitCode {
-            // Expected: exit code for warnings (template warnings for missing recommended tags)
-        }
-    }
-
     // MARK: - Lint JSON with template infos (suggestedLevel path)
 
     @Test("Lint JSON format with expert template produces info-level results with suggestedLevel")
     func lintJsonTemplateExpertInfos() throws {
-        // Build a feed that has tags beyond basic level so the basic template
-        // validator produces info-level results with suggestedLevel populated.
-        // Using a feed with podcast:locked + podcast:guid (standard-level tags)
-        // and validating against basic template to trigger infos.
         let xmlWithAdvancedTags = """
             <?xml version="1.0" encoding="UTF-8"?>
             <rss version="2.0"
@@ -333,8 +407,6 @@ struct TemplateIntegrationTests {
         defer { try? FileManager.default.removeItem(atPath: infoPath) }
         try xmlWithAdvancedTags.write(toFile: infoPath, atomically: true, encoding: .utf8)
 
-        // Use basic template against a feed with standard/advanced tags
-        // This should produce info-level results with suggestedLevel
         var command = try LintCommand.parse([
             infoPath, "--format", "json", "--template", "basic"
         ])
@@ -342,71 +414,6 @@ struct TemplateIntegrationTests {
             try command.run()
         } catch is ExitCode {
             // Expected: exit code for warnings/infos
-        }
-    }
-
-    // MARK: - Lint JSON with template errors (exercises errors map closure)
-
-    @Test("Lint JSON format with basic template errors for feed missing required tags")
-    func lintJsonTemplateErrors() throws {
-        // Feed missing required basic tags: itunesImage, itunesCategory, itunesExplicit
-        // This produces template ERRORS (not just warnings) in JSON output
-        let minimalXML = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
-            <channel>
-                <title>Bare Minimum</title>
-                <link>https://example.com</link>
-                <description>No iTunes tags at all.</description>
-                <item>
-                    <title>Ep</title>
-                </item>
-            </channel>
-            </rss>
-            """
-        let errorPath = "/tmp/pfm_template_error_\(UUID()).xml"
-        defer { try? FileManager.default.removeItem(atPath: errorPath) }
-        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
-
-        var command = try LintCommand.parse([
-            errorPath, "--format", "json", "--template", "basic"
-        ])
-        do {
-            try command.run()
-            Issue.record("Expected ExitCode for feed with template errors")
-        } catch is ExitCode {
-            // Expected: exit code 1 for template errors
-        }
-    }
-
-    // MARK: - Validate JSON with errors and template
-
-    @Test("Validate JSON format with errors and template entries")
-    func validateJsonWithErrorsAndTemplate() throws {
-        let minimalXML = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
-            <channel>
-                <title>Minimal</title>
-                <link>https://example.com</link>
-                <description>Test</description>
-                <item>
-                    <title>Ep</title>
-                </item>
-            </channel>
-            </rss>
-            """
-        let errorPath = "/tmp/pfm_validate_json_\(UUID()).xml"
-        defer { try? FileManager.default.removeItem(atPath: errorPath) }
-        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
-
-        var command = try ValidateCommand.parse([
-            errorPath, "--platform", "apple", "--format", "json", "--template", "standard"
-        ])
-        do {
-            try command.run()
-        } catch is ExitCode {
-            // Expected: errors for missing Apple and standard template requirements
         }
     }
 }

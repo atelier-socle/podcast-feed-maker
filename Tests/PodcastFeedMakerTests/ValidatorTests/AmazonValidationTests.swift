@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - AmazonValidationTests
 
@@ -11,23 +12,27 @@ struct AmazonValidationTests {
 
     // MARK: - Helpers
 
-    private func amazonFeed(items: [Item] = []) -> PodcastFeed {
-        PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "A podcast",
-            items: items,
-            itunesCategories: [ITunesCategory(text: "Tech")],
-            itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
-        ))
+    private func amazonFeed(items: [Item] = []) throws -> PodcastFeed {
+        let linkURL = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
+        return PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: linkURL,
+                description: "A podcast",
+                items: items,
+                itunesCategories: [ITunesCategory(text: "Tech")],
+                itunesExplicit: false,
+                itunesImage: imageURL
+            ))
     }
 
-    private func validItem() -> Item {
-        Item(
+    private func validItem() throws -> Item {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        return Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             ),
@@ -38,8 +43,8 @@ struct AmazonValidationTests {
     // MARK: - Valid Feed
 
     @Test("Valid Amazon feed passes")
-    func validFeedPasses() {
-        let feed = amazonFeed(items: [validItem()])
+    func validFeedPasses() throws {
+        let feed = try amazonFeed(items: [validItem()])
         let report = validator.validate(feed, for: .amazon)
         #expect(report.isValid)
     }
@@ -47,12 +52,13 @@ struct AmazonValidationTests {
     // MARK: - Required Fields
 
     @Test("Missing title is error")
-    func missingTitle() {
+    func missingTitle() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()]
+            items: [try validItem()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .amazon)
@@ -60,12 +66,13 @@ struct AmazonValidationTests {
     }
 
     @Test("Missing description is error")
-    func missingDescription() {
+    func missingDescription() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "",
-            items: [validItem()]
+            items: [try validItem()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .amazon)
@@ -73,8 +80,8 @@ struct AmazonValidationTests {
     }
 
     @Test("No items is error")
-    func noItems() {
-        let feed = amazonFeed(items: [])
+    func noItems() throws {
+        let feed = try amazonFeed(items: [])
         let report = validator.validate(feed, for: .amazon)
         #expect(report.errors.contains { $0.field == "channel.items" })
     }
@@ -82,17 +89,18 @@ struct AmazonValidationTests {
     // MARK: - Format Flexibility
 
     @Test("M4A enclosure has no error for Amazon")
-    func m4aAccepted() {
+    func m4aAccepted() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.m4a"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.m4a")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/x-m4a"
             ),
             guid: GUID(value: "ep-1", isPermaLink: false)
         )
-        let feed = amazonFeed(items: [item])
+        let feed = try amazonFeed(items: [item])
         let report = validator.validate(feed, for: .amazon)
         let typeErrors = report.errors.filter {
             $0.field.contains("enclosure.type")
@@ -103,35 +111,39 @@ struct AmazonValidationTests {
     // MARK: - Recommended Fields
 
     @Test("Missing itunes:image is warning")
-    func missingImageWarning() {
+    func missingImageWarning() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()]
+            items: [try validItem()]
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .amazon)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesImage"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesImage"
+            })
     }
 
     @Test("Missing GUID on item is warning")
-    func missingGuidWarning() {
+    func missingGuidWarning() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             )
         )
-        let feed = amazonFeed(items: [item])
+        let feed = try amazonFeed(items: [item])
         let report = validator.validate(feed, for: .amazon)
-        #expect(report.warnings.contains {
-            $0.field == "channel.items[0].guid"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].guid"
+            })
     }
 
     // MARK: - Missing Channel
@@ -146,46 +158,53 @@ struct AmazonValidationTests {
     // MARK: - Missing Recommended
 
     @Test("Missing itunes:category is warning")
-    func missingCategoryWarning() {
+    func missingCategoryWarning() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()],
+            items: [try validItem()],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .amazon)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesCategories"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesCategories"
+            })
     }
 
     @Test("Missing itunes:explicit is warning")
-    func missingExplicitWarning() {
+    func missingExplicitWarning() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()],
+            items: [try validItem()],
             itunesCategories: [ITunesCategory(text: "Tech")],
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .amazon)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesExplicit"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesExplicit"
+            })
     }
 
     @Test("Item without enclosure is error")
-    func itemNoEnclosure() {
+    func itemNoEnclosure() throws {
         let item = Item(title: "Episode")
-        let feed = amazonFeed(items: [item])
+        let feed = try amazonFeed(items: [item])
         let report = validator.validate(feed, for: .amazon)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0].enclosure"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0].enclosure"
+            })
     }
 }

@@ -3,30 +3,30 @@ import Testing
 
 @testable import PodcastFeedMaker
 
+// MARK: - Helpers
+
+private func makeFeed(
+    channelImage: URL? = nil,
+    items: [Item] = [],
+    atomLinks: [AtomLink] = [],
+    funding: [Funding] = []
+) throws -> PodcastFeed {
+    PodcastFeed(
+        channel: Channel(
+            title: "Podcast",
+            link: try #require(URL(string: "https://example.com")),
+            description: "A podcast",
+            items: items,
+            itunesImage: channelImage,
+            atomLinks: atomLinks,
+            funding: funding
+        ))
+}
+
 // MARK: - NetworkValidator Async Tests
 
 @Suite("NetworkValidator Async Tests", .serialized)
 struct NetworkValidatorAsyncTests {
-
-    // MARK: - Helpers
-
-    private func makeFeed(
-        channelImage: URL? = nil,
-        items: [Item] = [],
-        atomLinks: [AtomLink] = [],
-        funding: [Funding] = []
-    ) -> PodcastFeed {
-        PodcastFeed(
-            channel: Channel(
-                title: "Podcast",
-                link: URL(string: "https://example.com")!,
-                description: "A podcast",
-                items: items,
-                itunesImage: channelImage,
-                atomLinks: atomLinks,
-                funding: funding
-            ))
-    }
 
     // MARK: - checkArtwork
 
@@ -35,7 +35,7 @@ struct NetworkValidatorAsyncTests {
         let session = makeMockSession()
 
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed()
+        let feed = try makeFeed()
         let results = try await validator.checkArtwork(feed)
         #expect(results.isEmpty)
     }
@@ -51,7 +51,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let errors = results.filter { $0.severity == .error }
@@ -69,7 +69,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let errors = results.filter { $0.severity == .error }
@@ -84,7 +84,7 @@ struct NetworkValidatorAsyncTests {
         let session = makeMockSession()
 
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed()
+        let feed = try makeFeed()
         let results = try await validator.checkEnclosures(feed)
         #expect(results.isEmpty)
     }
@@ -104,13 +104,14 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
+        let enclosureURL = try #require(URL(string: url))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                url: enclosureURL, length: 1024, type: "audio/mpeg"
             )
         )
-        let feed = makeFeed(items: [item])
+        let feed = try makeFeed(items: [item])
         let results = try await validator.checkEnclosures(feed)
 
         let warnings = results.filter { $0.severity == .warning }
@@ -132,13 +133,14 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
+        let enclosureURL = try #require(URL(string: url))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                url: enclosureURL, length: 1024, type: "audio/mpeg"
             )
         )
-        let feed = makeFeed(items: [item])
+        let feed = try makeFeed(items: [item])
         let results = try await validator.checkEnclosures(feed)
 
         let warnings = results.filter {
@@ -158,7 +160,6 @@ struct NetworkValidatorAsyncTests {
         let atomURL = "https://cdn.example.com/async-all-feed.xml"
         let fundURL = "https://cdn.example.com/async-all-fund"
 
-
         for url in [artURL, encURL, atomURL, fundURL] {
             MockResponseStore.shared.set(
                 MockResponse(data: Data(), statusCode: 200),
@@ -168,17 +169,20 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
+        let enclosureURL = try #require(URL(string: encURL))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: encURL)!, length: 1024, type: "audio/mpeg"
+                url: enclosureURL, length: 1024, type: "audio/mpeg"
             )
         )
-        let feed = makeFeed(
+        let atomLinkURL = try #require(URL(string: atomURL))
+        let fundingURL = try #require(URL(string: fundURL))
+        let feed = try makeFeed(
             channelImage: URL(string: artURL),
             items: [item],
-            atomLinks: [AtomLink(href: URL(string: atomURL)!, rel: "self")],
-            funding: [Funding(url: URL(string: fundURL)!, message: "Support")]
+            atomLinks: [AtomLink(href: atomLinkURL, rel: "self")],
+            funding: [Funding(url: fundingURL, message: "Support")]
         )
         let results = try await validator.checkAllURLs(feed)
 
@@ -199,7 +203,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let infos = results.filter { $0.severity == .info }
@@ -219,7 +223,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let errors = results.filter { $0.severity == .error }
@@ -238,7 +242,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let warnings = results.filter { $0.severity == .warning }
@@ -252,17 +256,23 @@ struct NetworkValidatorAsyncTests {
     func networkErrorProducesError() async throws {
         let url = "https://cdn.example.com/async-missing-url.jpg"
 
-        // Not registering URL → MockURLProtocol returns fileDoesNotExist error
+        // Not registering URL -> MockURLProtocol returns fileDoesNotExist error
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let errors = results.filter { $0.severity == .error }
         #expect(errors.count >= 1)
         #expect(errors.first?.message.contains("Network error") == true)
     }
+}
+
+// MARK: - NetworkValidator Async Extended Tests
+
+@Suite("NetworkValidator Async Extended Tests", .serialized)
+struct NetworkValidatorAsyncExtendedTests {
 
     // MARK: - Content Type with no expectedType
 
@@ -281,7 +291,7 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         // Artwork URLs have no expectedType, so content-type mismatch should not trigger
@@ -320,11 +330,12 @@ struct NetworkValidatorAsyncTests {
                 MockResponse(data: Data(), statusCode: 200),
                 for: url
             )
+            let enclosureURL = try #require(URL(string: url))
             items.append(
                 Item(
                     title: "Episode \(i)",
                     enclosure: Enclosure(
-                        url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                        url: enclosureURL, length: 1024, type: "audio/mpeg"
                     )
                 )
             )
@@ -333,7 +344,7 @@ struct NetworkValidatorAsyncTests {
         let session = makeMockSession()
         let validator = NetworkValidator(
             session: session, maxConcurrency: 3)
-        let feed = makeFeed(items: items)
+        let feed = try makeFeed(items: items)
         let results = try await validator.checkEnclosures(feed)
 
         let errors = results.filter { $0.severity == .error }
@@ -354,7 +365,7 @@ struct NetworkValidatorAsyncTests {
         let session = makeMockSession()
         let validator = NetworkValidator(
             session: session, timeout: 5, maxConcurrency: 2)
-        let feed = makeFeed(channelImage: URL(string: url))
+        let feed = try makeFeed(channelImage: URL(string: url))
         let results = try await validator.checkArtwork(feed)
 
         let errors = results.filter { $0.severity == .error }
@@ -374,13 +385,14 @@ struct NetworkValidatorAsyncTests {
 
         let session = makeMockSession()
         let validator = NetworkValidator(session: session)
+        let enclosureURL = try #require(URL(string: url))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                url: enclosureURL, length: 1024, type: "audio/mpeg"
             )
         )
-        let feed = makeFeed(items: [item])
+        let feed = try makeFeed(items: [item])
         let results = try await validator.checkEnclosures(feed)
 
         let mismatches = results.filter {

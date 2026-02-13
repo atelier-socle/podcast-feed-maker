@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - EnclosureTests
 
@@ -15,8 +16,8 @@ struct EnclosureTests {
     // MARK: - Initialization (String type)
 
     @Test("Enclosure can be initialized with string type")
-    func enclosureInitWithStringType() {
-        let url = URL(string: "https://example.com/audio.mp3")!
+    func enclosureInitWithStringType() throws {
+        let url = try #require(URL(string: "https://example.com/audio.mp3"))
         let enclosure = Enclosure(url: url, length: 12345, type: "audio/mpeg")
 
         #expect(enclosure.url == url)
@@ -27,8 +28,8 @@ struct EnclosureTests {
     // MARK: - Initialization (MIMEType)
 
     @Test("Enclosure can be initialized with MIMEType enum")
-    func enclosureInitWithMimeType() {
-        let url = URL(string: "https://example.com/audio.mp3")!
+    func enclosureInitWithMimeType() throws {
+        let url = try #require(URL(string: "https://example.com/audio.mp3"))
         let enclosure = Enclosure(url: url, length: 12345, mimeType: .mpeg)
 
         #expect(enclosure.url == url)
@@ -37,8 +38,8 @@ struct EnclosureTests {
     }
 
     @Test("Enclosure MIMEType convenience init sets correct type string")
-    func enclosureMimeTypeConvenience() {
-        let url = URL(string: "https://example.com/audio.m4a")!
+    func enclosureMimeTypeConvenience() throws {
+        let url = try #require(URL(string: "https://example.com/audio.m4a"))
         let enclosure = Enclosure(url: url, length: 9999, mimeType: .m4a)
         #expect(enclosure.type == "audio/m4a")
     }
@@ -68,18 +69,20 @@ struct EnclosureTests {
     // MARK: - Properties
 
     @Test("Enclosure properties are mutable")
-    func enclosurePropertiesAreMutable() {
+    func enclosurePropertiesAreMutable() throws {
+        let oldURL = try #require(URL(string: "https://example.com/old.mp3"))
         var enclosure = Enclosure(
-            url: URL(string: "https://example.com/old.mp3")!,
+            url: oldURL,
             length: 100,
             type: "audio/mpeg"
         )
 
-        enclosure.url = URL(string: "https://example.com/new.mp3")!
+        let newURL = try #require(URL(string: "https://example.com/new.mp3"))
+        enclosure.url = newURL
         enclosure.length = 200
         enclosure.type = "audio/m4a"
 
-        #expect(enclosure.url == URL(string: "https://example.com/new.mp3")!)
+        #expect(enclosure.url == newURL)
         #expect(enclosure.length == 200)
         #expect(enclosure.type == "audio/m4a")
     }
@@ -87,10 +90,17 @@ struct EnclosureTests {
     // MARK: - XML Generation
 
     @Test("Enclosure generates expected XML via XMLBuilder")
-    func enclosureXmlRepresentation() {
-        let url = URL(string: "https://example.com/audio.m4a")!
+    func enclosureXmlRepresentation() throws {
+        let url = try #require(URL(string: "https://example.com/audio.m4a"))
         let enclosure = Enclosure(url: url, length: 9999, mimeType: .m4a)
-        let xml = XMLBuilder().selfClosingElement("enclosure", attributes: [("url", XMLBuilder.encodeURL(enclosure.url)), ("length", "\(enclosure.length)"), ("type", "\(enclosure.type)")])
+        let xml = XMLBuilder().selfClosingElement(
+            "enclosure",
+            attributes: [
+                ("url", XMLBuilder.encodeURL(enclosure.url)),
+                ("length", "\(enclosure.length)"),
+                ("type", "\(enclosure.type)")
+            ]
+        )
 
         #expect(xml.contains(#"<enclosure url="https://example.com/audio.m4a""#))
         #expect(xml.contains(#"length="9999""#))
@@ -99,33 +109,42 @@ struct EnclosureTests {
     }
 
     @Test("Enclosure XMLBuilder handles file URL gracefully")
-    func enclosureXmlHandlesFileUrl() {
-        let fileURL = URL(string: "file:///tmp/audio.mp3")!
+    func enclosureXmlHandlesFileUrl() throws {
+        let fileURL = try #require(URL(string: "file:///tmp/audio.mp3"))
         let enclosure = Enclosure(url: fileURL, length: 1000, type: "audio/mpeg")
         // Generation encodes the URL as-is; validation is handled by FeedValidator
-        let xml = XMLBuilder().selfClosingElement("enclosure", attributes: [("url", XMLBuilder.encodeURL(enclosure.url)), ("length", "\(enclosure.length)"), ("type", "\(enclosure.type)")])
+        let xml = XMLBuilder().selfClosingElement(
+            "enclosure",
+            attributes: [
+                ("url", XMLBuilder.encodeURL(enclosure.url)),
+                ("length", "\(enclosure.length)"),
+                ("type", "\(enclosure.type)")
+            ]
+        )
         #expect(xml.contains("enclosure"))
     }
 
     // MARK: - Item Integration
 
     @Test("Item can hold an Enclosure")
-    func itemCanHoldEnclosure() {
+    func itemCanHoldEnclosure() throws {
+        let url = try #require(URL(string: "https://example.com/ep1.mp3"))
         let enclosure = Enclosure(
-            url: URL(string: "https://example.com/ep1.mp3")!,
+            url: url,
             length: 50000,
             mimeType: .mpeg
         )
         let item = Item(enclosure: enclosure)
-        #expect(item.enclosure?.url == URL(string: "https://example.com/ep1.mp3")!)
+        #expect(item.enclosure?.url == url)
         #expect(item.enclosure?.length == 50000)
         #expect(item.enclosure?.type == "audio/mpeg")
     }
 
     @Test("Item XML contains enclosure tag when set")
-    func itemXmlContainsEnclosure() {
+    func itemXmlContainsEnclosure() throws {
+        let url = try #require(URL(string: "https://example.com/ep1.mp3"))
         let enclosure = Enclosure(
-            url: URL(string: "https://example.com/ep1.mp3")!,
+            url: url,
             length: 50000,
             mimeType: .mpeg
         )
@@ -144,31 +163,33 @@ struct EnclosureTests {
     // MARK: - Equatable
 
     @Test("Enclosures with same properties are equal")
-    func enclosuresEqual() {
-        let url = URL(string: "https://example.com/a.mp3")!
+    func enclosuresEqual() throws {
+        let url = try #require(URL(string: "https://example.com/a.mp3"))
         let enc1 = Enclosure(url: url, length: 100, type: "audio/mpeg")
         let enc2 = Enclosure(url: url, length: 100, type: "audio/mpeg")
         #expect(enc1 == enc2)
     }
 
     @Test("Enclosures with different URLs are not equal")
-    func enclosuresDifferentUrls() {
-        let enc1 = Enclosure(url: URL(string: "https://a.com/a.mp3")!, length: 100, type: "audio/mpeg")
-        let enc2 = Enclosure(url: URL(string: "https://b.com/b.mp3")!, length: 100, type: "audio/mpeg")
+    func enclosuresDifferentUrls() throws {
+        let urlA = try #require(URL(string: "https://a.com/a.mp3"))
+        let urlB = try #require(URL(string: "https://b.com/b.mp3"))
+        let enc1 = Enclosure(url: urlA, length: 100, type: "audio/mpeg")
+        let enc2 = Enclosure(url: urlB, length: 100, type: "audio/mpeg")
         #expect(enc1 != enc2)
     }
 
     @Test("Enclosures with different lengths are not equal")
-    func enclosuresDifferentLengths() {
-        let url = URL(string: "https://example.com/a.mp3")!
+    func enclosuresDifferentLengths() throws {
+        let url = try #require(URL(string: "https://example.com/a.mp3"))
         let enc1 = Enclosure(url: url, length: 100, type: "audio/mpeg")
         let enc2 = Enclosure(url: url, length: 200, type: "audio/mpeg")
         #expect(enc1 != enc2)
     }
 
     @Test("Enclosures with different types are not equal")
-    func enclosuresDifferentTypes() {
-        let url = URL(string: "https://example.com/a.mp3")!
+    func enclosuresDifferentTypes() throws {
+        let url = try #require(URL(string: "https://example.com/a.mp3"))
         let enc1 = Enclosure(url: url, length: 100, type: "audio/mpeg")
         let enc2 = Enclosure(url: url, length: 100, type: "audio/m4a")
         #expect(enc1 != enc2)
@@ -177,8 +198,8 @@ struct EnclosureTests {
     // MARK: - Hashable
 
     @Test("Enclosure is Hashable")
-    func enclosureHashable() {
-        let url = URL(string: "https://example.com/a.mp3")!
+    func enclosureHashable() throws {
+        let url = try #require(URL(string: "https://example.com/a.mp3"))
         let enclosure = Enclosure(url: url, length: 100, type: "audio/mpeg")
         let set: Set = [enclosure]
         #expect(set.contains(Enclosure(url: url, length: 100, type: "audio/mpeg")))
@@ -188,8 +209,9 @@ struct EnclosureTests {
 
     @Test("Enclosure can be encoded and decoded via JSON")
     func enclosureCodable() throws {
+        let url = try #require(URL(string: "https://example.com/ep.mp3"))
         let enclosure = Enclosure(
-            url: URL(string: "https://example.com/ep.mp3")!,
+            url: url,
             length: 12345,
             mimeType: .mpeg
         )

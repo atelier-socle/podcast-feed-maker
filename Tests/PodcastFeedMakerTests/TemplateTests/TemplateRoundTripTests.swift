@@ -6,16 +6,14 @@ import Testing
 @Suite("Template Round-Trip")
 struct TemplateRoundTripTests {
 
-    private let testURL = URL(string: "https://example.com")!
-    private let feedURL = URL(string: "https://example.com/feed.xml")!
-    private let imageURL = URL(string: "https://example.com/art.jpg")!
-
-    @Test("basic template → generate → parse → channel.title matches")
+    @Test("basic template -> generate -> parse -> channel.title matches")
     func basicRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.basic(
             title: "Round Trip Show", link: testURL, description: "Testing round-trip"
         ) { ch in
-            ch.category(.technology).explicit(false).image(self.imageURL.absoluteString)
+            ch.category(.technology).explicit(false).image(imageURL.absoluteString)
         }
 
         let xml = try FeedGenerator().generate(feed)
@@ -27,8 +25,11 @@ struct TemplateRoundTripTests {
         #expect(parsed.channel?.itunesImage == imageURL)
     }
 
-    @Test("standard template → generate → parse → validate against template")
+    @Test("standard template -> generate -> parse -> validate against template")
     func standardRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Standard Show", link: testURL, description: "A standard podcast"
         ) { ch in
@@ -38,8 +39,8 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
         }
 
@@ -52,6 +53,9 @@ struct TemplateRoundTripTests {
 
     @Test("standard template passes PSP-1 platform validation after round-trip")
     func standardPSP1RoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "PSP-1 Show", link: testURL, description: "Compliant"
         ) { ch in
@@ -61,8 +65,8 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
         }
 
@@ -75,6 +79,9 @@ struct TemplateRoundTripTests {
 
     @Test("advanced template round-trips with items")
     func advancedWithItemsRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         var feed = PodcastFeed.advanced(
             title: "Advanced Show", link: testURL, description: "Rich metadata"
         ) { ch in
@@ -84,8 +91,8 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
                 .medium(.podcast)
         }
@@ -110,6 +117,9 @@ struct TemplateRoundTripTests {
 
     @Test("detectLevel after round-trip matches original template level")
     func detectLevelAfterRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         let feed = PodcastFeed.standard(
             title: "Level Test", link: testURL, description: "Testing"
         ) { ch in
@@ -119,8 +129,8 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
         }
 
@@ -131,8 +141,11 @@ struct TemplateRoundTripTests {
         #expect(level >= .standard)
     }
 
-    @Test("expert template → generate → parse → validate against template")
+    @Test("expert template -> generate -> parse -> validate against template")
     func expertRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         var feed = PodcastFeed.expert(
             title: "Expert Show", link: testURL, description: "Full coverage"
         ) { ch in
@@ -142,14 +155,15 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
                 .medium(.podcast)
                 .funding(url: "https://example.com/donate", text: "Support")
         }
         feed.channel?.persons = [PodcastPerson(name: "Host")]
 
+        let transcriptURL = try #require(URL(string: "https://example.com/ep1.srt"))
         var item = Item(
             title: "Episode 1",
             enclosure: Enclosure.mp3(url: "https://example.com/ep1.mp3", length: 50_000),
@@ -159,7 +173,7 @@ struct TemplateRoundTripTests {
             itunesExplicit: false
         )
         item.transcripts = [
-            Transcript(url: URL(string: "https://example.com/ep1.srt")!, type: "application/srt")
+            Transcript(url: transcriptURL, type: "application/srt")
         ]
         feed.channel?.items = [item]
 
@@ -174,12 +188,14 @@ struct TemplateRoundTripTests {
 
     @Test("Apple platform validation passes after basic template round-trip")
     func applePlatformRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let imageURL = try Self.makeImageURL()
         var feed = PodcastFeed.basic(
             title: "Apple Show", link: testURL, description: "Apple-compatible podcast"
         ) { ch in
             ch.category(.technology)
                 .explicit(false)
-                .image(self.imageURL.absoluteString)
+                .image(imageURL.absoluteString)
                 .author("Host")
                 .language("en")
         }
@@ -202,6 +218,9 @@ struct TemplateRoundTripTests {
 
     @Test("all-platform validation passes after standard template with PSP-1 fields")
     func allPlatformRoundTrip() throws {
+        let testURL = try Self.makeTestURL()
+        let feedURL = try Self.makeFeedURL()
+        let imageURL = try Self.makeImageURL()
         var feed = PodcastFeed.standard(
             title: "Universal Show", link: testURL, description: "Cross-platform podcast"
         ) { ch in
@@ -211,8 +230,8 @@ struct TemplateRoundTripTests {
                 .owner(name: "Host", email: "h@example.com")
                 .locked(owner: "h@example.com")
                 .guid("aaaa-bbbb-cccc")
-                .atomLink(href: self.feedURL.absoluteString, rel: "self")
-                .image(self.imageURL.absoluteString)
+                .atomLink(href: feedURL.absoluteString, rel: "self")
+                .image(imageURL.absoluteString)
                 .language("en")
         }
 
@@ -233,5 +252,19 @@ struct TemplateRoundTripTests {
             let report = FeedValidator().validate(parsed, for: platform)
             #expect(report.errors.isEmpty, "Platform \(platform) should have no errors")
         }
+    }
+
+    // MARK: - Helpers
+
+    private static func makeTestURL() throws -> URL {
+        try #require(URL(string: "https://example.com"))
+    }
+
+    private static func makeFeedURL() throws -> URL {
+        try #require(URL(string: "https://example.com/feed.xml"))
+    }
+
+    private static func makeImageURL() throws -> URL {
+        try #require(URL(string: "https://example.com/art.jpg"))
     }
 }

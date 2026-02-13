@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - JSONChapterListTests
 
@@ -11,10 +12,12 @@ struct JSONChapterListTests {
 
     @Test("Encode JSONChapterList to JSON contains version and chapters")
     func encodeToJSON() throws {
-        let list = JSONChapterList(version: "1.2.0", chapters: [
-            JSONChapter(startTime: 0, title: "Intro"),
-            JSONChapter(startTime: 300, title: "Main Topic"),
-        ])
+        let list = JSONChapterList(
+            version: "1.2.0",
+            chapters: [
+                JSONChapter(startTime: 0, title: "Intro"),
+                JSONChapter(startTime: 300, title: "Main Topic")
+            ])
         let data = try JSONEncoder().encode(list)
         let json = try #require(
             JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -55,22 +58,24 @@ struct JSONChapterListTests {
 
     @Test("Round-trip encode then decode preserves equality")
     func roundTrip() throws {
-        let original = JSONChapterList(version: "1.2.0", chapters: [
-            JSONChapter(startTime: 0, title: "Intro"),
-            JSONChapter(
-                startTime: 60,
-                title: "Chapter 1",
-                endTime: 120,
-                url: URL(string: "https://example.com/ch1"),
-                img: URL(string: "https://example.com/ch1.jpg"),
-                toc: true,
-                location: PodcastLocation(
-                    name: "Austin, TX",
-                    geo: "geo:30.2672,-97.7431",
-                    osm: "R113314"
+        let original = JSONChapterList(
+            version: "1.2.0",
+            chapters: [
+                JSONChapter(startTime: 0, title: "Intro"),
+                JSONChapter(
+                    startTime: 60,
+                    title: "Chapter 1",
+                    endTime: 120,
+                    url: URL(string: "https://example.com/ch1"),
+                    img: URL(string: "https://example.com/ch1.jpg"),
+                    toc: true,
+                    location: PodcastLocation(
+                        name: "Austin, TX",
+                        geo: "geo:30.2672,-97.7431",
+                        osm: "R113314"
+                    )
                 )
-            ),
-        ])
+            ])
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
         let data = try encoder.encode(original)
@@ -203,13 +208,13 @@ struct JSONChapterListTests {
     @Test("JSONChapterList conforms to Equatable")
     func equatable() {
         let a = JSONChapterList(chapters: [
-            JSONChapter(startTime: 0, title: "A"),
+            JSONChapter(startTime: 0, title: "A")
         ])
         let b = JSONChapterList(chapters: [
-            JSONChapter(startTime: 0, title: "A"),
+            JSONChapter(startTime: 0, title: "A")
         ])
         let c = JSONChapterList(chapters: [
-            JSONChapter(startTime: 0, title: "B"),
+            JSONChapter(startTime: 0, title: "B")
         ])
         #expect(a == b)
         #expect(a != c)

@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - Gap 1: PodcastImage
 
@@ -8,9 +9,9 @@ import Testing
 struct PodcastImageComplianceTests {
 
     @Test("PodcastImage model stores all 7 attributes")
-    func modelAttributes() {
+    func modelAttributes() throws {
         let image = PodcastImage(
-            href: URL(string: "https://example.com/art.jpg")!,
+            href: try #require(URL(string: "https://example.com/art.jpg")),
             alt: "Show art",
             aspectRatio: "1/1",
             width: 3000,
@@ -28,8 +29,8 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("PodcastImage defaults are nil")
-    func modelDefaults() {
-        let image = PodcastImage(href: URL(string: "https://example.com/a.jpg")!)
+    func modelDefaults() throws {
+        let image = PodcastImage(href: try #require(URL(string: "https://example.com/a.jpg")))
         #expect(image.alt == nil)
         #expect(image.aspectRatio == nil)
         #expect(image.width == nil)
@@ -39,23 +40,23 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("Channel holds multiple podcast:image elements")
-    func channelMultipleImages() {
+    func channelMultipleImages() throws {
         let images = [
-            PodcastImage(href: URL(string: "https://example.com/art.jpg")!, purpose: "artwork"),
-            PodcastImage(href: URL(string: "https://example.com/social.jpg")!, purpose: "social"),
+            PodcastImage(href: try #require(URL(string: "https://example.com/art.jpg")), purpose: "artwork"),
+            PodcastImage(href: try #require(URL(string: "https://example.com/social.jpg")), purpose: "social")
         ]
         let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
             podcastImages: images
         )
         #expect(channel.podcastImages.count == 2)
     }
 
     @Test("Item holds multiple podcast:image elements")
-    func itemMultipleImages() {
+    func itemMultipleImages() throws {
         var item = Item(title: "Ep")
         item.podcastImages = [
-            PodcastImage(href: URL(string: "https://example.com/ep-art.jpg")!, purpose: "artwork"),
+            PodcastImage(href: try #require(URL(string: "https://example.com/ep-art.jpg")), purpose: "artwork")
         ]
         #expect(item.podcastImages.count == 1)
     }
@@ -63,17 +64,17 @@ struct PodcastImageComplianceTests {
     @Test("Generator emits podcast:image with aspect-ratio hyphen")
     func generatorEmitsImage() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.podcastImages = [
             PodcastImage(
-                href: URL(string: "https://example.com/art.jpg")!,
+                href: try #require(URL(string: "https://example.com/art.jpg")),
                 alt: "Art",
                 aspectRatio: "1/1",
                 width: 3000,
                 type: "image/jpeg",
                 purpose: "artwork"
-            ),
+            )
         ]
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -132,18 +133,18 @@ struct PodcastImageComplianceTests {
     @Test("podcast:image round-trips")
     func imageRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.podcastImages = [
             PodcastImage(
-                href: URL(string: "https://example.com/art.jpg")!,
+                href: try #require(URL(string: "https://example.com/art.jpg")),
                 alt: "Art",
                 aspectRatio: "16/9",
                 width: 1920,
                 height: 1080,
                 type: "image/png",
                 purpose: "social"
-            ),
+            )
         ]
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -158,12 +159,12 @@ struct PodcastImageComplianceTests {
     }
 
     @Test("NamespaceResolver detects podcast:image")
-    func namespaceResolverDetects() {
+    func namespaceResolverDetects() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.podcastImages = [
-            PodcastImage(href: URL(string: "https://example.com/art.jpg")!),
+            PodcastImage(href: try #require(URL(string: "https://example.com/art.jpg")))
         ]
         let feed = PodcastFeed(channel: channel)
         let ns = NamespaceResolver.resolve(feed)
@@ -178,11 +179,12 @@ struct PodcastPublisherComplianceTests {
 
     @Test("PodcastPublisher uses remoteItem container")
     func modelStructure() {
-        let pub = PodcastPublisher(remoteItem: RemoteItem(
-            feedGuid: "abc-123",
-            feedUrl: URL(string: "https://example.com/feed.xml"),
-            medium: "publisher"
-        ))
+        let pub = PodcastPublisher(
+            remoteItem: RemoteItem(
+                feedGuid: "abc-123",
+                feedUrl: URL(string: "https://example.com/feed.xml"),
+                medium: "publisher"
+            ))
         #expect(pub.remoteItem.feedGuid == "abc-123")
         #expect(pub.remoteItem.medium == "publisher")
     }
@@ -190,13 +192,14 @@ struct PodcastPublisherComplianceTests {
     @Test("Generator emits publisher container with remoteItem")
     func generatorEmitsContainer() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
-        channel.publisher = PodcastPublisher(remoteItem: RemoteItem(
-            feedGuid: "pub-guid-1",
-            feedUrl: URL(string: "https://publisher.example.com/feed.xml"),
-            medium: "publisher"
-        ))
+        channel.publisher = PodcastPublisher(
+            remoteItem: RemoteItem(
+                feedGuid: "pub-guid-1",
+                feedUrl: URL(string: "https://publisher.example.com/feed.xml"),
+                medium: "publisher"
+            ))
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
         #expect(xml.contains("<podcast:publisher>"))
@@ -230,13 +233,14 @@ struct PodcastPublisherComplianceTests {
     @Test("Publisher round-trips")
     func publisherRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
-        channel.publisher = PodcastPublisher(remoteItem: RemoteItem(
-            feedGuid: "my-pub-guid",
-            feedUrl: URL(string: "https://publisher.example.com/feed.xml"),
-            medium: "publisher"
-        ))
+        channel.publisher = PodcastPublisher(
+            remoteItem: RemoteItem(
+                feedGuid: "my-pub-guid",
+                feedUrl: URL(string: "https://publisher.example.com/feed.xml"),
+                medium: "publisher"
+            ))
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
         let reparsed = try FeedParser().parse(xml)
@@ -245,9 +249,9 @@ struct PodcastPublisherComplianceTests {
     }
 
     @Test("Builder creates publisher with remoteItem")
-    func builderPublisher() {
+    func builderPublisher() throws {
         let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         ).publisher(feedGuid: "abc", feedUrl: "https://pub.example.com/feed.xml")
         #expect(channel.publisher?.remoteItem.feedGuid == "abc")
         #expect(channel.publisher?.remoteItem.medium == "publisher")
@@ -273,12 +277,12 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Channel supports multiple locations")
-    func channelMultipleLocations() {
+    func channelMultipleLocations() throws {
         let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D",
             locations: [
                 PodcastLocation(name: "Austin", rel: "creator", country: "US"),
-                PodcastLocation(name: "Paris", rel: "subject", country: "FR"),
+                PodcastLocation(name: "Paris", rel: "subject", country: "FR")
             ]
         )
         #expect(channel.locations.count == 2)
@@ -286,9 +290,9 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Location computed property backward compatibility")
-    func computedPropertyBackwardCompat() {
+    func computedPropertyBackwardCompat() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.location = PodcastLocation(name: "Berlin")
         #expect(channel.locations.count == 1)
@@ -300,10 +304,10 @@ struct PodcastLocationComplianceTests {
     @Test("Generator emits rel and country attributes")
     func generatorEmitsAttributes() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.locations = [
-            PodcastLocation(name: "NYC", geo: "geo:40.7,-74.0", rel: "creator", country: "US"),
+            PodcastLocation(name: "NYC", geo: "geo:40.7,-74.0", rel: "creator", country: "US")
         ]
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -338,10 +342,10 @@ struct PodcastLocationComplianceTests {
     @Test("Location round-trips with rel and country")
     func locationRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.locations = [
-            PodcastLocation(name: "Berlin", rel: "creator", country: "DE"),
+            PodcastLocation(name: "Berlin", rel: "creator", country: "DE")
         ]
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
@@ -353,9 +357,9 @@ struct PodcastLocationComplianceTests {
     }
 
     @Test("Builder creates location with rel and country")
-    func builderLocation() {
+    func builderLocation() throws {
         let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         ).location(name: "NYC", geo: "geo:40.7,-74.0", rel: "creator", country: "US")
         #expect(channel.locations.count == 1)
         #expect(channel.locations[0].rel == "creator")
@@ -415,7 +419,7 @@ struct PodcastImagesComplianceTests {
     @Test("podcast:images srcset round-trips")
     func srcsetRoundTrip() throws {
         var channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
+            title: "T", link: try #require(URL(string: "https://example.com")), description: "D"
         )
         channel.podcastImagesSrcset = PodcastImages(
             srcset: "https://example.com/art-3000.jpg 3000w, https://example.com/art-600.jpg 600w"
@@ -424,219 +428,5 @@ struct PodcastImagesComplianceTests {
         let xml = try FeedGenerator().generate(feed)
         let reparsed = try FeedParser().parse(xml)
         #expect(reparsed.channel?.podcastImagesSrcset?.srcset.contains("3000w") == true)
-    }
-}
-
-// MARK: - Gap 5: itunes:new-feed-url
-
-@Suite("Spec Compliance — itunes:new-feed-url")
-struct ItunesNewFeedUrlComplianceTests {
-
-    @Test("Builder sets new feed URL")
-    func builderNewFeedUrl() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
-        ).newFeedUrl("https://example.com/new-feed.xml")
-        #expect(channel.itunesNewFeedUrl?.absoluteString == "https://example.com/new-feed.xml")
-    }
-
-    @Test("CrossCutting warns when new-feed-url is not HTTPS")
-    func crossCuttingHttpWarning() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            itunesNewFeedUrl: URL(string: "http://example.com/feed.xml")
-        )
-        let feed = PodcastFeed(channel: channel)
-        let results = CrossCuttingValidation.validate(feed)
-        let hasWarning = results.contains {
-            $0.field == "channel.itunesNewFeedUrl" && $0.severity == .warning
-        }
-        #expect(hasWarning)
-    }
-
-    @Test("CrossCutting no warning for HTTPS new-feed-url")
-    func crossCuttingHttpsOk() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            itunesNewFeedUrl: URL(string: "https://example.com/feed.xml")
-        )
-        let feed = PodcastFeed(channel: channel)
-        let results = CrossCuttingValidation.validate(feed)
-        let hasWarning = results.contains {
-            $0.field == "channel.itunesNewFeedUrl" && $0.severity == .warning
-        }
-        #expect(!hasWarning)
-    }
-
-    @Test("Apple validation shows INFO when new-feed-url present")
-    func appleInfoWhenPresent() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            items: [Item(title: "Ep", enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!, length: 1000, type: "audio/mpeg"
-            ))],
-            itunesCategories: [ITunesCategory(text: "Technology")],
-            itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg"),
-            itunesNewFeedUrl: URL(string: "https://example.com/new.xml")
-        )
-        let feed = PodcastFeed(channel: channel)
-        let results = AppleValidation.validate(feed)
-        let hasInfo = results.contains { (result: ValidationResult) in
-            result.field == "channel.itunesNewFeedUrl" && result.severity == .info
-        }
-        #expect(hasInfo)
-    }
-
-    @Test("itunes:new-feed-url round-trips")
-    func newFeedUrlRoundTrip() throws {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            itunesNewFeedUrl: URL(string: "https://example.com/new-feed.xml")
-        )
-        let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
-        let xml = try FeedGenerator().generate(feed)
-        #expect(xml.contains("<itunes:new-feed-url>https://example.com/new-feed.xml</itunes:new-feed-url>"))
-        let reparsed = try FeedParser().parse(xml)
-        #expect(reparsed.channel?.itunesNewFeedUrl?.absoluteString == "https://example.com/new-feed.xml")
-    }
-}
-
-// MARK: - Gap 6: itunes:complete
-
-@Suite("Spec Compliance — itunes:complete")
-struct ItunesCompleteComplianceTests {
-
-    @Test("Builder sets complete flag")
-    func builderComplete() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
-        ).complete(true)
-        #expect(channel.itunesComplete == true)
-    }
-
-    @Test("CrossCutting emits INFO when complete is true")
-    func crossCuttingInfo() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            itunesComplete: true
-        )
-        let feed = PodcastFeed(channel: channel)
-        let results = CrossCuttingValidation.validate(feed)
-        let hasInfo = results.contains {
-            $0.field == "channel.itunesComplete" && $0.severity == .info
-        }
-        #expect(hasInfo)
-    }
-
-    @Test("CrossCutting no INFO when complete is nil")
-    func crossCuttingNoInfoWhenNil() {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D"
-        )
-        let feed = PodcastFeed(channel: channel)
-        let results = CrossCuttingValidation.validate(feed)
-        let hasInfo = results.contains {
-            $0.field == "channel.itunesComplete"
-        }
-        #expect(!hasInfo)
-    }
-
-    @Test("itunes:complete round-trips")
-    func completeRoundTrip() throws {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            itunesComplete: true
-        )
-        let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
-        let xml = try FeedGenerator().generate(feed)
-        #expect(xml.contains("<itunes:complete>yes</itunes:complete>"))
-        let reparsed = try FeedParser().parse(xml)
-        #expect(reparsed.channel?.itunesComplete == true)
-    }
-}
-
-// MARK: - Gap 7: RSS Category domain
-
-@Suite("Spec Compliance — RSS Category domain")
-struct RSSCategoryDomainComplianceTests {
-
-    @Test("RSSCategory stores domain attribute")
-    func modelDomain() {
-        let cat = RSSCategory(value: "Technology", domain: "tech")
-        #expect(cat.value == "Technology")
-        #expect(cat.domain == "tech")
-    }
-
-    @Test("Generator emits domain attribute")
-    func generatorDomain() throws {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            categories: [RSSCategory(value: "Technology", domain: "tech")]
-        )
-        let feed = PodcastFeed(channel: channel)
-        let xml = try FeedGenerator().generate(feed)
-        #expect(xml.contains(#"<category domain="tech">Technology</category>"#))
-    }
-
-    @Test("Parser reads domain from channel category")
-    func parserChannelDomain() throws {
-        let xml = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rss version="2.0">
-              <channel>
-                <title>T</title><link>https://example.com</link>
-                <description>D</description>
-                <category domain="tech">Technology</category>
-                <category>Education</category>
-              </channel>
-            </rss>
-            """
-        let feed = try FeedParser().parse(xml)
-        let cats = try #require(feed.channel?.categories)
-        #expect(cats.count == 2)
-        #expect(cats[0].domain == "tech")
-        #expect(cats[0].value == "Technology")
-        #expect(cats[1].domain == nil)
-        #expect(cats[1].value == "Education")
-    }
-
-    @Test("Parser reads domain from item category")
-    func parserItemDomain() throws {
-        let xml = """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <rss version="2.0">
-              <channel>
-                <title>T</title><link>https://example.com</link>
-                <description>D</description>
-                <item>
-                  <title>Ep</title>
-                  <category domain="episodes">Season 1</category>
-                </item>
-              </channel>
-            </rss>
-            """
-        let feed = try FeedParser().parse(xml)
-        let cat = try #require(feed.channel?.items.first?.categories.first)
-        #expect(cat.domain == "episodes")
-        #expect(cat.value == "Season 1")
-    }
-
-    @Test("RSS category domain round-trips")
-    func domainRoundTrip() throws {
-        let channel = Channel(
-            title: "T", link: URL(string: "https://example.com")!, description: "D",
-            categories: [
-                RSSCategory(value: "Technology", domain: "tech"),
-                RSSCategory(value: "Education"),
-            ]
-        )
-        let feed = PodcastFeed(channel: channel)
-        let xml = try FeedGenerator().generate(feed)
-        let reparsed = try FeedParser().parse(xml)
-        let cats = try #require(reparsed.channel?.categories)
-        #expect(cats.count == 2)
-        #expect(cats[0].domain == "tech")
-        #expect(cats[1].domain == nil)
     }
 }

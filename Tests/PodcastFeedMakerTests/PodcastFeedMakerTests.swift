@@ -1,19 +1,22 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastFeedMakerTests {
 
     @Test
     func test_xmlRepresentation_generatesValidFeed() throws {
+        let channelLink = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/image.jpg"))
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: channelLink,
             description: "Welcome to the show!",
             itunesAuthor: "Jane Doe",
             itunesCategories: [ITunesCategory(.technology)],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/image.jpg")!
+            itunesImage: imageURL
         )
 
         let feed = PodcastFeed(channel: channel)
@@ -41,9 +44,10 @@ struct PodcastFeedMakerTests {
 
     @Test("generateStream yields chunks")
     func generateStreamYieldsChunks() async throws {
+        let streamLink = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Stream Test",
-            link: URL(string: "https://example.com")!,
+            link: streamLink,
             description: "Testing stream"
         )
         let feed = PodcastFeed(channel: channel)
@@ -58,9 +62,10 @@ struct PodcastFeedMakerTests {
 
     @Test("generateStream with prettyPrint false")
     func generateStreamMinified() async throws {
+        let minLink = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Stream Test",
-            link: URL(string: "https://example.com")!,
+            link: minLink,
             description: "Testing stream"
         )
         let feed = PodcastFeed(channel: channel)

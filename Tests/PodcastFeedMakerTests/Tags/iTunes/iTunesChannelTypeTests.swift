@@ -1,8 +1,9 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesChannelTypeTests {
+@testable import PodcastFeedMaker
+
+struct ITunesChannelTypeTests {
 
     // MARK: - Enum Cases
 
@@ -46,10 +47,10 @@ struct iTunesChannelTypeTests {
     // MARK: - Channel Integration
 
     @Test
-    func test_channel_itunesType_episodic() {
+    func test_channel_itunesType_episodic() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesType: .episodic
         )
@@ -57,10 +58,10 @@ struct iTunesChannelTypeTests {
     }
 
     @Test
-    func test_channel_itunesType_serial() {
+    func test_channel_itunesType_serial() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesType: .serial
         )
@@ -68,10 +69,10 @@ struct iTunesChannelTypeTests {
     }
 
     @Test
-    func test_channel_itunesType_defaultsToNil() {
+    func test_channel_itunesType_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesType == nil)

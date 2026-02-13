@@ -1,48 +1,50 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - Channel Builder Tests
 
 @Suite("Channel Fluent Builder")
 struct ChannelBuilderTests {
 
-    private func baseChannel() -> Channel {
-        Channel(
+    private func baseChannel() throws -> Channel {
+        let url = try #require(URL(string: "https://example.com"))
+        return Channel(
             title: "Test Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "A test podcast"
         )
     }
 
     @Test("author sets itunesAuthor")
-    func authorSetsItunesAuthor() {
-        let channel = baseChannel().author("John Doe")
+    func authorSetsItunesAuthor() throws {
+        let channel = try baseChannel().author("John Doe")
         #expect(channel.itunesAuthor == "John Doe")
     }
 
     @Test("language sets language")
-    func languageSetsLanguage() {
-        let channel = baseChannel().language("en-us")
+    func languageSetsLanguage() throws {
+        let channel = try baseChannel().language("en-us")
         #expect(channel.language == "en-us")
     }
 
     @Test("copyright sets copyright")
-    func copyrightSetsCopyright() {
-        let channel = baseChannel().copyright("2025 Acme")
+    func copyrightSetsCopyright() throws {
+        let channel = try baseChannel().copyright("2025 Acme")
         #expect(channel.copyright == "2025 Acme")
     }
 
     @Test("category appends itunesCategories")
-    func categoryAppendsCategory() {
-        let channel = baseChannel().category(.technology)
+    func categoryAppendsCategory() throws {
+        let channel = try baseChannel().category(.technology)
         #expect(channel.itunesCategories.count == 1)
         #expect(channel.itunesCategories[0].text == "Technology")
     }
 
     @Test("categories replaces all itunesCategories")
-    func categoriesReplacesAll() {
-        let channel = baseChannel()
+    func categoriesReplacesAll() throws {
+        let channel = try baseChannel()
             .category(.technology)
             .categories([.music(), .news()])
         #expect(channel.itunesCategories.count == 2)
@@ -50,74 +52,74 @@ struct ChannelBuilderTests {
     }
 
     @Test("explicit sets itunesExplicit")
-    func explicitSetsFlag() {
-        let channel = baseChannel().explicit(false)
+    func explicitSetsFlag() throws {
+        let channel = try baseChannel().explicit(false)
         #expect(channel.itunesExplicit == false)
     }
 
     @Test("image sets itunesImage")
-    func imageSetsImage() {
-        let channel = baseChannel().image("https://example.com/art.jpg")
+    func imageSetsImage() throws {
+        let channel = try baseChannel().image("https://example.com/art.jpg")
         #expect(channel.itunesImage?.absoluteString == "https://example.com/art.jpg")
     }
 
     @Test("type sets itunesType")
-    func typeSetsType() {
-        let channel = baseChannel().type("serial")
+    func typeSetsType() throws {
+        let channel = try baseChannel().type("serial")
         #expect(channel.itunesType == .serial)
     }
 
     @Test("owner sets itunesOwner")
-    func ownerSetsOwner() {
-        let channel = baseChannel().owner(name: "John", email: "john@test.com")
+    func ownerSetsOwner() throws {
+        let channel = try baseChannel().owner(name: "John", email: "john@test.com")
         #expect(channel.itunesOwner?.name == "John")
         #expect(channel.itunesOwner?.email == "john@test.com")
     }
 
     @Test("locked sets locked with owner")
-    func lockedSetsLocked() {
-        let channel = baseChannel().locked(owner: "owner@test.com")
+    func lockedSetsLocked() throws {
+        let channel = try baseChannel().locked(owner: "owner@test.com")
         #expect(channel.locked?.isLocked == true)
         #expect(channel.locked?.owner == "owner@test.com")
     }
 
     @Test("guid sets podcastGuid")
-    func guidSetsGuid() {
-        let channel = baseChannel().guid("abc-123")
+    func guidSetsGuid() throws {
+        let channel = try baseChannel().guid("abc-123")
         #expect(channel.podcastGuid?.value == "abc-123")
     }
 
     @Test("funding appends funding")
-    func fundingAppendsFunding() {
-        let channel = baseChannel().funding(url: "https://patreon.com/test", text: "Support us")
+    func fundingAppendsFunding() throws {
+        let channel = try baseChannel().funding(url: "https://patreon.com/test", text: "Support us")
         #expect(channel.funding.count == 1)
         #expect(channel.funding[0].message == "Support us")
     }
 
     @Test("atomLink appends atom link")
-    func atomLinkAppendsLink() {
-        let channel = baseChannel().atomLink(href: "https://example.com/feed", rel: "self")
+    func atomLinkAppendsLink() throws {
+        let channel = try baseChannel().atomLink(href: "https://example.com/feed", rel: "self")
         #expect(channel.atomLinks.count == 1)
         #expect(channel.atomLinks[0].rel == "self")
     }
 
     @Test("medium sets medium")
-    func mediumSetsMedium() {
-        let channel = baseChannel().medium(.podcast)
+    func mediumSetsMedium() throws {
+        let channel = try baseChannel().medium(.podcast)
         #expect(channel.medium == .podcast)
     }
 
     @Test("publisher sets publisher")
-    func publisherSetsPublisher() {
-        let channel = baseChannel().publisher(feedGuid: "pub-guid-1", feedUrl: "https://network.com/feed.xml")
+    func publisherSetsPublisher() throws {
+        let channel = try baseChannel().publisher(feedGuid: "pub-guid-1", feedUrl: "https://network.com/feed.xml")
         #expect(channel.publisher?.remoteItem.feedGuid == "pub-guid-1")
         #expect(channel.publisher?.remoteItem.feedUrl?.absoluteString == "https://network.com/feed.xml")
         #expect(channel.publisher?.remoteItem.medium == "publisher")
     }
 
     @Test("chained modifiers produce correct model")
-    func chainedModifiers() {
-        let channel = baseChannel()
+    func chainedModifiers() throws {
+        let channel = try baseChannel()
             .author("Host Name")
             .category(.technology)
             .explicit(false)
@@ -300,9 +302,10 @@ struct FullUsageExampleTests {
 
     @Test("Full usage example from spec compiles and produces valid model")
     func fullUsageExample() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "A great podcast"
         )
         .author("Host Name")

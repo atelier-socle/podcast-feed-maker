@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - Helpers
 
@@ -107,8 +108,9 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits unknown channel elements")
     func generatorEmitsChannelUnknowns() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc",
             unknownElements: [
                 UnknownElement(name: "custom:tag", textContent: "value")
@@ -122,13 +124,16 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits unknown item elements")
     func generatorEmitsItemUnknowns() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc",
             items: [
-                Item(title: "Ep", unknownElements: [
-                    UnknownElement(name: "custom:score", textContent: "10")
-                ])
+                Item(
+                    title: "Ep",
+                    unknownElements: [
+                        UnknownElement(name: "custom:score", textContent: "10")
+                    ])
             ]
         )
         let generator = FeedGenerator()
@@ -139,8 +144,9 @@ struct UnknownElementPreservationTests {
     @Test("Generator emits attributes on unknown elements")
     func generatorEmitsAttrs() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc",
             unknownElements: [
                 UnknownElement(name: "custom:meta", attributes: ["key": "val"], textContent: "text")
@@ -205,8 +211,9 @@ struct XMLCommentPreservationTests {
     @Test("Generator emits channel comments")
     func generatorEmitsChannelComments() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc",
             xmlComments: ["Channel note"]
         )
@@ -218,8 +225,9 @@ struct XMLCommentPreservationTests {
     @Test("Generator emits item comments")
     func generatorEmitsItemComments() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc",
             items: [
                 Item(title: "Ep", xmlComments: ["Item note"])
@@ -286,16 +294,16 @@ struct CDATATrackingTests {
     @Test("Parser tracks multiple CDATA fields")
     func parserTracksMultipleCDATA() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description><![CDATA[Description]]></description>
-            <itunes:summary><![CDATA[Summary text]]></itunes:summary>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description><![CDATA[Description]]></description>
+                <itunes:summary><![CDATA[Summary text]]></itunes:summary>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         let channel = try #require(feed.channel)
         #expect(channel.cdataFields.contains("description"))
@@ -305,8 +313,9 @@ struct CDATATrackingTests {
     @Test("Generator uses CDATA for tracked fields")
     func generatorUsesCDATA() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Plain text description",
             cdataFields: ["description"]
         )
@@ -318,8 +327,9 @@ struct CDATATrackingTests {
     @Test("Generator does not use CDATA for non-tracked fields")
     func generatorDoesNotUseCDATAForNonTracked() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Plain text"
         )
         let generator = FeedGenerator()
@@ -343,16 +353,16 @@ struct CDATATrackingTests {
     @Test("Round-trip preserves CDATA wrapping on itunes:summary")
     func roundTripCDATASummary() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description>Desc</description>
-            <itunes:summary><![CDATA[Summary with no HTML]]></itunes:summary>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+                <itunes:summary><![CDATA[Summary with no HTML]]></itunes:summary>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         let generator = FeedGenerator(namespaceMode: .feedDefined)
         let output = try generator.generate(feed)
@@ -362,8 +372,9 @@ struct CDATATrackingTests {
     @Test("Default behavior unchanged (no cdataFields uses smartElement logic)")
     func defaultBehaviorUnchanged() throws {
         var feed = PodcastFeed(namespaces: [.itunes])
+        let linkURL = try #require(URL(string: "https://example.com"))
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Contains <b>HTML</b> content"
         )
         let generator = FeedGenerator()
@@ -381,15 +392,15 @@ struct NamespacePrefixPreservationTests {
     @Test("Parser records prefix-to-URI mappings")
     func parserRecordsPrefixMappings() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description>Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         #expect(feed.namespacePrefixes["itunes"] == "http://www.itunes.com/dtds/podcast-1.0.dtd")
         #expect(feed.namespacePrefixes["atom"] == "http://www.w3.org/2005/Atom")
@@ -398,15 +409,15 @@ struct NamespacePrefixPreservationTests {
     @Test("Parser records custom prefix for iTunes URI")
     func parserRecordsCustomPrefix() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:apple="http://www.itunes.com/dtds/podcast-1.0.dtd">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description>Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:apple="http://www.itunes.com/dtds/podcast-1.0.dtd">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         #expect(feed.namespacePrefixes["apple"] == "http://www.itunes.com/dtds/podcast-1.0.dtd")
     }
@@ -414,15 +425,15 @@ struct NamespacePrefixPreservationTests {
     @Test("Parser records standard prefixes correctly")
     func parserRecordsStandardPrefixes() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description>Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         #expect(feed.namespacePrefixes["podcast"] == "https://podcastindex.org/namespace/1.0")
         #expect(feed.namespacePrefixes["dc"] == "http://purl.org/dc/elements/1.1/")
@@ -430,12 +441,13 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .parsed mode uses stored prefixes")
     func generatorParsedModeUsesPrefixes() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
         var feed = PodcastFeed(
             namespaces: [.itunes],
             namespacePrefixes: ["apple": "http://www.itunes.com/dtds/podcast-1.0.dtd"]
         )
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc"
         )
         let generator = FeedGenerator(namespaceMode: .parsed)
@@ -445,9 +457,10 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .parsed mode with empty prefixes falls back to standard")
     func generatorParsedFallback() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
         var feed = PodcastFeed(namespaces: [.itunes])
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc"
         )
         let generator = FeedGenerator(namespaceMode: .parsed)
@@ -457,12 +470,13 @@ struct NamespacePrefixPreservationTests {
 
     @Test("Generator .feedDefined mode ignores stored prefixes (no regression)")
     func generatorFeedDefinedIgnoresPrefixes() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
         var feed = PodcastFeed(
             namespaces: [.itunes],
             namespacePrefixes: ["apple": "http://www.itunes.com/dtds/podcast-1.0.dtd"]
         )
         feed.channel = Channel(
-            title: "Test", link: URL(string: "https://example.com")!,
+            title: "Test", link: linkURL,
             description: "Desc"
         )
         let generator = FeedGenerator(namespaceMode: .feedDefined)
@@ -475,15 +489,15 @@ struct NamespacePrefixPreservationTests {
     @Test("Round-trip preserves original prefix declarations")
     func roundTripPrefixes() throws {
         let xml = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:apple="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:podcast="https://podcastindex.org/namespace/1.0">
-          <channel>
-            <title>Test</title>
-            <link>https://example.com</link>
-            <description>Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:apple="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+              <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Desc</description>
+              </channel>
+            </rss>
+            """
         let feed = try parse(xml)
         let generator = FeedGenerator(namespaceMode: .parsed)
         let output = try generator.generate(feed)

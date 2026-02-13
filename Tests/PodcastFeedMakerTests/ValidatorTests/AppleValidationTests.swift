@@ -3,10 +3,10 @@ import Testing
 
 @testable import PodcastFeedMaker
 
-// MARK: - AppleValidationTests
+// MARK: - Apple Validation — Required Fields
 
-@Suite("Apple Validation Tests")
-struct AppleValidationTests {
+@Suite("Apple Validation — Required Fields")
+struct AppleRequiredFieldsTests {
 
     private let validator = FeedValidator()
 
@@ -21,11 +21,12 @@ struct AppleValidationTests {
         itunesOwner: ITunesOwner? = ITunesOwner(name: "Host", email: "h@e.com"),
         language: String? = "en",
         itunesType: ITunesShowType? = .episodic
-    ) -> PodcastFeed {
-        PodcastFeed(
+    ) throws -> PodcastFeed {
+        let url = try #require(URL(string: "https://example.com"))
+        return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: URL(string: "https://example.com")!,
+                link: url,
                 description: "A great podcast",
                 language: language,
                 items: items,
@@ -38,11 +39,13 @@ struct AppleValidationTests {
             ))
     }
 
-    private func validItem(index: Int = 0) -> Item {
-        Item(
+    private func validItem(index: Int = 0) throws -> Item {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep\(index).mp3"))
+        let imageURL = try #require(URL(string: "https://example.com/ep\(index).jpg"))
+        return Item(
             title: "Episode \(index)",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep\(index).mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             ),
@@ -51,15 +54,15 @@ struct AppleValidationTests {
             itunesDuration: 600,
             itunesEpisodeType: .full,
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/ep\(index).jpg")!
+            itunesImage: imageURL
         )
     }
 
     // MARK: - All Required Present
 
     @Test("Valid Apple feed passes")
-    func validFeedPasses() {
-        let feed = appleFeed(items: [validItem()])
+    func validFeedPasses() throws {
+        let feed = try appleFeed(items: [validItem()])
         let report = validator.validate(feed, for: .apple)
         #expect(report.isValid)
     }
@@ -67,15 +70,17 @@ struct AppleValidationTests {
     // MARK: - Missing Required Fields
 
     @Test("Missing title is error")
-    func missingTitle() {
+    func missingTitle() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: "",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()],
+            items: [try validItem()],
             itunesCategories: [ITunesCategory(text: "Tech")],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
@@ -83,15 +88,17 @@ struct AppleValidationTests {
     }
 
     @Test("Missing description is error")
-    func missingDescription() {
+    func missingDescription() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "",
-            items: [validItem()],
+            items: [try validItem()],
             itunesCategories: [ITunesCategory(text: "Tech")],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
@@ -99,15 +106,15 @@ struct AppleValidationTests {
     }
 
     @Test("Missing itunes:image is error")
-    func missingImage() {
-        let feed = appleFeed(items: [validItem()], itunesImage: nil)
+    func missingImage() throws {
+        let feed = try appleFeed(items: [validItem()], itunesImage: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(report.errors.contains { $0.field == "channel.itunesImage" })
     }
 
     @Test("Missing itunes:category is error")
-    func missingCategory() {
-        let feed = appleFeed(items: [validItem()], itunesCategories: [])
+    func missingCategory() throws {
+        let feed = try appleFeed(items: [validItem()], itunesCategories: [])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.errors.contains {
@@ -116,8 +123,8 @@ struct AppleValidationTests {
     }
 
     @Test("Missing itunes:explicit is error")
-    func missingExplicit() {
-        let feed = appleFeed(items: [validItem()], itunesExplicit: nil)
+    func missingExplicit() throws {
+        let feed = try appleFeed(items: [validItem()], itunesExplicit: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.errors.contains {
@@ -126,9 +133,9 @@ struct AppleValidationTests {
     }
 
     @Test("No items with enclosure is error")
-    func noItemsWithEnclosure() {
+    func noItemsWithEnclosure() throws {
         let itemNoEnclosure = Item(title: "Ep")
-        let feed = appleFeed(items: [itemNoEnclosure])
+        let feed = try appleFeed(items: [itemNoEnclosure])
         let report = validator.validate(feed, for: .apple)
         #expect(report.errors.contains { $0.field == "channel.items" })
     }
@@ -136,8 +143,8 @@ struct AppleValidationTests {
     // MARK: - HTTPS Enforcement
 
     @Test("HTTP artwork URL is error")
-    func httpArtworkURL() {
-        let feed = appleFeed(
+    func httpArtworkURL() throws {
+        let feed = try appleFeed(
             items: [validItem()],
             itunesImage: URL(string: "http://example.com/art.jpg")
         )
@@ -150,16 +157,17 @@ struct AppleValidationTests {
     }
 
     @Test("HTTP enclosure URL is error")
-    func httpEnclosureURL() {
+    func httpEnclosureURL() throws {
+        let enclosureURL = try #require(URL(string: "http://example.com/ep.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "http://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             )
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.errors.contains {
@@ -168,8 +176,8 @@ struct AppleValidationTests {
     }
 
     @Test("HTTPS enclosure URL passes")
-    func httpsEnclosureURL() {
-        let feed = appleFeed(items: [validItem()])
+    func httpsEnclosureURL() throws {
+        let feed = try appleFeed(items: [validItem()])
         let report = validator.validate(feed, for: .apple)
         let urlErrors = report.errors.filter {
             $0.field.contains("enclosure.url")
@@ -180,16 +188,17 @@ struct AppleValidationTests {
     // MARK: - Audio Type
 
     @Test("Unsupported audio type is error")
-    func unsupportedAudioType() {
+    func unsupportedAudioType() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.wma"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.wma")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/x-ms-wma"
             )
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.errors.contains {
@@ -200,8 +209,8 @@ struct AppleValidationTests {
     // MARK: - Recommended Fields
 
     @Test("Missing itunes:author is warning")
-    func missingAuthorWarning() {
-        let feed = appleFeed(items: [validItem()], itunesAuthor: nil)
+    func missingAuthorWarning() throws {
+        let feed = try appleFeed(items: [validItem()], itunesAuthor: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -210,8 +219,8 @@ struct AppleValidationTests {
     }
 
     @Test("Missing itunes:owner is warning")
-    func missingOwnerWarning() {
-        let feed = appleFeed(items: [validItem()], itunesOwner: nil)
+    func missingOwnerWarning() throws {
+        let feed = try appleFeed(items: [validItem()], itunesOwner: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -220,8 +229,8 @@ struct AppleValidationTests {
     }
 
     @Test("Missing language is warning")
-    func missingLanguageWarning() {
-        let feed = appleFeed(items: [validItem()], language: nil)
+    func missingLanguageWarning() throws {
+        let feed = try appleFeed(items: [validItem()], language: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -230,25 +239,73 @@ struct AppleValidationTests {
     }
 
     @Test("Missing itunes:type is info")
-    func missingTypeInfo() {
-        let feed = appleFeed(items: [validItem()], itunesType: nil)
+    func missingTypeInfo() throws {
+        let feed = try appleFeed(items: [validItem()], itunesType: nil)
         let report = validator.validate(feed, for: .apple)
         #expect(report.infos.contains { $0.field == "channel.itunesType" })
+    }
+}
+
+// MARK: - Apple Validation — Content Rules
+
+@Suite("Apple Validation — Content Rules")
+struct AppleContentRulesTests {
+
+    private let validator = FeedValidator()
+
+    // MARK: - Helpers
+
+    private func appleFeed(items: [Item] = []) throws -> PodcastFeed {
+        let url = try #require(URL(string: "https://example.com"))
+        return PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "A great podcast",
+                language: "en",
+                items: items,
+                itunesAuthor: "Author",
+                itunesCategories: [ITunesCategory(text: "Technology")],
+                itunesExplicit: false,
+                itunesImage: URL(string: "https://example.com/art.jpg"),
+                itunesOwner: ITunesOwner(name: "Host", email: "h@e.com"),
+                itunesType: .episodic
+            ))
+    }
+
+    private func validItem(index: Int = 0) throws -> Item {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep\(index).mp3"))
+        let imageURL = try #require(URL(string: "https://example.com/ep\(index).jpg"))
+        return Item(
+            title: "Episode \(index)",
+            enclosure: Enclosure(
+                url: enclosureURL,
+                length: 1024,
+                type: "audio/mpeg"
+            ),
+            guid: GUID(value: "ep-\(index)", isPermaLink: false),
+            pubDate: Date(),
+            itunesDuration: 600,
+            itunesEpisodeType: .full,
+            itunesExplicit: false,
+            itunesImage: imageURL
+        )
     }
 
     // MARK: - Item Recommendations
 
     @Test("Item missing GUID generates warning")
-    func itemMissingGuid() {
+    func itemMissingGuid() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             )
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -257,17 +314,18 @@ struct AppleValidationTests {
     }
 
     @Test("Item missing pubDate generates warning")
-    func itemMissingPubDate() {
+    func itemMissingPubDate() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             ),
             guid: GUID(value: "ep-1", isPermaLink: false)
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -278,16 +336,18 @@ struct AppleValidationTests {
     // MARK: - Length Checks
 
     @Test("Title over 255 chars generates warning")
-    func longTitle() {
+    func longTitle() throws {
         let longTitle = String(repeating: "a", count: 300)
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: longTitle,
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: "desc",
-            items: [validItem()],
+            items: [try validItem()],
             itunesCategories: [ITunesCategory(text: "Tech")],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
@@ -298,16 +358,18 @@ struct AppleValidationTests {
     }
 
     @Test("Description over 4000 chars generates warning")
-    func longDescription() {
+    func longDescription() throws {
         let longDesc = String(repeating: "a", count: 4500)
+        let url = try #require(URL(string: "https://example.com"))
+        let imageURL = try #require(URL(string: "https://example.com/art.jpg"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: url,
             description: longDesc,
-            items: [validItem()],
+            items: [try validItem()],
             itunesCategories: [ITunesCategory(text: "Tech")],
             itunesExplicit: false,
-            itunesImage: URL(string: "https://example.com/art.jpg")!
+            itunesImage: imageURL
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
@@ -320,9 +382,9 @@ struct AppleValidationTests {
     // MARK: - Cross-Field Validation
 
     @Test("Duration without enclosure is warning")
-    func durationWithoutEnclosure() {
+    func durationWithoutEnclosure() throws {
         let item = Item(title: "Episode", itunesDuration: 600)
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {
@@ -331,9 +393,23 @@ struct AppleValidationTests {
     }
 
     @Test("Serial show without season/episode tags is info")
-    func serialNoSeasonEpisode() {
-        let item = validItem()
-        let feed = appleFeed(items: [item], itunesType: .serial)
+    func serialNoSeasonEpisode() throws {
+        let item = try validItem()
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "A great podcast",
+                language: "en",
+                items: [item],
+                itunesAuthor: "Author",
+                itunesCategories: [ITunesCategory(text: "Technology")],
+                itunesExplicit: false,
+                itunesImage: URL(string: "https://example.com/art.jpg"),
+                itunesOwner: ITunesOwner(name: "Host", email: "h@e.com"),
+                itunesType: .serial
+            ))
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.infos.contains {
@@ -342,10 +418,24 @@ struct AppleValidationTests {
     }
 
     @Test("Serial show with season tag does not warn")
-    func serialWithSeason() {
-        var item = validItem()
+    func serialWithSeason() throws {
+        var item = try validItem()
         item.itunesSeason = 1
-        let feed = appleFeed(items: [item], itunesType: .serial)
+        let url = try #require(URL(string: "https://example.com"))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: url,
+                description: "A great podcast",
+                language: "en",
+                items: [item],
+                itunesAuthor: "Author",
+                itunesCategories: [ITunesCategory(text: "Technology")],
+                itunesExplicit: false,
+                itunesImage: URL(string: "https://example.com/art.jpg"),
+                itunesOwner: ITunesOwner(name: "Host", email: "h@e.com"),
+                itunesType: .serial
+            ))
         let report = validator.validate(feed, for: .apple)
         #expect(
             !report.infos.contains {
@@ -356,15 +446,16 @@ struct AppleValidationTests {
     // MARK: - Item Without Title or Description
 
     @Test("Item with neither title nor description is error for Apple")
-    func itemNoTitleNoDescription() {
+    func itemNoTitleNoDescription() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             )
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.errors.contains {
@@ -374,11 +465,12 @@ struct AppleValidationTests {
     }
 
     @Test("Item with only description but no title passes Apple title check")
-    func itemWithDescriptionOnly() {
+    func itemWithDescriptionOnly() throws {
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
         let item = Item(
             description: "An episode description",
             enclosure: Enclosure(
-                url: URL(string: "https://example.com/ep.mp3")!,
+                url: enclosureURL,
                 length: 1024,
                 type: "audio/mpeg"
             ),
@@ -389,7 +481,7 @@ struct AppleValidationTests {
             itunesExplicit: false,
             itunesImage: URL(string: "https://example.com/ep.jpg")
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             !report.errors.contains {
@@ -401,10 +493,10 @@ struct AppleValidationTests {
     // MARK: - Non-ASCII Enclosure URL
 
     @Test("Percent-encoded URL does not trigger non-ASCII warning")
-    func percentEncodedEnclosureURL() {
+    func percentEncodedEnclosureURL() throws {
         // Foundation's URL(string:) percent-encodes non-ASCII chars,
         // so absoluteString remains ASCII. Verify no false positive.
-        let encodedURL = URL(string: "https://example.com/%C3%A9pisode.mp3")!
+        let encodedURL = try #require(URL(string: "https://example.com/%C3%A9pisode.mp3"))
         let item = Item(
             title: "Episode",
             enclosure: Enclosure(
@@ -419,7 +511,7 @@ struct AppleValidationTests {
             itunesExplicit: false,
             itunesImage: URL(string: "https://example.com/ep.jpg")
         )
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             !report.warnings.contains {
@@ -428,8 +520,8 @@ struct AppleValidationTests {
     }
 
     @Test("ASCII enclosure URL does not trigger non-ASCII warning")
-    func asciiEnclosureURL() {
-        let feed = appleFeed(items: [validItem()])
+    func asciiEnclosureURL() throws {
+        let feed = try appleFeed(items: [validItem()])
         let report = validator.validate(feed, for: .apple)
         #expect(
             !report.warnings.contains {
@@ -440,10 +532,10 @@ struct AppleValidationTests {
     // MARK: - Item Description Length
 
     @Test("Item description over 4000 bytes generates warning")
-    func itemLongDescription() {
-        var item = validItem()
+    func itemLongDescription() throws {
+        var item = try validItem()
         item.description = String(repeating: "x", count: 4500)
-        let feed = appleFeed(items: [item])
+        let feed = try appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
         #expect(
             report.warnings.contains {

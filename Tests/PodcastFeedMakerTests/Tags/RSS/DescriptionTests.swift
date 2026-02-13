@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - DescriptionTests
 
@@ -15,10 +16,11 @@ struct DescriptionTests {
     // MARK: - Channel Description
 
     @Test("Channel requires a description at initialization")
-    func channelDescriptionIsRequired() {
+    func channelDescriptionIsRequired() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "A great podcast about Swift"
         )
 
@@ -26,10 +28,11 @@ struct DescriptionTests {
     }
 
     @Test("Channel description is mutable")
-    func channelDescriptionIsMutable() {
+    func channelDescriptionIsMutable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         var channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Original"
         )
 
@@ -39,9 +42,10 @@ struct DescriptionTests {
 
     @Test("Channel XML contains description tag")
     func channelXmlContainsDescription() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "This is my show"
         )
 
@@ -51,9 +55,10 @@ struct DescriptionTests {
 
     @Test("Channel XML wraps HTML-containing description in CDATA")
     func channelXmlWrapsHtmlDescriptionInCDATA() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "This is a <b>great</b> & useful podcast"
         )
 
@@ -106,16 +111,16 @@ struct DescriptionTests {
     // MARK: - Equatable
 
     @Test("Channels with same description are equal")
-    func channelsWithSameDescriptionAreEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithSameDescriptionAreEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "Same")
         let channel2 = Channel(title: "T", link: url, description: "Same")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different descriptions are not equal")
-    func channelsWithDifferentDescriptionsAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithDifferentDescriptionsAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "A")
         let channel2 = Channel(title: "T", link: url, description: "B")
         #expect(channel1 != channel2)

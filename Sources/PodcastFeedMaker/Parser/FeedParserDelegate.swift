@@ -56,7 +56,6 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     var channelLanguage: String?
     var channelCopyright: String?
     var channelManagingEditor: String?
-    // swiftlint:disable:next inclusive_language
     var channelWebMaster: String?
     var channelPubDate: Date?
     var channelLastBuildDate: Date?

@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct HelpersTests {
     @Test
@@ -35,7 +36,8 @@ struct HelpersTests {
         )
 
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: -2 * 60 * 60)!
+        let tz = try #require(TimeZone(secondsFromGMT: -2 * 60 * 60))
+        calendar.timeZone = tz
         calendar.locale = Locale(identifier: "en_US")
 
         let date = try #require(calendar.date(from: components))
@@ -44,28 +46,31 @@ struct HelpersTests {
 
     @Test
     func testValidateURL() throws {
-        try XMLBuilder.validateURL(URL(string: "https://swift.org")!, context: "test")
+        let validURL = try #require(URL(string: "https://swift.org"))
+        try XMLBuilder.validateURL(validURL, context: "test")
 
+        let ftpURL = try #require(URL(string: "ftp://invalid-url"))
         #expect(throws: GeneratorError.self) {
-            try XMLBuilder.validateURL(URL(string: "ftp://invalid-url")!, context: "test")
+            try XMLBuilder.validateURL(ftpURL, context: "test")
         }
 
+        let fileURL = try #require(URL(string: "file://file_path"))
         #expect(throws: GeneratorError.self) {
-            try XMLBuilder.validateURL(URL(string: "file://file_path")!, context: "test")
+            try XMLBuilder.validateURL(fileURL, context: "test")
         }
     }
 
     @Test
-    func testEncodeURL() {
-        let input = URL(string: "https://swift.org/search?query=école+swift&lang=fr")!
+    func testEncodeURL() throws {
+        let input = try #require(URL(string: "https://swift.org/search?query=école+swift&lang=fr"))
         let encoded = XMLBuilder.encodeURL(input)
         #expect(encoded.contains("query=%C3%A9cole+swift"))
         #expect(encoded.contains("lang=fr"))
     }
 
     @Test
-    func test_encodeURL_returnsEscapedStringOrFallback() {
-        let url = URL(string: "https://example.com/query?param=ç©🎉")!
+    func test_encodeURL_returnsEscapedStringOrFallback() throws {
+        let url = try #require(URL(string: "https://example.com/query?param=ç©🎉"))
         let encoded = XMLBuilder.encodeURL(url)
         #expect(encoded.starts(with: "https://example.com"))
     }

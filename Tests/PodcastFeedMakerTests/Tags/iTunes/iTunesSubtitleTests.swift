@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesSubtitleTests {
+@testable import PodcastFeedMaker
+
+struct ITunesSubtitleTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesSubtitle_shouldStoreValue() {
+    func test_channel_itunesSubtitle_shouldStoreValue() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSubtitle: "Welcome to the show"
         )
@@ -18,20 +19,20 @@ struct iTunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_defaultsToNil() {
+    func test_channel_itunesSubtitle_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesSubtitle == nil)
     }
 
     @Test
-    func test_channel_itunesSubtitle_withEmptyString() {
+    func test_channel_itunesSubtitle_withEmptyString() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSubtitle: ""
         )
@@ -39,10 +40,10 @@ struct iTunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_withSpecialCharacters() {
+    func test_channel_itunesSubtitle_withSpecialCharacters() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSubtitle: "Latest updates & highlights"
         )
@@ -50,11 +51,11 @@ struct iTunesSubtitleTests {
     }
 
     @Test
-    func test_channel_itunesSubtitle_with255Characters() {
+    func test_channel_itunesSubtitle_with255Characters() throws {
         let text = String(repeating: "a", count: 255)
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSubtitle: text
         )
@@ -64,16 +65,17 @@ struct iTunesSubtitleTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameSubtitle() {
+    func test_channel_equatable_sameSubtitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "A"
         )
@@ -81,16 +83,17 @@ struct iTunesSubtitleTests {
     }
 
     @Test
-    func test_channel_equatable_differentSubtitle() {
+    func test_channel_equatable_differentSubtitle() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "B"
         )
@@ -100,22 +103,23 @@ struct iTunesSubtitleTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "B"
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSubtitle: "A"
         )

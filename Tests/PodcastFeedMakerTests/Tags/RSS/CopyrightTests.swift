@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - CopyrightTests
 
@@ -13,10 +14,11 @@ struct CopyrightTests {
     // MARK: - Initialization
 
     @Test("Channel copyright defaults to nil")
-    func channelCopyrightDefaultsToNil() {
+    func channelCopyrightDefaultsToNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -24,10 +26,11 @@ struct CopyrightTests {
     }
 
     @Test("Channel copyright can be set at initialization")
-    func channelCopyrightCanBeSet() {
+    func channelCopyrightCanBeSet() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             copyright: "2025 Atelier Socle"
         )
@@ -36,10 +39,11 @@ struct CopyrightTests {
     }
 
     @Test("Channel copyright is mutable")
-    func channelCopyrightIsMutable() {
+    func channelCopyrightIsMutable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         var channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -51,9 +55,10 @@ struct CopyrightTests {
 
     @Test("Channel XML contains copyright tag when set")
     func channelXmlContainsCopyright() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             copyright: "2025 Atelier Socle"
         )
@@ -64,9 +69,10 @@ struct CopyrightTests {
 
     @Test("Channel XML omits copyright tag when nil")
     func channelXmlOmitsCopyrightWhenNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -76,9 +82,10 @@ struct CopyrightTests {
 
     @Test("Channel XML escapes special characters in copyright")
     func channelXmlEscapesSpecialCharsInCopyright() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             copyright: "\u{00A9} 2025 Atelier Socle"
         )
@@ -89,9 +96,10 @@ struct CopyrightTests {
 
     @Test("Channel XML escapes ampersand and angle brackets in copyright")
     func channelXmlEscapesAmpersandInCopyright() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             copyright: "My & Co <2025>"
         )
@@ -103,24 +111,24 @@ struct CopyrightTests {
     // MARK: - Equatable
 
     @Test("Channels with same copyright are equal")
-    func channelsWithSameCopyrightAreEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithSameCopyrightAreEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different copyrights are not equal")
-    func channelsWithDifferentCopyrightsAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithDifferentCopyrightsAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2024")
         #expect(channel1 != channel2)
     }
 
     @Test("Channels with nil vs non-nil copyright are not equal")
-    func channelsWithNilVsNonNilCopyrightAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithNilVsNonNilCopyrightAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D")
         let channel2 = Channel(title: "T", link: url, description: "D", copyright: "2025")
         #expect(channel1 != channel2)

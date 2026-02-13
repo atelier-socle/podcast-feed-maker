@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesVerifyTests {
+@testable import PodcastFeedMaker
+
+struct ITunesVerifyTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesVerify_true() {
+    func test_channel_itunesVerify_true() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesVerify: true
         )
@@ -18,10 +19,10 @@ struct iTunesVerifyTests {
     }
 
     @Test
-    func test_channel_itunesVerify_false() {
+    func test_channel_itunesVerify_false() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesVerify: false
         )
@@ -29,10 +30,10 @@ struct iTunesVerifyTests {
     }
 
     @Test
-    func test_channel_itunesVerify_defaultsToNil() {
+    func test_channel_itunesVerify_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesVerify == nil)
@@ -41,16 +42,17 @@ struct iTunesVerifyTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameVerify() {
+    func test_channel_equatable_sameVerify() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: true
         )
@@ -58,16 +60,17 @@ struct iTunesVerifyTests {
     }
 
     @Test
-    func test_channel_equatable_differentVerify() {
+    func test_channel_equatable_differentVerify() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: false
         )
@@ -77,22 +80,23 @@ struct iTunesVerifyTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: false
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesVerify: true
         )

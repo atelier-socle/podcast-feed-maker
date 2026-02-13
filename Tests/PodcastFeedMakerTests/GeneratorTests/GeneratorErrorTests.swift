@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 @Suite("GeneratorError Tests")
 struct GeneratorErrorTests {

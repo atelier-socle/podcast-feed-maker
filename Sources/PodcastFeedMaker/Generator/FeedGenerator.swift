@@ -140,7 +140,6 @@ public struct FeedGenerator: Sendable {
         if let language = channel.language { lines.append(b.element("language", content: language)) }
         if let copyright = channel.copyright { lines.append(b.element("copyright", content: copyright)) }
         if let managingEditor = channel.managingEditor { lines.append(b.element("managingEditor", content: managingEditor)) }
-        // swiftlint:disable:next inclusive_language
         if let webMaster = channel.webMaster { lines.append(b.element("webMaster", content: webMaster)) }
         if let pubDate = channel.pubDate { lines.append(b.element("pubDate", content: XMLBuilder.rfc2822Date(pubDate))) }
         if let lastBuildDate = channel.lastBuildDate {

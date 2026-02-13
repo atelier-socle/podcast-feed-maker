@@ -1,8 +1,9 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesEpisodeTypeTests {
+@testable import PodcastFeedMaker
+
+struct ITunesEpisodeTypeTests {
 
     // MARK: - Enum Cases and Raw Values
 

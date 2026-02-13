@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesCompleteTests {
+@testable import PodcastFeedMaker
+
+struct ITunesCompleteTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesComplete_true() {
+    func test_channel_itunesComplete_true() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesComplete: true
         )
@@ -18,10 +19,10 @@ struct iTunesCompleteTests {
     }
 
     @Test
-    func test_channel_itunesComplete_false() {
+    func test_channel_itunesComplete_false() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesComplete: false
         )
@@ -29,10 +30,10 @@ struct iTunesCompleteTests {
     }
 
     @Test
-    func test_channel_itunesComplete_defaultsToNil() {
+    func test_channel_itunesComplete_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesComplete == nil)
@@ -41,16 +42,17 @@ struct iTunesCompleteTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameComplete() {
+    func test_channel_equatable_sameComplete() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: true
         )
@@ -58,16 +60,17 @@ struct iTunesCompleteTests {
     }
 
     @Test
-    func test_channel_equatable_differentComplete() {
+    func test_channel_equatable_differentComplete() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: false
         )
@@ -77,22 +80,23 @@ struct iTunesCompleteTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: true
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesComplete: false
         )

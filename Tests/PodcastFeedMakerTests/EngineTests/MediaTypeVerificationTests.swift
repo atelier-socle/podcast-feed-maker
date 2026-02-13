@@ -14,7 +14,7 @@ struct MediaSignatureTests {
     func detectMP3ID3() {
         let data = Data([
             0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -26,7 +26,7 @@ struct MediaSignatureTests {
     func detectMP3SyncFB() {
         let data = Data([
             0xFF, 0xFB, 0x90, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -54,7 +54,7 @@ struct MediaSignatureTests {
     func detectM4A() {
         let data = Data([
             0x00, 0x00, 0x00, 0x1C, 0x66, 0x74,
-            0x79, 0x70, 0x4D, 0x34, 0x41, 0x20,
+            0x79, 0x70, 0x4D, 0x34, 0x41, 0x20
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -68,7 +68,7 @@ struct MediaSignatureTests {
     func detectOGG() {
         let data = Data([
             0x4F, 0x67, 0x67, 0x53, 0x00, 0x02,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -80,7 +80,7 @@ struct MediaSignatureTests {
     func detectFLAC() {
         let data = Data([
             0x66, 0x4C, 0x61, 0x43, 0x00, 0x00,
-            0x00, 0x22, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x22, 0x00, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -93,7 +93,7 @@ struct MediaSignatureTests {
         let data = Data([
             0x52, 0x49, 0x46, 0x46,
             0x00, 0x00, 0x00, 0x00,
-            0x57, 0x41, 0x56, 0x45,
+            0x57, 0x41, 0x56, 0x45
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -105,7 +105,7 @@ struct MediaSignatureTests {
     func detectWMA() {
         let data = Data([
             0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
-            0xA6, 0xD9, 0x00, 0xAA,
+            0xA6, 0xD9, 0x00, 0xAA
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -120,7 +120,7 @@ struct MediaSignatureTests {
         let data = Data([
             0x52, 0x49, 0x46, 0x46,
             0x00, 0x00, 0x00, 0x00,
-            0x41, 0x56, 0x49, 0x20,
+            0x41, 0x56, 0x49, 0x20
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -133,7 +133,7 @@ struct MediaSignatureTests {
         let data = Data([
             0x00, 0x00, 0x00, 0x14,
             0x66, 0x74, 0x79, 0x70,
-            0x71, 0x74, 0x20, 0x20,
+            0x71, 0x74, 0x20, 0x20
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -146,7 +146,7 @@ struct MediaSignatureTests {
         let data = Data([
             0x6D, 0x6F, 0x6F, 0x76,
             0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -158,7 +158,7 @@ struct MediaSignatureTests {
         let data = Data([
             0x00, 0x00, 0x00, 0x1C,
             0x66, 0x74, 0x79, 0x70,
-            0x69, 0x73, 0x6F, 0x6D,
+            0x69, 0x73, 0x6F, 0x6D
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -172,7 +172,7 @@ struct MediaSignatureTests {
     func detectPDF() {
         let data = Data([
             0x25, 0x50, 0x44, 0x46, 0x2D, 0x31,
-            0x2E, 0x34, 0x0A, 0x00, 0x00, 0x00,
+            0x2E, 0x34, 0x0A, 0x00, 0x00, 0x00
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -186,7 +186,7 @@ struct MediaSignatureTests {
     func detectJPEG() {
         let data = Data([
             0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10,
-            0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
+            0x4A, 0x46, 0x49, 0x46, 0x00, 0x01
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -198,7 +198,7 @@ struct MediaSignatureTests {
     func detectPNG() {
         let data = Data([
             0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A,
-            0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+            0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D
         ])
         let signature = MediaSignature.detect(from: data)
         #expect(signature != nil)
@@ -212,7 +212,7 @@ struct MediaSignatureTests {
     func unknownBytes() {
         let data = Data([
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
-            0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C,
+            0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C
         ])
         #expect(MediaSignature.detect(from: data) == nil)
     }
@@ -259,7 +259,7 @@ struct ImageDimensionParserTests {
             0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
             0x00, 0x00, 0x00, 0x0D,
             0x49, 0x48, 0x44, 0x52,
-            0x00, 0x00, 0x05, 0x78,
+            0x00, 0x00, 0x05, 0x78
         ])
         #expect(ImageDimensionParser.parsePNG(data) == nil)
     }
@@ -269,7 +269,7 @@ struct ImageDimensionParserTests {
         var data = Data([
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x0D,
-            0x49, 0x48, 0x44, 0x52,
+            0x49, 0x48, 0x44, 0x52
         ])
         data.append(contentsOf: [0x00, 0x00, 0x05, 0x78])
         data.append(contentsOf: [0x00, 0x00, 0x05, 0x78])
@@ -293,7 +293,7 @@ struct ImageDimensionParserTests {
             0xFF, 0xD8,
             0xFF, 0xC2,
             0x00, 0x11,
-            0x08,
+            0x08
         ])
         data.append(contentsOf: [0x05, 0x78])  // Height: 1400
         data.append(contentsOf: [0x05, 0x78])  // Width: 1400
@@ -308,13 +308,13 @@ struct ImageDimensionParserTests {
         var data = Data([
             0xFF, 0xD8,
             0xFF, 0xE1,  // APP1 (EXIF)
-            0x00, 0x20,  // Length (32)
+            0x00, 0x20  // Length (32)
         ])
         data.append(contentsOf: Array(repeating: UInt8(0x00), count: 30))
         data.append(contentsOf: [
             0xFF, 0xC0,  // SOF0
             0x00, 0x11,
-            0x08,
+            0x08
         ])
         data.append(contentsOf: [0x0B, 0xB8])  // Height: 3000
         data.append(contentsOf: [0x0B, 0xB8])  // Width: 3000
@@ -329,7 +329,7 @@ struct ImageDimensionParserTests {
         var data = Data([
             0xFF, 0xD8,
             0xFF, 0xE0,
-            0x00, 0x10,
+            0x00, 0x10
         ])
         data.append(contentsOf: Array(repeating: UInt8(0x00), count: 14))
         #expect(ImageDimensionParser.parseJPEG(data) == nil)
@@ -339,7 +339,7 @@ struct ImageDimensionParserTests {
     func jpegInvalidSOI() {
         let data = Data([
             0x00, 0x00, 0xFF, 0xC0, 0x00, 0x11,
-            0x08, 0x05, 0x78, 0x05, 0x78,
+            0x08, 0x05, 0x78, 0x05, 0x78
         ])
         #expect(ImageDimensionParser.parseJPEG(data) == nil)
     }
@@ -431,7 +431,7 @@ struct ImageDimensionParserTests {
         var data = Data([
             0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
             0x00, 0x00, 0x00, 0x0D,
-            0x49, 0x48, 0x44, 0x52,
+            0x49, 0x48, 0x44, 0x52
         ])
         data.append(UInt8((width >> 24) & 0xFF))
         data.append(UInt8((width >> 16) & 0xFF))
@@ -451,548 +451,12 @@ struct ImageDimensionParserTests {
             0xFF, 0xD8,
             0xFF, 0xC0,
             0x00, 0x11,
-            0x08,
+            0x08
         ])
         data.append(UInt8((height >> 8) & 0xFF))
         data.append(UInt8(height & 0xFF))
         data.append(UInt8((width >> 8) & 0xFF))
         data.append(UInt8(width & 0xFF))
         return data
-    }
-}
-
-// MARK: - Integration Tests (with MockURLProtocol)
-
-@Suite("Media Type Verification Integration Tests", .serialized)
-struct MediaTypeVerificationIntegrationTests {
-
-    // MARK: - Helpers
-
-    private func feedWithEnclosure(
-        url urlString: String, type: String
-    ) -> PodcastFeed {
-        guard let enclosureURL = URL(string: urlString) else {
-            return PodcastFeed(channel: nil)
-        }
-        return PodcastFeed(
-            channel: Channel(
-                title: "Test Podcast",
-                link: URL(string: "https://example.com")
-                    ?? URL(fileURLWithPath: "/"),
-                description: "A test podcast",
-                items: [
-                    Item(
-                        title: "Episode 1",
-                        enclosure: Enclosure(
-                            url: enclosureURL,
-                            length: 1_000_000,
-                            type: type
-                        )
-                    )
-                ]
-            ))
-    }
-
-    private func feedWithArtwork(
-        channelArtwork: String? = nil
-    ) -> PodcastFeed {
-        PodcastFeed(
-            channel: Channel(
-                title: "Test Podcast",
-                link: URL(string: "https://example.com")
-                    ?? URL(fileURLWithPath: "/"),
-                description: "A test podcast",
-                items: [Item(title: "Episode 1")],
-                itunesImage: channelArtwork.flatMap { URL(string: $0) }
-            ))
-    }
-
-    private func makeJPEGData(width: Int, height: Int) -> Data {
-        var data = Data([
-            0xFF, 0xD8,
-            0xFF, 0xC0,
-            0x00, 0x11,
-            0x08,
-        ])
-        data.append(UInt8((height >> 8) & 0xFF))
-        data.append(UInt8(height & 0xFF))
-        data.append(UInt8((width >> 8) & 0xFF))
-        data.append(UInt8(width & 0xFF))
-        let remaining = max(0, 1024 - data.count)
-        data.append(
-            contentsOf: Array(repeating: UInt8(0x00), count: remaining))
-        return data
-    }
-
-    private func makePNGData(width: Int, height: Int) -> Data {
-        var data = Data([
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-            0x00, 0x00, 0x00, 0x0D,
-            0x49, 0x48, 0x44, 0x52,
-        ])
-        data.append(UInt8((width >> 24) & 0xFF))
-        data.append(UInt8((width >> 16) & 0xFF))
-        data.append(UInt8((width >> 8) & 0xFF))
-        data.append(UInt8(width & 0xFF))
-        data.append(UInt8((height >> 24) & 0xFF))
-        data.append(UInt8((height >> 16) & 0xFF))
-        data.append(UInt8((height >> 8) & 0xFF))
-        data.append(UInt8(height & 0xFF))
-        let remaining = max(0, 1024 - data.count)
-        data.append(
-            contentsOf: Array(repeating: UInt8(0x00), count: remaining))
-        return data
-    }
-
-    // MARK: - Media Type Verification
-
-    @Test("MP3 enclosure with actual MP3 magic bytes passes")
-    func mp3MatchPasses() async throws {
-        let url = "https://cdn.example.com/episode1.mp3"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data([
-                    0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                ]),
-                statusCode: 206,
-                headers: ["Content-Range": "bytes 0-11/5000000"]
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithEnclosure(url: url, type: "audio/mpeg")
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let enclosureErrors = results.filter {
-            $0.field.contains("enclosure") && $0.severity == .error
-        }
-        #expect(enclosureErrors.isEmpty)
-    }
-
-    @Test("MP3 enclosure with M4A bytes produces error mismatch")
-    func mp3WithM4ABytesError() async throws {
-        let url = "https://cdn.example.com/episode2.mp3"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data([
-                    0x00, 0x00, 0x00, 0x1C, 0x66, 0x74,
-                    0x79, 0x70, 0x4D, 0x34, 0x41, 0x20,
-                ]),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithEnclosure(url: url, type: "audio/mpeg")
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let errors = results.filter { $0.severity == .error }
-        #expect(errors.count >= 1)
-        #expect(errors.first?.message.contains("declares audio/mpeg") == true)
-        #expect(errors.first?.message.contains("MPEG-4 container") == true)
-    }
-
-    @Test("MP3 enclosure with HTML bytes produces info (unknown format)")
-    func mp3WithHTMLBytesInfo() async throws {
-        let url = "https://cdn.example.com/episode3.mp3"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data(Array("<!DOCTYPE ".utf8)),
-                statusCode: 200
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithEnclosure(url: url, type: "audio/mpeg")
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let infos = results.filter {
-            $0.field.contains("enclosure") && $0.severity == .info
-        }
-        #expect(infos.count >= 1)
-        #expect(
-            infos.first?.message.contains(
-                "Could not determine actual file type") == true)
-    }
-
-    @Test("Server returns 200 instead of 206 still works")
-    func noRangeSupportStillWorks() async throws {
-        let url = "https://cdn.example.com/episode4.mp3"
-
-        var fullData = Data([
-            0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        ])
-        fullData.append(
-            contentsOf: Array(repeating: UInt8(0), count: 100))
-        MockResponseStore.shared.set(
-            MockResponse(data: fullData, statusCode: 200),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithEnclosure(url: url, type: "audio/mpeg")
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let enclosureErrors = results.filter {
-            $0.field.contains("enclosure") && $0.severity == .error
-        }
-        #expect(enclosureErrors.isEmpty)
-    }
-
-    @Test("Server returns 404 produces warning")
-    func server404ProducesWarning() async throws {
-        let url = "https://cdn.example.com/missing5.mp3"
-
-        // Do not register — MockURLProtocol returns fileDoesNotExist
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithEnclosure(url: url, type: "audio/mpeg")
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let warnings = results.filter { $0.severity == .warning }
-        #expect(warnings.count >= 1)
-        #expect(
-            warnings.first?.message.contains(
-                "Could not verify media type") == true)
-    }
-
-    // MARK: - Artwork Dimension Checking
-
-    @Test("Artwork JPEG 2000x2000 passes for all platforms")
-    func artwork2000PassesAll() async throws {
-        let url = "https://cdn.example.com/art6.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 2000, height: 2000),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-
-        for platform in ValidationPlatform.allCases {
-            let results = try await validator.checkArtworkDimensions(
-                feed, for: platform)
-            let errors = results.filter { $0.severity == .error }
-            #expect(
-                errors.isEmpty,
-                "No errors expected for \(platform) with 2000x2000")
-        }
-    }
-
-    @Test("Artwork JPEG 500x500 errors too small for Apple")
-    func artwork500ErrorApple() async throws {
-        let url = "https://cdn.example.com/art7.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 500, height: 500),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .apple)
-
-        let errors = results.filter { $0.severity == .error }
-        #expect(errors.count >= 1)
-        #expect(errors.first?.message.contains("500\u{00D7}500") == true)
-        #expect(errors.first?.message.contains("minimum") == true)
-        #expect(errors.first?.message.contains("apple") == true)
-    }
-
-    @Test("Artwork PNG 4000x4000 warns too large for Spotify")
-    func artwork4000WarnsSpotify() async throws {
-        let url = "https://cdn.example.com/art8.png"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makePNGData(width: 4000, height: 4000),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .spotify)
-
-        let warnings = results.filter { $0.severity == .warning }
-        #expect(warnings.count >= 1)
-        #expect(
-            warnings.first?.message.contains("4000\u{00D7}4000") == true)
-        #expect(warnings.first?.message.contains("maximum") == true)
-        #expect(warnings.first?.message.contains("spotify") == true)
-    }
-
-    @Test("Artwork 1400x1000 errors not square for Apple")
-    func artworkNotSquareErrorApple() async throws {
-        let url = "https://cdn.example.com/art9.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 1400, height: 1000),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .apple)
-
-        let squareErrors = results.filter {
-            $0.severity == .error && $0.message.contains("square")
-        }
-        #expect(squareErrors.count >= 1)
-        #expect(
-            squareErrors.first?.message.contains("1400\u{00D7}1000") == true)
-        #expect(
-            squareErrors.first?.message.contains("1:1 aspect ratio") == true)
-    }
-
-    @Test("Artwork 1400x1000 warns not square for Amazon")
-    func artworkNotSquareWarningAmazon() async throws {
-        let url = "https://cdn.example.com/art10.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 1400, height: 1000),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .amazon)
-
-        let squareWarnings = results.filter {
-            $0.severity == .warning && $0.message.contains("square")
-        }
-        #expect(squareWarnings.count >= 1)
-        #expect(
-            squareWarnings.first?.message.contains("recommended") == true)
-    }
-
-    @Test("Podcast Index has no dimension requirements")
-    func podcastIndexNoDimensions() async throws {
-        let url = "https://cdn.example.com/art11.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 100, height: 50),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .podcastIndex)
-
-        #expect(results.isEmpty)
-    }
-
-    @Test("PSP-1 has no dimension requirements")
-    func psp1NoDimensions() async throws {
-        let url = "https://cdn.example.com/art12.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: makeJPEGData(width: 100, height: 50),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .psp1)
-
-        #expect(results.isEmpty)
-    }
-
-    @Test("Artwork with non-image signature (MP3) produces warning")
-    func artworkWithNonImageSignature() async throws {
-        let url = "https://cdn.example.com/art-mp3.jpg"
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data([
-                    0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                ]),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.verifyMediaTypes(feed)
-
-        let warnings = results.filter {
-            $0.severity == .warning && $0.message.contains("JPEG or PNG")
-        }
-        #expect(warnings.count >= 1)
-    }
-
-    @Test("Artwork dimension check error produces warning")
-    func artworkDimensionCheckError() async throws {
-        let url = "https://cdn.example.com/art-err.jpg"
-        // Not registering → network error
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .apple)
-
-        let warnings = results.filter { $0.severity == .warning }
-        #expect(warnings.count >= 1)
-        #expect(
-            warnings.first?.message.contains("Could not check artwork dimensions")
-                == true)
-    }
-
-    @Test("Empty feed returns empty for media verification")
-    func emptyFeedMediaVerification() async throws {
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = PodcastFeed(channel: nil)
-        let results = try await validator.verifyMediaTypes(feed)
-        #expect(results.isEmpty)
-    }
-
-    @Test("Empty feed returns empty for artwork dimensions")
-    func emptyFeedArtworkDimensions() async throws {
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = PodcastFeed(channel: nil)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .apple)
-        #expect(results.isEmpty)
-    }
-
-    @Test("Enclosure with no declared type and valid signature passes")
-    func enclosureNoDeclaredType() async throws {
-        let url = "https://cdn.example.com/art-nodecl.mp3"
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data([
-                    0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                ]),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        // Enclosure with matching type (no mismatch)
-        let feed = PodcastFeed(
-            channel: Channel(
-                title: "Test",
-                link: URL(string: "https://example.com")!,
-                description: "Desc",
-                items: [
-                    Item(
-                        title: "Ep",
-                        enclosure: Enclosure(
-                            url: URL(string: url)!,
-                            length: 1024,
-                            type: "audio/mp3"
-                        )
-                    )
-                ]
-            ))
-        let results = try await validator.verifyMediaTypes(feed)
-        let errors = results.filter { $0.severity == .error }
-        #expect(errors.isEmpty)
-    }
-
-    @Test("Live item enclosure and artwork are extracted")
-    func liveItemExtraction() {
-        let validator = NetworkValidator()
-        let liveItem = PodcastLiveItem(
-            status: .live,
-            start: Date(),
-            enclosure: Enclosure(
-                url: URL(string: "https://cdn.example.com/live.mp3")!,
-                length: 0,
-                type: "audio/mpeg"
-            ),
-            itunesImage: URL(string: "https://cdn.example.com/live-art.jpg")
-        )
-        var channel = Channel(
-            title: "Test",
-            link: URL(string: "https://example.com")!,
-            description: "Desc"
-        )
-        channel.liveItems = [liveItem]
-        let feed = PodcastFeed(channel: channel)
-        let entries = validator.extractMediaVerificationEntries(from: feed)
-        // Live item enclosure + live item artwork
-        let liveEntries = entries.filter { $0.field.contains("liveItems") }
-        #expect(liveEntries.count == 2)
-    }
-
-    @Test("Cannot parse dimensions returns info")
-    func cannotParseDimensionsInfo() async throws {
-        let url = "https://cdn.example.com/art13.jpg"
-
-        MockResponseStore.shared.set(
-            MockResponse(
-                data: Data(
-                    Array(repeating: UInt8(0x42), count: 1024)),
-                statusCode: 206
-            ),
-            for: url
-        )
-
-        let session = makeMockSession()
-        let validator = NetworkValidator(session: session)
-        let feed = feedWithArtwork(channelArtwork: url)
-        let results = try await validator.checkArtworkDimensions(
-            feed, for: .apple)
-
-        let infos = results.filter { $0.severity == .info }
-        #expect(infos.count >= 1)
-        #expect(
-            infos.first?.message.contains(
-                "Could not determine dimensions") == true)
     }
 }

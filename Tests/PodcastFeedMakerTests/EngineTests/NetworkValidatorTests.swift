@@ -15,21 +15,21 @@ struct NetworkValidatorTests {
     private func feedWithArtwork(
         channelImage: URL? = nil,
         itemImages: [URL] = []
-    ) -> PodcastFeed {
+    ) throws -> PodcastFeed {
         let items = itemImages.enumerated().map { idx, url in
             Item(title: "Episode \(idx)", itunesImage: url)
         }
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "Desc",
                 items: items,
                 itunesImage: channelImage
             ))
     }
 
-    private func feedWithEnclosures(_ enclosures: [(URL, String)]) -> PodcastFeed {
+    private func feedWithEnclosures(_ enclosures: [(URL, String)]) throws -> PodcastFeed {
         let items = enclosures.enumerated().map { idx, pair in
             Item(
                 title: "Episode \(idx)",
@@ -43,7 +43,7 @@ struct NetworkValidatorTests {
         return PodcastFeed(
             channel: Channel(
                 title: "Podcast",
-                link: URL(string: "https://example.com")!,
+                link: try #require(URL(string: "https://example.com")),
                 description: "Desc",
                 items: items
             ))
@@ -52,9 +52,9 @@ struct NetworkValidatorTests {
     // MARK: - URL Extraction: Artwork
 
     @Test("Extracts channel artwork URL")
-    func extractChannelArtwork() {
-        let url = URL(string: "https://example.com/art.jpg")!
-        let feed = feedWithArtwork(channelImage: url)
+    func extractChannelArtwork() throws {
+        let url = try #require(URL(string: "https://example.com/art.jpg"))
+        let feed = try feedWithArtwork(channelImage: url)
         let entries = validator.extractArtworkURLs(from: feed)
         #expect(entries.count == 1)
         #expect(entries[0].url == url)
@@ -62,10 +62,10 @@ struct NetworkValidatorTests {
     }
 
     @Test("Extracts item artwork URLs")
-    func extractItemArtwork() {
-        let url1 = URL(string: "https://example.com/ep1.jpg")!
-        let url2 = URL(string: "https://example.com/ep2.jpg")!
-        let feed = feedWithArtwork(itemImages: [url1, url2])
+    func extractItemArtwork() throws {
+        let url1 = try #require(URL(string: "https://example.com/ep1.jpg"))
+        let url2 = try #require(URL(string: "https://example.com/ep2.jpg"))
+        let feed = try feedWithArtwork(itemImages: [url1, url2])
         let entries = validator.extractArtworkURLs(from: feed)
         #expect(entries.count == 2)
         #expect(entries[0].field == "channel.items[0].itunesImage")
@@ -75,9 +75,9 @@ struct NetworkValidatorTests {
     // MARK: - URL Extraction: Enclosures
 
     @Test("Extracts enclosure URLs with expected types")
-    func extractEnclosures() {
-        let url = URL(string: "https://example.com/ep.mp3")!
-        let feed = feedWithEnclosures([(url, "audio/mpeg")])
+    func extractEnclosures() throws {
+        let url = try #require(URL(string: "https://example.com/ep.mp3"))
+        let feed = try feedWithEnclosures([(url, "audio/mpeg")])
         let entries = validator.extractEnclosureEntries(from: feed)
         #expect(entries.count == 1)
         #expect(entries[0].url == url)
@@ -88,32 +88,37 @@ struct NetworkValidatorTests {
     // MARK: - URL Extraction: All URLs
 
     @Test("extractAllURLEntries includes artwork, enclosures, atom links, and funding")
-    func extractAllURLs() {
+    func extractAllURLs() throws {
+        let linkURL = try #require(URL(string: "https://example.com"))
+        let enclosureURL = try #require(URL(string: "https://example.com/ep.mp3"))
+        let itemImageURL = try #require(URL(string: "https://example.com/ep.jpg"))
+        let atomLinkURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let fundingURL = try #require(URL(string: "https://example.com/fund"))
         let channel = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: linkURL,
             description: "Desc",
             items: [
                 Item(
                     title: "Episode",
                     enclosure: Enclosure(
-                        url: URL(string: "https://example.com/ep.mp3")!,
+                        url: enclosureURL,
                         length: 1024,
                         type: "audio/mpeg"
                     ),
-                    itunesImage: URL(string: "https://example.com/ep.jpg")!
+                    itunesImage: itemImageURL
                 )
             ],
             itunesImage: URL(string: "https://example.com/art.jpg"),
             atomLinks: [
                 AtomLink(
-                    href: URL(string: "https://example.com/feed.xml")!,
+                    href: atomLinkURL,
                     rel: "self"
                 )
             ],
             funding: [
                 Funding(
-                    url: URL(string: "https://example.com/fund")!,
+                    url: fundingURL,
                     message: "Support"
                 )
             ]

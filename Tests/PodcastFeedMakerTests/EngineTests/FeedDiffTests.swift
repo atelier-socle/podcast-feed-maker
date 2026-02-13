@@ -53,10 +53,10 @@ struct FeedDiffChannelTests {
         title: String = "Test",
         link: String = "https://example.com",
         description: String = "Desc"
-    ) -> Channel {
+    ) throws -> Channel {
         Channel(
             title: title,
-            link: URL(string: link)!,
+            link: try #require(URL(string: link)),
             description: description
         )
     }
@@ -66,16 +66,16 @@ struct FeedDiffChannelTests {
     }
 
     @Test("identical feeds produce no differences")
-    func identicalFeedsNoDiff() {
-        let feed = makeFeed(channel: makeChannel())
+    func identicalFeedsNoDiff() throws {
+        let feed = makeFeed(channel: try makeChannel())
         let diffs = FeedDiff().diff(feed, feed)
         #expect(diffs.isEmpty)
     }
 
     @Test("detects title change")
-    func detectsTitleChange() {
-        let lhs = makeFeed(channel: makeChannel(title: "Old Title"))
-        let rhs = makeFeed(channel: makeChannel(title: "New Title"))
+    func detectsTitleChange() throws {
+        let lhs = makeFeed(channel: try makeChannel(title: "Old Title"))
+        let rhs = makeFeed(channel: try makeChannel(title: "New Title"))
         let diffs = FeedDiff().diff(lhs, rhs)
         let titleDiff = diffs.first { $0.field == "channel.title" }
         #expect(titleDiff?.changeType == .modified)
@@ -84,9 +84,9 @@ struct FeedDiffChannelTests {
     }
 
     @Test("detects description change")
-    func detectsDescriptionChange() {
-        let lhs = makeFeed(channel: makeChannel(description: "Old desc"))
-        let rhs = makeFeed(channel: makeChannel(description: "New desc"))
+    func detectsDescriptionChange() throws {
+        let lhs = makeFeed(channel: try makeChannel(description: "Old desc"))
+        let rhs = makeFeed(channel: try makeChannel(description: "New desc"))
         let diffs = FeedDiff().diff(lhs, rhs)
         let descDiff = diffs.first { $0.field == "channel.description" }
         #expect(descDiff != nil)
@@ -94,10 +94,10 @@ struct FeedDiffChannelTests {
     }
 
     @Test("detects language added")
-    func detectsLanguageAdded() {
-        var lhsCh = makeChannel()
+    func detectsLanguageAdded() throws {
+        var lhsCh = try makeChannel()
         lhsCh.language = nil
-        var rhsCh = makeChannel()
+        var rhsCh = try makeChannel()
         rhsCh.language = "en-us"
         let diffs = FeedDiff().diff(makeFeed(channel: lhsCh), makeFeed(channel: rhsCh))
         let langDiff = diffs.first { $0.field == "channel.language" }
@@ -106,10 +106,10 @@ struct FeedDiffChannelTests {
     }
 
     @Test("detects itunesAuthor removed")
-    func detectsAuthorRemoved() {
-        var lhsCh = makeChannel()
+    func detectsAuthorRemoved() throws {
+        var lhsCh = try makeChannel()
         lhsCh.itunesAuthor = "Host"
-        var rhsCh = makeChannel()
+        var rhsCh = try makeChannel()
         rhsCh.itunesAuthor = nil
         let diffs = FeedDiff().diff(makeFeed(channel: lhsCh), makeFeed(channel: rhsCh))
         let authorDiff = diffs.first { $0.field == "channel.itunesAuthor" }
@@ -118,10 +118,10 @@ struct FeedDiffChannelTests {
     }
 
     @Test("detects itunesExplicit change")
-    func detectsExplicitChange() {
-        var lhsCh = makeChannel()
+    func detectsExplicitChange() throws {
+        var lhsCh = try makeChannel()
         lhsCh.itunesExplicit = false
-        var rhsCh = makeChannel()
+        var rhsCh = try makeChannel()
         rhsCh.itunesExplicit = true
         let diffs = FeedDiff().diff(makeFeed(channel: lhsCh), makeFeed(channel: rhsCh))
         let explicitDiff = diffs.first { $0.field == "channel.itunesExplicit" }
@@ -129,9 +129,9 @@ struct FeedDiffChannelTests {
     }
 
     @Test("handles nil channels")
-    func handlesNilChannels() {
+    func handlesNilChannels() throws {
         let empty = PodcastFeed(channel: nil)
-        let full = makeFeed(channel: makeChannel())
+        let full = makeFeed(channel: try makeChannel())
         let diffs = FeedDiff().diff(empty, full)
         #expect(diffs.count == 1)
         #expect(diffs[0].changeType == .added)
@@ -145,10 +145,10 @@ struct FeedDiffChannelTests {
 @Suite("FeedDiff Items")
 struct FeedDiffItemTests {
 
-    private func makeFeed(items: [Item]) -> PodcastFeed {
+    private func makeFeed(items: [Item]) throws -> PodcastFeed {
         var channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "Desc"
         )
         channel.items = items
@@ -156,31 +156,31 @@ struct FeedDiffItemTests {
     }
 
     @Test("detects added item")
-    func detectsAddedItem() {
-        let lhs = makeFeed(items: [])
-        let rhs = makeFeed(items: [Item(title: "Episode 1")])
+    func detectsAddedItem() throws {
+        let lhs = try makeFeed(items: [])
+        let rhs = try makeFeed(items: [Item(title: "Episode 1")])
         let diffs = FeedDiff().diff(lhs, rhs)
         let addedItem = diffs.first { $0.changeType == .added && $0.field.hasPrefix("items[") }
         #expect(addedItem != nil)
     }
 
     @Test("detects removed item")
-    func detectsRemovedItem() {
-        let lhs = makeFeed(items: [Item(title: "Episode 1")])
-        let rhs = makeFeed(items: [])
+    func detectsRemovedItem() throws {
+        let lhs = try makeFeed(items: [Item(title: "Episode 1")])
+        let rhs = try makeFeed(items: [])
         let diffs = FeedDiff().diff(lhs, rhs)
         let removedItem = diffs.first { $0.changeType == .removed && $0.field.hasPrefix("items[") }
         #expect(removedItem != nil)
     }
 
     @Test("detects modified item title")
-    func detectsModifiedItemTitle() {
+    func detectsModifiedItemTitle() throws {
         var item1 = Item(title: "Old Title")
         item1.guid = GUID(value: "ep-1", isPermaLink: false)
         var item2 = Item(title: "New Title")
         item2.guid = GUID(value: "ep-1", isPermaLink: false)
-        let lhs = makeFeed(items: [item1])
-        let rhs = makeFeed(items: [item2])
+        let lhs = try makeFeed(items: [item1])
+        let rhs = try makeFeed(items: [item2])
         let diffs = FeedDiff().diff(lhs, rhs)
         let titleDiff = diffs.first { $0.field.contains(".title") }
         #expect(titleDiff?.changeType == .modified)
@@ -189,15 +189,15 @@ struct FeedDiffItemTests {
     }
 
     @Test("matches items by guid")
-    func matchesByGuid() {
+    func matchesByGuid() throws {
         var item1 = Item(title: "Ep 1")
         item1.guid = GUID(value: "guid-1", isPermaLink: false)
         item1.itunesDuration = 100
         var item2 = Item(title: "Ep 1")
         item2.guid = GUID(value: "guid-1", isPermaLink: false)
         item2.itunesDuration = 200
-        let lhs = makeFeed(items: [item1])
-        let rhs = makeFeed(items: [item2])
+        let lhs = try makeFeed(items: [item1])
+        let rhs = try makeFeed(items: [item2])
         let diffs = FeedDiff().diff(lhs, rhs)
         let durationDiff = diffs.first { $0.field.contains("itunesDuration") }
         #expect(durationDiff?.changeType == .modified)
@@ -206,28 +206,28 @@ struct FeedDiffItemTests {
     }
 
     @Test("matches items by title when no guid")
-    func matchesByTitle() {
+    func matchesByTitle() throws {
         var item1 = Item(title: "Episode 1")
         item1.itunesSeason = 1
         var item2 = Item(title: "Episode 1")
         item2.itunesSeason = 2
-        let lhs = makeFeed(items: [item1])
-        let rhs = makeFeed(items: [item2])
+        let lhs = try makeFeed(items: [item1])
+        let rhs = try makeFeed(items: [item2])
         let diffs = FeedDiff().diff(lhs, rhs)
         let seasonDiff = diffs.first { $0.field.contains("itunesSeason") }
         #expect(seasonDiff?.changeType == .modified)
     }
 
     @Test("detects enclosure URL change")
-    func detectsEnclosureURLChange() {
+    func detectsEnclosureURLChange() throws {
         var item1 = Item(title: "Ep 1")
         item1.guid = GUID(value: "ep-1", isPermaLink: false)
         item1.enclosure = Enclosure.mp3(url: "https://example.com/old.mp3", length: 1000)
         var item2 = Item(title: "Ep 1")
         item2.guid = GUID(value: "ep-1", isPermaLink: false)
         item2.enclosure = Enclosure.mp3(url: "https://example.com/new.mp3", length: 1000)
-        let lhs = makeFeed(items: [item1])
-        let rhs = makeFeed(items: [item2])
+        let lhs = try makeFeed(items: [item1])
+        let rhs = try makeFeed(items: [item2])
         let diffs = FeedDiff().diff(lhs, rhs)
         let encDiff = diffs.first { $0.field.contains("enclosure.url") }
         #expect(encDiff?.changeType == .modified)
@@ -283,17 +283,18 @@ struct FeedDiffXMLTests {
 struct PodcastFeedEngineDiffTests {
 
     @Test("engine diff(model) delegates to FeedDiff")
-    func engineDiffModel() {
+    func engineDiffModel() throws {
         let engine = PodcastFeedEngine()
+        let linkURL = try #require(URL(string: "https://example.com"))
         var ch1 = Channel(
             title: "Old",
-            link: URL(string: "https://example.com")!,
+            link: linkURL,
             description: "Desc"
         )
         ch1.language = "en"
         let ch2 = Channel(
             title: "Old",
-            link: URL(string: "https://example.com")!,
+            link: linkURL,
             description: "Desc"
         )
         let feed1 = PodcastFeed(channel: ch1)

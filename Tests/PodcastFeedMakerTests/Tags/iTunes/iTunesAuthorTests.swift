@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesAuthorTests {
+@testable import PodcastFeedMaker
+
+struct ITunesAuthorTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesAuthor_shouldStoreValue() {
+    func test_channel_itunesAuthor_shouldStoreValue() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesAuthor: "John Doe"
         )
@@ -18,20 +19,20 @@ struct iTunesAuthorTests {
     }
 
     @Test
-    func test_channel_itunesAuthor_defaultsToNil() {
+    func test_channel_itunesAuthor_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesAuthor == nil)
     }
 
     @Test
-    func test_channel_itunesAuthor_withSpecialCharacters() {
+    func test_channel_itunesAuthor_withSpecialCharacters() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesAuthor: "John & Sons <Media>"
         )
@@ -39,10 +40,10 @@ struct iTunesAuthorTests {
     }
 
     @Test
-    func test_channel_itunesAuthor_withEmptyString() {
+    func test_channel_itunesAuthor_withEmptyString() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesAuthor: ""
         )
@@ -72,16 +73,17 @@ struct iTunesAuthorTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameAuthor() {
+    func test_channel_equatable_sameAuthor() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesAuthor: "Same Author"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesAuthor: "Same Author"
         )
@@ -89,16 +91,17 @@ struct iTunesAuthorTests {
     }
 
     @Test
-    func test_channel_equatable_differentAuthor() {
+    func test_channel_equatable_differentAuthor() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesAuthor: "Author A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesAuthor: "Author B"
         )

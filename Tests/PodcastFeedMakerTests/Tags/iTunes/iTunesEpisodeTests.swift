@@ -1,8 +1,9 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesEpisodeTests {
+@testable import PodcastFeedMaker
+
+struct ITunesEpisodeTests {
 
     // MARK: - Item
 

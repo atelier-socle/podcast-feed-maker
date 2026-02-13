@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesSummaryTests {
+@testable import PodcastFeedMaker
+
+struct ITunesSummaryTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesSummary_shouldStoreValue() {
+    func test_channel_itunesSummary_shouldStoreValue() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSummary: "Swift & SwiftUI explained in detail"
         )
@@ -18,20 +19,20 @@ struct iTunesSummaryTests {
     }
 
     @Test
-    func test_channel_itunesSummary_defaultsToNil() {
+    func test_channel_itunesSummary_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesSummary == nil)
     }
 
     @Test
-    func test_channel_itunesSummary_withEmptyString() {
+    func test_channel_itunesSummary_withEmptyString() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSummary: ""
         )
@@ -39,11 +40,11 @@ struct iTunesSummaryTests {
     }
 
     @Test
-    func test_channel_itunesSummary_withHTMLContent() {
+    func test_channel_itunesSummary_withHTMLContent() throws {
         let htmlContent = "<p><strong>SwiftUI</strong> explained</p>"
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSummary: htmlContent
         )
@@ -51,11 +52,11 @@ struct iTunesSummaryTests {
     }
 
     @Test
-    func test_channel_itunesSummary_withLongText() {
+    func test_channel_itunesSummary_withLongText() throws {
         let longText = String(repeating: "A long summary. ", count: 100)
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesSummary: longText
         )
@@ -65,16 +66,17 @@ struct iTunesSummaryTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameSummary() {
+    func test_channel_equatable_sameSummary() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "A"
         )
@@ -82,16 +84,17 @@ struct iTunesSummaryTests {
     }
 
     @Test
-    func test_channel_equatable_differentSummary() {
+    func test_channel_equatable_differentSummary() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "B"
         )
@@ -101,22 +104,23 @@ struct iTunesSummaryTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "A"
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "A"
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesSummary: "B"
         )

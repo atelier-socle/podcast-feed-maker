@@ -1,16 +1,17 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
 
-struct iTunesBlockTests {
+@testable import PodcastFeedMaker
+
+struct ITunesBlockTests {
 
     // MARK: - Channel
 
     @Test
-    func test_channel_itunesBlock_true() {
+    func test_channel_itunesBlock_true() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesBlock: true
         )
@@ -18,10 +19,10 @@ struct iTunesBlockTests {
     }
 
     @Test
-    func test_channel_itunesBlock_false() {
+    func test_channel_itunesBlock_false() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast",
             itunesBlock: false
         )
@@ -29,10 +30,10 @@ struct iTunesBlockTests {
     }
 
     @Test
-    func test_channel_itunesBlock_defaultsToNil() {
+    func test_channel_itunesBlock_defaultsToNil() throws {
         let channel = Channel(
             title: "My Podcast",
-            link: URL(string: "https://example.com")!,
+            link: try #require(URL(string: "https://example.com")),
             description: "A great podcast"
         )
         #expect(channel.itunesBlock == nil)
@@ -61,16 +62,17 @@ struct iTunesBlockTests {
     // MARK: - Equatable
 
     @Test
-    func test_channel_equatable_sameBlock() {
+    func test_channel_equatable_sameBlock() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: true
         )
@@ -78,16 +80,17 @@ struct iTunesBlockTests {
     }
 
     @Test
-    func test_channel_equatable_differentBlock() {
+    func test_channel_equatable_differentBlock() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: false
         )
@@ -111,22 +114,23 @@ struct iTunesBlockTests {
     // MARK: - Hashable
 
     @Test
-    func test_channel_hashable() {
+    func test_channel_hashable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channelA = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: true
         )
         let channelB = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: false
         )
         let channelC = Channel(
             title: "Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             itunesBlock: true
         )

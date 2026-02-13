@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - FeedTests
 
@@ -18,10 +19,11 @@ struct FeedTests {
     /// Creates a minimal channel for feed construction.
     private func makeMinimalChannel(
         title: String = "Test Podcast",
-        link: URL = URL(string: "https://example.com")!,
+        link: URL? = URL(string: "https://example.com"),
         description: String = "A test podcast"
-    ) -> Channel {
-        Channel(title: title, link: link, description: description)
+    ) throws -> Channel {
+        let resolvedLink = try #require(link)
+        return Channel(title: title, link: resolvedLink, description: description)
     }
 
     // MARK: - Initialization
@@ -59,12 +61,13 @@ struct FeedTests {
     }
 
     @Test("PodcastFeed can be initialized with a channel")
-    func feedInitWithChannel() {
-        let channel = makeMinimalChannel()
+    func feedInitWithChannel() throws {
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(channel: channel)
 
         #expect(feed.channel?.title == "Test Podcast")
-        #expect(feed.channel?.link == URL(string: "https://example.com")!)
+        let expectedLink = try #require(URL(string: "https://example.com"))
+        #expect(feed.channel?.link == expectedLink)
         #expect(feed.channel?.description == "A test podcast")
         #expect(feed.version == "2.0")
     }
@@ -107,12 +110,12 @@ struct FeedTests {
     // MARK: - Mutability
 
     @Test("PodcastFeed properties are mutable")
-    func feedPropertiesAreMutable() {
+    func feedPropertiesAreMutable() throws {
         var feed = PodcastFeed()
 
         feed.version = "3.0"
         feed.namespaces = [.itunes]
-        feed.channel = makeMinimalChannel()
+        feed.channel = try makeMinimalChannel()
 
         #expect(feed.version == "3.0")
         #expect(feed.namespaces.count == 1)
@@ -120,10 +123,10 @@ struct FeedTests {
     }
 
     @Test("PodcastFeed channel can be replaced")
-    func feedChannelCanBeReplaced() {
-        var feed = PodcastFeed(channel: makeMinimalChannel(title: "Original"))
+    func feedChannelCanBeReplaced() throws {
+        var feed = PodcastFeed(channel: try makeMinimalChannel(title: "Original"))
 
-        feed.channel = makeMinimalChannel(title: "Replacement")
+        feed.channel = try makeMinimalChannel(title: "Replacement")
 
         #expect(feed.channel?.title == "Replacement")
     }
@@ -132,7 +135,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates valid RSS structure")
     func feedXmlRepresentation() throws {
-        let channel = makeMinimalChannel()
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(channel: channel)
         let xml = try FeedGenerator().generate(feed)
 
@@ -149,7 +152,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with all standard namespace declarations")
     func feedXmlIncludesNamespaces() throws {
-        let channel = makeMinimalChannel()
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(channel: channel)
         let xml = try FeedGenerator().generate(feed)
 
@@ -163,7 +166,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with custom namespaces only includes those")
     func feedXmlWithCustomNamespaces() throws {
-        let channel = makeMinimalChannel()
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [.itunes], channel: channel)
         let xml = try FeedGenerator().generate(feed)
 
@@ -177,7 +180,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with empty namespaces has no xmlns declarations")
     func feedXmlWithEmptyNamespaces() throws {
-        let channel = makeMinimalChannel()
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [], channel: channel)
         let xml = try FeedGenerator().generate(feed)
 
@@ -188,7 +191,7 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with podcast-only namespace")
     func feedXmlWithPodcastOnlyNamespace() throws {
-        let channel = makeMinimalChannel()
+        let channel = try makeMinimalChannel()
         let feed = PodcastFeed(namespaces: [.podcast], channel: channel)
         let xml = try FeedGenerator().generate(feed)
 
@@ -198,9 +201,10 @@ struct FeedTests {
 
     @Test("PodcastFeed generates XML with channel items")
     func feedXmlIncludesChannelItems() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Test",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             items: [
                 Item(title: "Episode 1"),
@@ -246,17 +250,19 @@ struct FeedTests {
     func feedXmlThrowsWithMatchingDetails() {
         let feed = PodcastFeed(channel: nil)
 
-        #expect(performing: {
-            try FeedGenerator().generate(feed)
-        }, throws: { error in
-            error as? GeneratorError == .missingChannel
-                && error.localizedDescription.contains("Missing channel")
-        })
+        #expect(
+            performing: {
+                try FeedGenerator().generate(feed)
+            },
+            throws: { error in
+                error as? GeneratorError == .missingChannel
+                    && error.localizedDescription.contains("Missing channel")
+            })
     }
 
     @Test("PodcastFeed with channel does not throw")
     func feedWithChannelDoesNotThrow() throws {
-        let feed = PodcastFeed(channel: makeMinimalChannel())
+        let feed = PodcastFeed(channel: try makeMinimalChannel())
         let xml = try FeedGenerator().generate(feed)
         #expect(!xml.isEmpty)
     }
@@ -264,17 +270,18 @@ struct FeedTests {
     // MARK: - Sendable
 
     @Test("PodcastFeed is Sendable")
-    func feedIsSendable() async {
-        let feed = PodcastFeed(channel: makeMinimalChannel())
+    func feedIsSendable() async throws {
+        let feed = PodcastFeed(channel: try makeMinimalChannel())
         let result = await Task { feed.version }.value
         #expect(result == "2.0")
     }
 
     @Test("PodcastFeed channel is accessible across concurrency boundaries")
-    func feedChannelIsSendable() async {
+    func feedChannelIsSendable() async throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Concurrent Podcast",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Desc",
             podcastGuid: PodcastGuid(value: "guid-123")
         )
@@ -286,25 +293,25 @@ struct FeedTests {
     // MARK: - Equatable
 
     @Test("Feeds with identical properties are equal")
-    func feedsWithIdenticalPropertiesAreEqual() {
-        let channel = makeMinimalChannel()
+    func feedsWithIdenticalPropertiesAreEqual() throws {
+        let channel = try makeMinimalChannel()
         let feed1 = PodcastFeed(channel: channel)
         let feed2 = PodcastFeed(channel: channel)
         #expect(feed1 == feed2)
     }
 
     @Test("Feeds with different versions are not equal")
-    func feedsWithDifferentVersionsAreNotEqual() {
-        let channel = makeMinimalChannel()
+    func feedsWithDifferentVersionsAreNotEqual() throws {
+        let channel = try makeMinimalChannel()
         let feed1 = PodcastFeed(version: "2.0", channel: channel)
         let feed2 = PodcastFeed(version: "2.1", channel: channel)
         #expect(feed1 != feed2)
     }
 
     @Test("Feeds with nil vs non-nil channel are not equal")
-    func feedsWithNilVsNonNilChannelAreNotEqual() {
+    func feedsWithNilVsNonNilChannelAreNotEqual() throws {
         let feed1 = PodcastFeed()
-        let feed2 = PodcastFeed(channel: makeMinimalChannel())
+        let feed2 = PodcastFeed(channel: try makeMinimalChannel())
         #expect(feed1 != feed2)
     }
 
@@ -316,9 +323,9 @@ struct FeedTests {
     }
 
     @Test("Feeds with different channels are not equal")
-    func feedsWithDifferentChannelsAreNotEqual() {
-        let feed1 = PodcastFeed(channel: makeMinimalChannel(title: "A"))
-        let feed2 = PodcastFeed(channel: makeMinimalChannel(title: "B"))
+    func feedsWithDifferentChannelsAreNotEqual() throws {
+        let feed1 = PodcastFeed(channel: try makeMinimalChannel(title: "A"))
+        let feed2 = PodcastFeed(channel: try makeMinimalChannel(title: "B"))
         #expect(feed1 != feed2)
     }
 
@@ -356,9 +363,9 @@ struct FeedTests {
     }
 
     @Test("Feeds with different channels produce different hashes")
-    func feedHashDiffersWithChannels() {
-        let feed1 = PodcastFeed(channel: makeMinimalChannel(title: "A"))
-        let feed2 = PodcastFeed(channel: makeMinimalChannel(title: "B"))
+    func feedHashDiffersWithChannels() throws {
+        let feed1 = PodcastFeed(channel: try makeMinimalChannel(title: "A"))
+        let feed2 = PodcastFeed(channel: try makeMinimalChannel(title: "B"))
         let set: Set = [feed1, feed2]
         #expect(set.count == 2)
     }

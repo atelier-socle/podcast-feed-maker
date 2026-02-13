@@ -35,7 +35,7 @@ public struct Channel: Sendable, Hashable, Equatable, Codable {
     public var managingEditor: String?
 
     /// Email address for the webmaster.
-    public var webMaster: String?  // swiftlint:disable:this inclusive_language
+    public var webMaster: String?
 
     /// The publication date for the channel content.
     public var pubDate: Date?
@@ -233,7 +233,6 @@ public struct Channel: Sendable, Hashable, Equatable, Codable {
         language: String? = nil,
         copyright: String? = nil,
         managingEditor: String? = nil,
-        // swiftlint:disable:next inclusive_language
         webMaster: String? = nil,
         pubDate: Date? = nil,
         lastBuildDate: Date? = nil,

@@ -1,14 +1,15 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct AtomLinkTests {
 
     // MARK: - Initialization
 
     @Test
-    func initWithAllParameters() {
-        let href = URL(string: "https://example.com/feed.xml")!
+    func initWithAllParameters() throws {
+        let href = try #require(URL(string: "https://example.com/feed.xml"))
         let link = AtomLink(
             href: href,
             rel: "self",
@@ -27,8 +28,8 @@ struct AtomLinkTests {
     }
 
     @Test
-    func initWithHrefOnly() {
-        let href = URL(string: "https://example.com/feed.xml")!
+    func initWithHrefOnly() throws {
+        let href = try #require(URL(string: "https://example.com/feed.xml"))
         let link = AtomLink(href: href)
 
         #expect(link.href == href)
@@ -42,8 +43,8 @@ struct AtomLinkTests {
     // MARK: - Self Link Factory
 
     @Test
-    func selfLinkFactorySetsSelfRelAndRssType() {
-        let href = URL(string: "https://example.com/feed.xml")!
+    func selfLinkFactorySetsSelfRelAndRssType() throws {
+        let href = try #require(URL(string: "https://example.com/feed.xml"))
         let link = AtomLink.selfLink(href: href)
 
         #expect(link.href == href)
@@ -57,9 +58,9 @@ struct AtomLinkTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() {
-        let url1 = URL(string: "https://example.com/a.xml")!
-        let url2 = URL(string: "https://example.com/b.xml")!
+    func equatableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/a.xml"))
+        let url2 = try #require(URL(string: "https://example.com/b.xml"))
 
         let link1 = AtomLink(href: url1, rel: "self", type: "application/rss+xml")
         let link2 = AtomLink(href: url1, rel: "self", type: "application/rss+xml")
@@ -70,9 +71,9 @@ struct AtomLinkTests {
     }
 
     @Test
-    func hashableConformance() {
-        let url1 = URL(string: "https://example.com/a.xml")!
-        let url2 = URL(string: "https://example.com/b.xml")!
+    func hashableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/a.xml"))
+        let url2 = try #require(URL(string: "https://example.com/b.xml"))
 
         let link1 = AtomLink(href: url1, rel: "self")
         let link2 = AtomLink(href: url1, rel: "self")
@@ -85,8 +86,9 @@ struct AtomLinkTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithRelAndType() {
-        let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
+    func xmlRepresentationWithRelAndType() throws {
+        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let link = AtomLink.selfLink(href: feedURL)
         let b = XMLBuilder()
         var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
         if let rel = link.rel { attrs.append(("rel", rel)) }
@@ -103,8 +105,9 @@ struct AtomLinkTests {
     }
 
     @Test
-    func xmlRepresentationWithHrefOnly() {
-        let link = AtomLink(href: URL(string: "https://example.com/other.xml")!)
+    func xmlRepresentationWithHrefOnly() throws {
+        let otherURL = try #require(URL(string: "https://example.com/other.xml"))
+        let link = AtomLink(href: otherURL)
         let b = XMLBuilder()
         var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
         if let rel = link.rel { attrs.append(("rel", rel)) }
@@ -121,8 +124,9 @@ struct AtomLinkTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() {
-        let link = AtomLink.selfLink(href: URL(string: "https://example.com/feed.xml")!)
+    func xmlRepresentationIsSelfClosingTag() throws {
+        let feedURL = try #require(URL(string: "https://example.com/feed.xml"))
+        let link = AtomLink.selfLink(href: feedURL)
         let b = XMLBuilder()
         var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(link.href))]
         if let rel = link.rel { attrs.append(("rel", rel)) }

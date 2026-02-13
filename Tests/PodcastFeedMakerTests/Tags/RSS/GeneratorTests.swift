@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - GeneratorTests
 
@@ -13,10 +14,11 @@ struct GeneratorTests {
     // MARK: - Initialization
 
     @Test("Channel generator defaults to nil")
-    func channelGeneratorDefaultsToNil() {
+    func channelGeneratorDefaultsToNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -24,10 +26,11 @@ struct GeneratorTests {
     }
 
     @Test("Channel generator can be set at initialization")
-    func channelGeneratorCanBeSet() {
+    func channelGeneratorCanBeSet() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             generator: "PodcastFeedMaker 1.0"
         )
@@ -36,10 +39,11 @@ struct GeneratorTests {
     }
 
     @Test("Channel generator is mutable")
-    func channelGeneratorIsMutable() {
+    func channelGeneratorIsMutable() throws {
+        let link = try #require(URL(string: "https://example.com"))
         var channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -51,9 +55,10 @@ struct GeneratorTests {
 
     @Test("Channel XML contains generator tag when set")
     func channelXmlContainsGenerator() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             generator: "PodcastFeedMaker 1.0"
         )
@@ -64,9 +69,10 @@ struct GeneratorTests {
 
     @Test("Channel XML omits generator tag when nil")
     func channelXmlOmitsGeneratorWhenNil() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description"
         )
 
@@ -76,9 +82,10 @@ struct GeneratorTests {
 
     @Test("Channel XML escapes special characters in generator")
     func channelXmlEscapesSpecialCharsInGenerator() throws {
+        let link = try #require(URL(string: "https://example.com"))
         let channel = Channel(
             title: "Title",
-            link: URL(string: "https://example.com")!,
+            link: link,
             description: "Description",
             generator: "My & Co <2025>"
         )
@@ -90,16 +97,16 @@ struct GeneratorTests {
     // MARK: - Equatable
 
     @Test("Channels with same generator are equal")
-    func channelsWithSameGeneratorAreEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithSameGeneratorAreEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", generator: "Gen")
         let channel2 = Channel(title: "T", link: url, description: "D", generator: "Gen")
         #expect(channel1 == channel2)
     }
 
     @Test("Channels with different generators are not equal")
-    func channelsWithDifferentGeneratorsAreNotEqual() {
-        let url = URL(string: "https://example.com")!
+    func channelsWithDifferentGeneratorsAreNotEqual() throws {
+        let url = try #require(URL(string: "https://example.com"))
         let channel1 = Channel(title: "T", link: url, description: "D", generator: "Gen1")
         let channel2 = Channel(title: "T", link: url, description: "D", generator: "Gen2")
         #expect(channel1 != channel2)

@@ -1,14 +1,15 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastTranscriptTests {
 
     // MARK: - Initialization
 
     @Test
-    func initWithRequiredParameters() {
-        let url = URL(string: "https://example.com/transcript.vtt")!
+    func initWithRequiredParameters() throws {
+        let url = try #require(URL(string: "https://example.com/transcript.vtt"))
         let transcript = Transcript(url: url, type: "text/vtt")
 
         #expect(transcript.url == url)
@@ -18,8 +19,8 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func initWithAllParameters() {
-        let url = URL(string: "https://example.com/transcript.vtt")!
+    func initWithAllParameters() throws {
+        let url = try #require(URL(string: "https://example.com/transcript.vtt"))
         let transcript = Transcript(
             url: url,
             type: "text/vtt",
@@ -68,9 +69,9 @@ struct PodcastTranscriptTests {
     // MARK: - Equatable & Hashable
 
     @Test
-    func equatableConformance() {
-        let url1 = URL(string: "https://example.com/a.vtt")!
-        let url2 = URL(string: "https://example.com/b.srt")!
+    func equatableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/a.vtt"))
+        let url2 = try #require(URL(string: "https://example.com/b.srt"))
 
         let a = Transcript(url: url1, type: "text/vtt")
         let b = Transcript(url: url1, type: "text/vtt")
@@ -81,9 +82,9 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func hashableConformance() {
-        let url1 = URL(string: "https://example.com/a.vtt")!
-        let url2 = URL(string: "https://example.com/b.srt")!
+    func hashableConformance() throws {
+        let url1 = try #require(URL(string: "https://example.com/a.vtt"))
+        let url2 = try #require(URL(string: "https://example.com/b.srt"))
 
         let a = Transcript(url: url1, type: "text/vtt")
         let b = Transcript(url: url1, type: "text/vtt")
@@ -96,9 +97,10 @@ struct PodcastTranscriptTests {
     // MARK: - XML Representation
 
     @Test
-    func xmlRepresentationWithUrlAndType() {
+    func xmlRepresentationWithUrlAndType() throws {
+        let transcriptURL = try #require(URL(string: "https://example.com/subs.srt"))
         let transcript = Transcript(
-            url: URL(string: "https://example.com/subs.srt")!,
+            url: transcriptURL,
             type: "application/srt"
         )
 
@@ -113,9 +115,10 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationWithLanguageAndRel() {
+    func xmlRepresentationWithLanguageAndRel() throws {
+        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
         let transcript = Transcript(
-            url: URL(string: "https://example.com/ep1.vtt")!,
+            url: transcriptURL,
             type: "text/vtt",
             language: "en",
             rel: "captions"
@@ -132,9 +135,10 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationIsSelfClosingTag() {
+    func xmlRepresentationIsSelfClosingTag() throws {
+        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
         let transcript = Transcript(
-            url: URL(string: "https://example.com/ep1.vtt")!,
+            url: transcriptURL,
             type: "text/vtt"
         )
 
@@ -147,9 +151,10 @@ struct PodcastTranscriptTests {
     }
 
     @Test
-    func xmlRepresentationWithoutOptionalAttributes() {
+    func xmlRepresentationWithoutOptionalAttributes() throws {
+        let transcriptURL = try #require(URL(string: "https://example.com/ep1.vtt"))
         let transcript = Transcript(
-            url: URL(string: "https://example.com/ep1.vtt")!,
+            url: transcriptURL,
             type: "text/vtt"
         )
 
