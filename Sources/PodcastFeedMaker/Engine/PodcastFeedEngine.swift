@@ -157,6 +157,35 @@ public struct PodcastFeedEngine: Sendable {
         ).generate(feed)
     }
 
+    // MARK: - Diff
+
+    /// Compares two feed models and returns detailed differences.
+    ///
+    /// - Parameters:
+    ///   - lhs: The original feed.
+    ///   - rhs: The updated feed.
+    /// - Returns: An array of ``FeedDifference`` values.
+    public func diff(
+        _ lhs: PodcastFeed, _ rhs: PodcastFeed
+    ) -> [FeedDifference] {
+        FeedDiff().diff(lhs, rhs)
+    }
+
+    /// Compares two XML feed strings and returns detailed differences.
+    ///
+    /// Parses both strings, then diffs the resulting models.
+    ///
+    /// - Parameters:
+    ///   - lhs: The original XML string.
+    ///   - rhs: The updated XML string.
+    /// - Returns: An array of ``FeedDifference`` values.
+    /// - Throws: ``ParserError`` if either string cannot be parsed.
+    public func diff(
+        xml lhs: String, xml rhs: String
+    ) throws -> [FeedDifference] {
+        try FeedDiff().diff(xml: lhs, xml: rhs)
+    }
+
     /// Checks whether two XML feeds produce equivalent models.
     ///
     /// Parses both strings and compares the resulting ``PodcastFeed``
