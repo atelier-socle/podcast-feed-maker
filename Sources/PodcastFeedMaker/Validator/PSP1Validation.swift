@@ -11,6 +11,9 @@ enum PSP1Validation {
     /// Maximum recommended length for text values.
     private static let maxTextLength = 255
 
+    /// Maximum description size in bytes per PSP-1.
+    private static let maxDescriptionBytes = 4000
+
     // MARK: - Public API
 
     /// Validates the feed against PSP-1 requirements.
@@ -118,6 +121,15 @@ enum PSP1Validation {
                     platform: .psp1
                 ))
         }
+        if channel.language == nil {
+            results.append(
+                ValidationResult(
+                    severity: .error,
+                    message: "Language is required",
+                    field: "channel.language",
+                    platform: .psp1
+                ))
+        }
 
         return results
     }
@@ -128,16 +140,6 @@ enum PSP1Validation {
         _ channel: Channel
     ) -> [ValidationResult] {
         var results: [ValidationResult] = []
-
-        if channel.language == nil {
-            results.append(
-                ValidationResult(
-                    severity: .warning,
-                    message: "Language is recommended",
-                    field: "channel.language",
-                    platform: .psp1
-                ))
-        }
         if channel.itunesAuthor == nil {
             results.append(
                 ValidationResult(
@@ -220,6 +222,17 @@ enum PSP1Validation {
                     platform: .psp1
                 ))
         }
+        if let author = channel.itunesAuthor,
+            hasLeadingOrTrailingWhitespace(author)
+        {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "itunes:author has leading or trailing whitespace",
+                    field: "channel.itunesAuthor",
+                    platform: .psp1
+                ))
+        }
 
         for (idx, item) in channel.items.enumerated() {
             let prefix = "channel.items[\(idx)]"
@@ -255,6 +268,33 @@ enum PSP1Validation {
                     platform: .psp1
                 ))
         }
+        if let author = channel.itunesAuthor, author.count > maxTextLength {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "itunes:author exceeds \(maxTextLength) characters",
+                    field: "channel.itunesAuthor",
+                    platform: .psp1
+                ))
+        }
+        if let itunesTitle = channel.itunesTitle, itunesTitle.count > maxTextLength {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "itunes:title exceeds \(maxTextLength) characters",
+                    field: "channel.itunesTitle",
+                    platform: .psp1
+                ))
+        }
+        if channel.description.data(using: .utf8)?.count ?? 0 > maxDescriptionBytes {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "Description exceeds \(maxDescriptionBytes) bytes",
+                    field: "channel.description",
+                    platform: .psp1
+                ))
+        }
 
         for (idx, item) in channel.items.enumerated() {
             if let title = item.title, title.count > maxTextLength {
@@ -263,6 +303,17 @@ enum PSP1Validation {
                         severity: .warning,
                         message: "Item title exceeds \(maxTextLength) characters",
                         field: "channel.items[\(idx)].title",
+                        platform: .psp1
+                    ))
+            }
+            if let desc = item.description,
+                desc.data(using: .utf8)?.count ?? 0 > maxDescriptionBytes
+            {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "Item description exceeds \(maxDescriptionBytes) bytes",
+                        field: "channel.items[\(idx)].description",
                         platform: .psp1
                     ))
             }

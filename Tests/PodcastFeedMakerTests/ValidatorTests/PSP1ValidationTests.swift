@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - PSP1ValidationTests
 
@@ -26,20 +27,21 @@ struct PSP1ValidationTests {
         itunesAuthor: String? = "Host",
         items: [Item] = []
     ) -> PodcastFeed {
-        PodcastFeed(channel: Channel(
-            title: title,
-            link: URL(string: "https://example.com")!,
-            description: description,
-            language: language,
-            items: items,
-            itunesAuthor: itunesAuthor,
-            itunesCategories: itunesCategories,
-            itunesExplicit: itunesExplicit,
-            itunesImage: itunesImage,
-            atomLinks: atomLinks,
-            podcastGuid: podcastGuid,
-            locked: locked
-        ))
+        PodcastFeed(
+            channel: Channel(
+                title: title,
+                link: URL(string: "https://example.com")!,
+                description: description,
+                language: language,
+                items: items,
+                itunesAuthor: itunesAuthor,
+                itunesCategories: itunesCategories,
+                itunesExplicit: itunesExplicit,
+                itunesImage: itunesImage,
+                atomLinks: atomLinks,
+                podcastGuid: podcastGuid,
+                locked: locked
+            ))
     }
 
     private func validItem() -> Item {
@@ -114,45 +116,49 @@ struct PSP1ValidationTests {
     func missingImage() {
         let feed = psp1Feed(itunesImage: nil)
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesImage"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesImage"
+            })
     }
 
     @Test("Missing itunes:category is error")
     func missingCategory() {
         let feed = psp1Feed(itunesCategories: [])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesCategories"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesCategories"
+            })
     }
 
     @Test("Missing itunes:explicit is error")
     func missingExplicit() {
         let feed = psp1Feed(itunesExplicit: nil)
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesExplicit"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesExplicit"
+            })
     }
 
     // MARK: - Recommended Fields
 
-    @Test("Missing language is warning")
+    @Test("Missing language is error")
     func missingLanguage() {
         let feed = psp1Feed(language: nil)
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains { $0.field == "channel.language" })
+        #expect(report.errors.contains { $0.field == "channel.language" })
     }
 
     @Test("Missing itunes:author is warning")
     func missingAuthor() {
         let feed = psp1Feed(itunesAuthor: nil)
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesAuthor"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesAuthor"
+            })
     }
 
     // MARK: - Item Checks
@@ -162,9 +168,10 @@ struct PSP1ValidationTests {
         let item = Item()
         let feed = psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0]"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0]"
+            })
     }
 
     @Test("Item without enclosure is error")
@@ -172,9 +179,10 @@ struct PSP1ValidationTests {
         let item = Item(title: "Episode")
         let feed = psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0].enclosure"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0].enclosure"
+            })
     }
 
     @Test("Item without GUID is error")
@@ -189,9 +197,10 @@ struct PSP1ValidationTests {
         )
         let feed = psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0].guid"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0].guid"
+            })
     }
 
     // MARK: - Whitespace
@@ -200,19 +209,21 @@ struct PSP1ValidationTests {
     func leadingWhitespaceTitle() {
         let feed = psp1Feed(title: " My Podcast")
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.title" && $0.message.contains("whitespace")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.title" && $0.message.contains("whitespace")
+            })
     }
 
     @Test("Trailing whitespace in description is warning")
     func trailingWhitespaceDescription() {
         let feed = psp1Feed(description: "A podcast ")
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.description"
-                && $0.message.contains("whitespace")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.description"
+                    && $0.message.contains("whitespace")
+            })
     }
 
     // MARK: - Text Length
@@ -222,9 +233,10 @@ struct PSP1ValidationTests {
         let longTitle = String(repeating: "x", count: 300)
         let feed = psp1Feed(title: longTitle)
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.title" && $0.message.contains("255")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.title" && $0.message.contains("255")
+            })
     }
 
     // MARK: - Missing Channel
@@ -250,10 +262,11 @@ struct PSP1ValidationTests {
         )
         let feed = psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.items[0].title"
-                && $0.message.contains("whitespace")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].title"
+                    && $0.message.contains("whitespace")
+            })
     }
 
     // MARK: - Item-Level Title Length
@@ -271,9 +284,10 @@ struct PSP1ValidationTests {
         )
         let feed = psp1Feed(items: [item])
         let report = validator.validate(feed, for: .psp1)
-        #expect(report.warnings.contains {
-            $0.field == "channel.items[0].title"
-                && $0.message.contains("255")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].title"
+                    && $0.message.contains("255")
+            })
     }
 }

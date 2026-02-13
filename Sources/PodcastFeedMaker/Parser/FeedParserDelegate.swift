@@ -172,7 +172,7 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     func parseBool(_ string: String) -> Bool? {
         switch string.lowercased() {
         case "yes", "true", "1": return true
-        case "no", "false", "0": return false
+        case "no", "false", "0", "clean": return false
         default: return nil
         }
     }

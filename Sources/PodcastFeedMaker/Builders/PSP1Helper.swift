@@ -43,6 +43,9 @@ public struct PSP1Configuration: Sendable {
     /// The globally unique identifier (`podcast:guid`).
     public let podcastGUID: String
 
+    /// The feed language (BCP 47). Required by PSP-1.
+    public let language: String
+
     /// Creates a new PSP-1 configuration.
     ///
     /// - Parameters:
@@ -57,6 +60,7 @@ public struct PSP1Configuration: Sendable {
     ///   - explicit: Whether the podcast contains explicit content.
     ///   - imageURL: The podcast artwork URL.
     ///   - podcastGUID: The globally unique identifier.
+    ///   - language: The feed language (BCP 47). Defaults to `"en"`.
     public init(
         title: String,
         link: URL,
@@ -68,7 +72,8 @@ public struct PSP1Configuration: Sendable {
         category: ITunesCategory,
         explicit: Bool,
         imageURL: URL,
-        podcastGUID: String
+        podcastGUID: String,
+        language: String = "en"
     ) {
         self.title = title
         self.link = link
@@ -81,6 +86,7 @@ public struct PSP1Configuration: Sendable {
         self.explicit = explicit
         self.imageURL = imageURL
         self.podcastGUID = podcastGUID
+        self.language = language
     }
 }
 
@@ -105,6 +111,7 @@ extension PodcastFeed {
             title: config.title,
             link: config.link,
             description: config.description,
+            language: config.language,
             itunesAuthor: config.author,
             itunesCategories: [config.category],
             itunesExplicit: config.explicit,

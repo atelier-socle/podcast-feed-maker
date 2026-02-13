@@ -72,4 +72,7 @@ public enum PodcastMedium: String, CaseIterable, Hashable, Equatable, Sendable, 
 
     /// A list of course feeds.
     case courseL
+
+    /// A list of publisher feeds.
+    case publisherL
 }

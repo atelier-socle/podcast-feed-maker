@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - Channel Rating Tests
 
@@ -45,12 +46,13 @@ struct ChannelRatingTests {
 
     @Test("Generator emits rating element when set")
     func generatorEmitsRating() throws {
-        let feed = PodcastFeed(channel: Channel(
-            title: "Test",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
-        ))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Test",
+                link: URL(string: "https://example.com")!,
+                description: "desc",
+                rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
+            ))
         let xml = try FeedGenerator().generate(feed)
         #expect(xml.contains("<rating>"))
         #expect(xml.contains("</rating>"))
@@ -59,29 +61,31 @@ struct ChannelRatingTests {
 
     @Test("Generator omits rating element when nil")
     func generatorOmitsRating() throws {
-        let feed = PodcastFeed(channel: Channel(
-            title: "Test",
-            link: URL(string: "https://example.com")!,
-            description: "desc"
-        ))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Test",
+                link: URL(string: "https://example.com")!,
+                description: "desc"
+            ))
         let xml = try FeedGenerator().generate(feed)
         #expect(!xml.contains("<rating>"))
     }
 
     @Test("Generator places rating between ttl and image")
     func generatorRatingOrdering() throws {
-        let feed = PodcastFeed(channel: Channel(
-            title: "Test",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            ttl: 60,
-            rating: "test-rating",
-            image: RSSImage(
-                url: URL(string: "https://example.com/img.jpg")!,
-                title: "Art",
-                link: URL(string: "https://example.com")!
-            )
-        ))
+        let feed = PodcastFeed(
+            channel: Channel(
+                title: "Test",
+                link: URL(string: "https://example.com")!,
+                description: "desc",
+                ttl: 60,
+                rating: "test-rating",
+                image: RSSImage(
+                    url: URL(string: "https://example.com/img.jpg")!,
+                    title: "Art",
+                    link: URL(string: "https://example.com")!
+                )
+            ))
         let xml = try FeedGenerator().generate(feed)
         let ttlRange = try #require(xml.range(of: "<ttl>"))
         let ratingRange = try #require(xml.range(of: "<rating>"))
@@ -130,12 +134,13 @@ struct ChannelRatingTests {
 
     @Test("Rating survives round-trip: generate → parse")
     func ratingRoundTrip() throws {
-        let original = PodcastFeed(channel: Channel(
-            title: "Test",
-            link: URL(string: "https://example.com")!,
-            description: "desc",
-            rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
-        ))
+        let original = PodcastFeed(
+            channel: Channel(
+                title: "Test",
+                link: URL(string: "https://example.com")!,
+                description: "desc",
+                rating: "(PICS-1.1 \"http://www.classify.org/safesurf/\" 1 r (SS~~000 1))"
+            ))
         let xml = try FeedGenerator().generate(original)
         let reparsed = try FeedParser().parse(xml)
         #expect(reparsed.channel?.rating == original.channel?.rating)
@@ -262,7 +267,7 @@ struct JSONChapterListMetadataTests {
             podcastName: "Podcast Name",
             chapters: [
                 JSONChapter(startTime: 0, title: "Intro"),
-                JSONChapter(startTime: 300, title: "Main"),
+                JSONChapter(startTime: 300, title: "Main")
             ]
         )
         let data = try JSONEncoder().encode(original)
@@ -287,11 +292,11 @@ struct JSONChapterListMetadataTests {
 @Suite("PodcastMedium Tests")
 struct PodcastMediumTests {
 
-    // MARK: - All 18 Cases
+    // MARK: - All 19 Cases
 
-    @Test("All 18 cases exist")
+    @Test("All 19 cases exist")
     func allCasesCount() {
-        #expect(PodcastMedium.allCases.count == 18)
+        #expect(PodcastMedium.allCases.count == 19)
     }
 
     @Test("Core types have correct rawValues")
@@ -318,15 +323,16 @@ struct PodcastMediumTests {
         #expect(PodcastMedium.newsletterL.rawValue == "newsletterL")
         #expect(PodcastMedium.blogL.rawValue == "blogL")
         #expect(PodcastMedium.courseL.rawValue == "courseL")
+        #expect(PodcastMedium.publisherL.rawValue == "publisherL")
     }
 
-    @Test("Init from rawValue works for all 18 cases")
+    @Test("Init from rawValue works for all 19 cases")
     func initFromRawValue() {
         let rawValues = [
             "podcast", "music", "video", "film", "audiobook",
             "newsletter", "blog", "publisher", "course", "mixed",
             "podcastL", "musicL", "videoL", "filmL", "audiobookL",
-            "newsletterL", "blogL", "courseL",
+            "newsletterL", "blogL", "courseL", "publisherL"
         ]
         for raw in rawValues {
             #expect(PodcastMedium(rawValue: raw) != nil, "Failed for: \(raw)")
@@ -336,7 +342,6 @@ struct PodcastMediumTests {
     @Test("Init from invalid rawValue returns nil")
     func initInvalidRawValue() {
         #expect(PodcastMedium(rawValue: "unknown") == nil)
-        #expect(PodcastMedium(rawValue: "publisherL") == nil)
         #expect(PodcastMedium(rawValue: "") == nil)
     }
 

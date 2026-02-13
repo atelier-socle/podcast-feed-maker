@@ -15,7 +15,7 @@ private let appleAllowedAudioTypes: Set<String> = [
 ///
 /// Apple Podcasts has strict requirements including HTTPS-only URLs,
 /// iTunes tags, and artwork specifications.
-enum AppleValidation {
+enum AppleValidation {  // swiftlint:disable:this type_body_length
 
     // MARK: - Public API
 
@@ -280,16 +280,25 @@ enum AppleValidation {
         }
 
         for (idx, item) in channel.items.enumerated() {
-            if let enclosure = item.enclosure,
-                enclosure.url.scheme?.lowercased() != "https"
-            {
-                results.append(
-                    ValidationResult(
-                        severity: .error,
-                        message: "Enclosure URL must use HTTPS",
-                        field: "channel.items[\(idx)].enclosure.url",
-                        platform: .apple
-                    ))
+            if let enclosure = item.enclosure {
+                if enclosure.url.scheme?.lowercased() != "https" {
+                    results.append(
+                        ValidationResult(
+                            severity: .error,
+                            message: "Enclosure URL must use HTTPS",
+                            field: "channel.items[\(idx)].enclosure.url",
+                            platform: .apple
+                        ))
+                }
+                if !enclosure.url.absoluteString.allSatisfy(\.isASCII) {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Enclosure URL contains non-ASCII characters",
+                            field: "channel.items[\(idx)].enclosure.url",
+                            platform: .apple
+                        ))
+                }
             }
         }
 
@@ -342,14 +351,27 @@ enum AppleValidation {
                     platform: .apple
                 ))
         }
-        if channel.description.count > 4000 {
+        if channel.description.data(using: .utf8)?.count ?? 0 > 4000 {
             results.append(
                 ValidationResult(
                     severity: .warning,
-                    message: "Description should not exceed 4000 characters",
+                    message: "Description exceeds 4000 bytes",
                     field: "channel.description",
                     platform: .apple
                 ))
+        }
+        for (idx, item) in channel.items.enumerated() {
+            if let desc = item.description,
+                desc.data(using: .utf8)?.count ?? 0 > 4000
+            {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "Item description exceeds 4000 bytes",
+                        field: "channel.items[\(idx)].description",
+                        platform: .apple
+                    ))
+            }
         }
 
         return results
