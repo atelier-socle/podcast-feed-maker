@@ -1,4 +1,6 @@
-name: Deploy DocC to GitHub Pages
+# docc-deploy.yml — Deploy DocC documentation to GitHub Pages.
+
+name: DocC
 
 on:
   push:
@@ -6,28 +8,37 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  deploy-docc:
-    runs-on: macos-latest
-
+  deploy:
+    name: "Deploy DocC"
+    runs-on: macos-26
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
-
-      - name: 🛠️ Set up Swift
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "6.0"
-
-      - name: 📘 Build documentation
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.2.app
+      - name: Build Documentation
         run: |
-          mkdir -p docs
-          swift package --allow-writing-to-directory docs             generate-documentation             --target PodcastFeedMaker             --output-path docs             --transform-for-static-hosting             --hosting-base-path podcast-feed-maker             --disable-indexing
-
-      - name: 🚀 Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+          swift package --allow-writing-to-directory docs \
+            generate-documentation \
+            --target PodcastFeedMaker \
+            --output-path docs \
+            --transform-for-static-hosting \
+            --hosting-base-path podcast-feed-maker \
+            --disable-indexing
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          path: docs
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
