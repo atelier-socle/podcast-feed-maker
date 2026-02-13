@@ -35,6 +35,8 @@ jobs:
             --transform-for-static-hosting \
             --hosting-base-path podcast-feed-maker \
             --disable-indexing
+      - name: Add root redirect
+        run: echo '<meta http-equiv="refresh" content="0; url=documentation/podcastfeedmaker/" />' > docs/index.html
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
