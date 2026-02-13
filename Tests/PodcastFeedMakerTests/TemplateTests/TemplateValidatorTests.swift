@@ -1,0 +1,269 @@
+import Foundation
+import Testing
+
+@testable import PodcastFeedMaker
+
+@Suite("TemplateValidator")
+struct TemplateValidatorTests {
+
+    private let validator = TemplateValidator()
+    private let testURL = URL(string: "https://example.com")!
+    private let imageURL = URL(string: "https://example.com/art.jpg")!
+
+    // MARK: - Helpers
+
+    private func makeMinimalFeed() -> PodcastFeed {
+        let channel = Channel(
+            title: "Test", link: testURL, description: "A test podcast"
+        )
+        return PodcastFeed(channel: channel)
+    }
+
+    private func makeBasicCompliantFeed() -> PodcastFeed {
+        PodcastFeed.basic(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.category(.technology).explicit(false).image(self.imageURL.absoluteString)
+        }
+    }
+
+    private func makeStandardCompliantFeed() -> PodcastFeed {
+        PodcastFeed.standard(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.author("Host")
+                .explicit(false)
+                .category(.technology)
+                .owner(name: "Host", email: "h@example.com")
+                .locked(owner: "h@example.com")
+                .guid("aaaa-bbbb-cccc")
+                .atomLink(href: "https://example.com/feed.xml", rel: "self")
+                .image(self.imageURL.absoluteString)
+                .language("en")
+        }
+    }
+
+    // MARK: - Basic Validation
+
+    @Test("compliant basic feed has no errors")
+    func basicCompliant() {
+        let feed = makeBasicCompliantFeed()
+        let report = validator.validate(feed, against: BasicTemplate())
+        #expect(report.isCompliant)
+    }
+
+    @Test("missing itunesImage produces error")
+    func missingItunesImage() {
+        let feed = PodcastFeed.basic(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.category(.technology).explicit(false)
+        }
+        let report = validator.validate(feed, against: BasicTemplate())
+        #expect(!report.isCompliant)
+        let imageError = report.errors.first { $0.tag == .itunesImage }
+        #expect(imageError != nil)
+    }
+
+    @Test("missing itunesCategory produces error")
+    func missingCategory() {
+        let feed = PodcastFeed.basic(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.explicit(false).image(self.imageURL.absoluteString)
+        }
+        let report = validator.validate(feed, against: BasicTemplate())
+        let categoryError = report.errors.first { $0.tag == .itunesCategory }
+        #expect(categoryError != nil)
+    }
+
+    @Test("missing itunesExplicit produces error")
+    func missingExplicit() {
+        let feed = PodcastFeed.basic(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.category(.technology).image(self.imageURL.absoluteString)
+        }
+        let report = validator.validate(feed, against: BasicTemplate())
+        let explicitError = report.errors.first { $0.tag == .itunesExplicit }
+        #expect(explicitError != nil)
+    }
+
+    @Test("missing recommended tags produce warnings not errors")
+    func recommendedWarnings() {
+        let feed = makeBasicCompliantFeed()
+        let report = validator.validate(feed, against: BasicTemplate())
+        // language is recommended for basic — should be a warning
+        let languageWarning = report.warnings.first { $0.tag == .language }
+        #expect(languageWarning != nil)
+        // Still compliant because warnings don't affect compliance
+        #expect(report.isCompliant)
+    }
+
+    // MARK: - Standard Validation
+
+    @Test("standard compliant feed has no errors")
+    func standardCompliant() {
+        let feed = makeStandardCompliantFeed()
+        let report = validator.validate(feed, against: StandardTemplate())
+        #expect(report.isCompliant)
+    }
+
+    @Test("standard template detects missing podcastGuid")
+    func missingPodcastGuid() {
+        let feed = PodcastFeed.standard(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.author("Host")
+                .explicit(false)
+                .category(.technology)
+                .owner(name: "Host", email: "h@example.com")
+                .locked(owner: "h@example.com")
+                .atomLink(href: "https://example.com/feed.xml", rel: "self")
+                .image(self.imageURL.absoluteString)
+                .language("en")
+        }
+        let report = validator.validate(feed, against: StandardTemplate())
+        let guidError = report.errors.first { $0.tag == .podcastGuid }
+        #expect(guidError != nil)
+    }
+
+    // MARK: - Item Validation
+
+    @Test("missing required item tags produce errors")
+    func missingItemTags() {
+        var feed = makeBasicCompliantFeed()
+        // Add an item without title or enclosure
+        feed.channel?.items = [Item()]
+        let report = validator.validate(feed, against: BasicTemplate())
+        let titleError = report.errors.first { $0.tag == .itemTitle }
+        let enclosureError = report.errors.first { $0.tag == .itemEnclosure }
+        #expect(titleError != nil)
+        #expect(enclosureError != nil)
+    }
+
+    @Test("item with all required basic tags passes")
+    func itemWithRequiredTags() {
+        var feed = makeBasicCompliantFeed()
+        feed.channel?.items = [
+            Item(
+                title: "Episode 1",
+                enclosure: Enclosure.mp3(url: "https://example.com/ep1.mp3", length: 1000)
+            )
+        ]
+        let report = validator.validate(feed, against: BasicTemplate())
+        let itemErrors = report.errors.filter {
+            $0.message.contains("item[")
+        }
+        #expect(itemErrors.isEmpty)
+    }
+
+    // MARK: - No Channel
+
+    @Test("feed without channel produces error")
+    func noChannel() {
+        let feed = PodcastFeed()
+        let report = validator.validate(feed, against: BasicTemplate())
+        #expect(!report.isCompliant)
+        #expect(report.errors.count == 1)
+        #expect(report.errors[0].message.contains("no channel"))
+    }
+
+    // MARK: - Level Detection
+
+    @Test("detectLevel returns basic for minimal feed")
+    func detectBasic() {
+        let feed = makeBasicCompliantFeed()
+        let level = validator.detectLevel(feed)
+        #expect(level == .basic)
+    }
+
+    @Test("detectLevel returns standard for PSP-1 compliant feed")
+    func detectStandard() {
+        let config = PSP1Configuration(
+            title: "Show",
+            link: testURL,
+            description: "About",
+            feedURL: URL(string: "https://example.com/feed.xml")!,
+            author: "Host",
+            ownerName: "Host",
+            ownerEmail: "h@example.com",
+            category: .technology,
+            explicit: false,
+            imageURL: imageURL,
+            podcastGUID: "aaaa-bbbb-cccc"
+        )
+        let feed = PodcastFeed.psp1Compliant(config: config)
+        let level = validator.detectLevel(feed)
+        // PSP-1 feeds match standard (may match higher if more tags present)
+        #expect(level >= .standard)
+    }
+
+    // MARK: - Level Mismatch Detection
+
+    @Test("expert tag in basic feed produces info")
+    func levelMismatch() {
+        var feed = makeBasicCompliantFeed()
+        feed.channel?.value = PodcastValue(
+            type: "lightning", method: "keysend", recipients: []
+        )
+        let report = validator.validate(feed, against: BasicTemplate())
+        let infos = report.infos.filter { $0.tag == .podcastValue }
+        #expect(!infos.isEmpty)
+    }
+
+    @Test("level mismatch info has suggestedLevel populated")
+    func levelMismatchSuggestedLevel() {
+        var feed = makeBasicCompliantFeed()
+        feed.channel?.value = PodcastValue(
+            type: "lightning", method: "keysend", recipients: []
+        )
+        let report = validator.validate(feed, against: BasicTemplate())
+        let valueInfo = report.infos.first { $0.tag == .podcastValue }
+        #expect(valueInfo?.suggestedLevel == .expert)
+    }
+
+    @Test("error results have nil suggestedLevel")
+    func errorResultsNilSuggestedLevel() {
+        let feed = PodcastFeed.basic(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.category(.technology).explicit(false)
+        }
+        let report = validator.validate(feed, against: BasicTemplate())
+        for error in report.errors {
+            #expect(error.suggestedLevel == nil)
+        }
+    }
+
+    @Test("warning results have nil suggestedLevel")
+    func warningResultsNilSuggestedLevel() {
+        let feed = makeBasicCompliantFeed()
+        let report = validator.validate(feed, against: BasicTemplate())
+        for warning in report.warnings {
+            #expect(warning.suggestedLevel == nil)
+        }
+    }
+
+    // MARK: - Standard ≡ PSP1Configuration
+
+    @Test("standard template + PSP-1 fields passes PSP-1 validation")
+    func standardMatchesPSP1() {
+        let feed = PodcastFeed.standard(
+            title: "Show", link: testURL, description: "About"
+        ) { ch in
+            ch.author("Host")
+                .explicit(false)
+                .category(.technology)
+                .owner(name: "Host", email: "h@example.com")
+                .locked(owner: "h@example.com")
+                .guid("aaaa-bbbb-cccc")
+                .atomLink(href: "https://example.com/feed.xml", rel: "self")
+                .image(self.imageURL.absoluteString)
+                .language("en")
+        }
+        let report = FeedValidator().validate(feed, for: .psp1)
+        #expect(report.isValid)
+        #expect(report.errors.isEmpty)
+    }
+}
