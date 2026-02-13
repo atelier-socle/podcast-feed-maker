@@ -14,8 +14,11 @@ enum CrossCuttingValidation {
 
         var results: [ValidationResult] = []
         results += checkGuidUniqueness(channel)
+        results += checkGuidPermaLinkConsistency(channel)
         results += checkURLFormats(channel)
         results += checkItemMinimumContent(channel)
+        results += checkFuturePubDate(channel)
+        results += checkAtomSelfLink(channel)
         return results
     }
 
@@ -41,6 +44,87 @@ enum CrossCuttingValidation {
             }
         }
         return results
+    }
+
+    // MARK: - GUID PermaLink Consistency
+
+    private static func checkGuidPermaLinkConsistency(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+        for (idx, item) in channel.items.enumerated() {
+            guard let guid = item.guid else { continue }
+            let looksLikeURL =
+                guid.value.hasPrefix("http://")
+                || guid.value.hasPrefix("https://")
+
+            if looksLikeURL && !guid.isPermaLink {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "GUID looks like a URL but isPermaLink is false",
+                        field: "channel.items[\(idx)].guid"
+                    ))
+            }
+            if !looksLikeURL && guid.isPermaLink {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "GUID is not a URL but isPermaLink is true",
+                        field: "channel.items[\(idx)].guid"
+                    ))
+            }
+        }
+        return results
+    }
+
+    // MARK: - Future PubDate
+
+    private static func checkFuturePubDate(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+        let futureThreshold = Date().addingTimeInterval(24 * 60 * 60)
+
+        if let pubDate = channel.pubDate, pubDate > futureThreshold {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "Channel pubDate is more than 24 hours in the future",
+                    field: "channel.pubDate"
+                ))
+        }
+
+        for (idx, item) in channel.items.enumerated() {
+            if let pubDate = item.pubDate, pubDate > futureThreshold {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "Item pubDate is more than 24 hours in the future",
+                        field: "channel.items[\(idx)].pubDate"
+                    ))
+            }
+        }
+
+        return results
+    }
+
+    // MARK: - Atom Self Link
+
+    private static func checkAtomSelfLink(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        let hasSelfLink = channel.atomLinks.contains { $0.rel == "self" }
+        if !hasSelfLink {
+            return [
+                ValidationResult(
+                    severity: .info,
+                    message: "No atom:link with rel=\"self\" found",
+                    field: "channel.atomLinks"
+                )
+            ]
+        }
+        return []
     }
 
     // MARK: - URL Format

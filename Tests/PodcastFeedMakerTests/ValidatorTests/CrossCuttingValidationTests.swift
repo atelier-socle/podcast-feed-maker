@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 @Suite("CrossCuttingValidation Tests")
 struct CrossCuttingValidationTests {
@@ -88,5 +89,106 @@ struct CrossCuttingValidationTests {
         let feed = PodcastFeed(channel: channel)
         let results = CrossCuttingValidation.validate(feed)
         #expect(!results.contains { $0.message.contains("title or description") })
+    }
+
+    // MARK: - GUID PermaLink Consistency
+
+    @Test("URL-like GUID with isPermaLink false generates warning")
+    func urlGuidNotPermaLink() {
+        let item = Item(
+            title: "Episode",
+            guid: GUID(
+                value: "https://example.com/ep1",
+                isPermaLink: false
+            )
+        )
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [item]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let results = CrossCuttingValidation.validate(feed)
+        #expect(
+            results.contains {
+                $0.message.contains("looks like a URL") && $0.message.contains("isPermaLink")
+            })
+    }
+
+    @Test("Non-URL GUID with isPermaLink true generates warning")
+    func nonUrlGuidIsPermaLink() {
+        let item = Item(
+            title: "Episode",
+            guid: GUID(value: "ep-001-uuid", isPermaLink: true)
+        )
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [item]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let results = CrossCuttingValidation.validate(feed)
+        #expect(
+            results.contains {
+                $0.message.contains("not a URL") && $0.message.contains("isPermaLink")
+            })
+    }
+
+    // MARK: - Future PubDate
+
+    @Test("PubDate more than 24h in the future generates warning")
+    func futurePubDate() {
+        let futureDate = Date().addingTimeInterval(48 * 60 * 60)
+        let item = Item(title: "Episode", pubDate: futureDate)
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [item]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let results = CrossCuttingValidation.validate(feed)
+        #expect(
+            results.contains {
+                $0.message.contains("future") && $0.field.contains("pubDate")
+            })
+    }
+
+    @Test("PubDate within 24h does not generate warning")
+    func recentPubDate() {
+        let recentDate = Date().addingTimeInterval(12 * 60 * 60)
+        let item = Item(title: "Episode", pubDate: recentDate)
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [item]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let results = CrossCuttingValidation.validate(feed)
+        #expect(
+            !results.contains {
+                $0.message.contains("future") && $0.field.contains("pubDate")
+            })
+    }
+
+    // MARK: - Atom Self Link
+
+    @Test("No atom:link self generates info")
+    func noAtomSelfLink() {
+        let channel = Channel(
+            title: "Podcast",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [Item(title: "Ep")]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let results = CrossCuttingValidation.validate(feed)
+        #expect(
+            results.contains {
+                $0.message.contains("atom:link") && $0.message.contains("self")
+            })
     }
 }

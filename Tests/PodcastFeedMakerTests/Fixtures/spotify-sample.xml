@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:psc="http://podlove.org/simple-chapters">
+  <channel>
+    <title>Spotify Sample Podcast</title>
+    <link>https://example.com/spotify</link>
+    <description>A Spotify-optimized feed with MP3-only enclosures and short descriptions</description>
+    <atom:link href="https://example.com/spotify/feed.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <itunes:author>Spotify Host</itunes:author>
+    <itunes:category text="Music" />
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="https://example.com/spotify/artwork-2048x2048.jpg" />
+    <itunes:owner>
+      <itunes:name>Spotify Host</itunes:name>
+      <itunes:email>host@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:type>episodic</itunes:type>
+    <item>
+      <title>Track Review: Latest Hits</title>
+      <description>Reviewing the top tracks this week</description>
+      <enclosure url="https://example.com/spotify/ep1.mp3" length="42000000" type="audio/mpeg" />
+      <guid isPermaLink="false">spotify-ep-001</guid>
+      <pubDate>Fri, 07 Feb 2025 12:00:00 +0000</pubDate>
+      <itunes:duration>2100</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <psc:chapters version="1.2">
+        <psc:chapter start="00:00:00.000" title="Introduction" />
+        <psc:chapter start="00:02:30" title="Track 1: Morning Light" />
+        <psc:chapter start="00:08:15" title="Track 2: City Nights" />
+        <psc:chapter start="00:15:00" title="Track 3: Ocean Waves" />
+        <psc:chapter start="00:22:00" title="Wrap Up" />
+      </psc:chapters>
+    </item>
+    <item>
+      <title>Artist Spotlight</title>
+      <description>An in-depth look at emerging artists</description>
+      <enclosure url="https://example.com/spotify/ep2.mp3" length="38000000" type="audio/mpeg" />
+      <guid isPermaLink="false">spotify-ep-002</guid>
+      <pubDate>Fri, 31 Jan 2025 12:00:00 +0000</pubDate>
+      <itunes:duration>1900</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+  </channel>
+</rss>

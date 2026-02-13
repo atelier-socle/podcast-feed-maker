@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - AppleValidationTests
 
@@ -21,19 +22,20 @@ struct AppleValidationTests {
         language: String? = "en",
         itunesType: ITunesShowType? = .episodic
     ) -> PodcastFeed {
-        PodcastFeed(channel: Channel(
-            title: "Podcast",
-            link: URL(string: "https://example.com")!,
-            description: "A great podcast",
-            language: language,
-            items: items,
-            itunesAuthor: itunesAuthor,
-            itunesCategories: itunesCategories,
-            itunesExplicit: itunesExplicit,
-            itunesImage: itunesImage,
-            itunesOwner: itunesOwner,
-            itunesType: itunesType
-        ))
+        PodcastFeed(
+            channel: Channel(
+                title: "Podcast",
+                link: URL(string: "https://example.com")!,
+                description: "A great podcast",
+                language: language,
+                items: items,
+                itunesAuthor: itunesAuthor,
+                itunesCategories: itunesCategories,
+                itunesExplicit: itunesExplicit,
+                itunesImage: itunesImage,
+                itunesOwner: itunesOwner,
+                itunesType: itunesType
+            ))
     }
 
     private func validItem(index: Int = 0) -> Item {
@@ -107,18 +109,20 @@ struct AppleValidationTests {
     func missingCategory() {
         let feed = appleFeed(items: [validItem()], itunesCategories: [])
         let report = validator.validate(feed, for: .apple)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesCategories"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesCategories"
+            })
     }
 
     @Test("Missing itunes:explicit is error")
     func missingExplicit() {
         let feed = appleFeed(items: [validItem()], itunesExplicit: nil)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesExplicit"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesExplicit"
+            })
     }
 
     @Test("No items with enclosure is error")
@@ -138,10 +142,11 @@ struct AppleValidationTests {
             itunesImage: URL(string: "http://example.com/art.jpg")
         )
         let report = validator.validate(feed, for: .apple)
-        #expect(report.errors.contains {
-            $0.field == "channel.itunesImage"
-                && $0.message.contains("HTTPS")
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.itunesImage"
+                    && $0.message.contains("HTTPS")
+            })
     }
 
     @Test("HTTP enclosure URL is error")
@@ -156,9 +161,10 @@ struct AppleValidationTests {
         )
         let feed = appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0].enclosure.url"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0].enclosure.url"
+            })
     }
 
     @Test("HTTPS enclosure URL passes")
@@ -185,9 +191,10 @@ struct AppleValidationTests {
         )
         let feed = appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
-        #expect(report.errors.contains {
-            $0.field == "channel.items[0].enclosure.type"
-        })
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0].enclosure.type"
+            })
     }
 
     // MARK: - Recommended Fields
@@ -196,27 +203,30 @@ struct AppleValidationTests {
     func missingAuthorWarning() {
         let feed = appleFeed(items: [validItem()], itunesAuthor: nil)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesAuthor"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesAuthor"
+            })
     }
 
     @Test("Missing itunes:owner is warning")
     func missingOwnerWarning() {
         let feed = appleFeed(items: [validItem()], itunesOwner: nil)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.itunesOwner"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.itunesOwner"
+            })
     }
 
     @Test("Missing language is warning")
     func missingLanguageWarning() {
         let feed = appleFeed(items: [validItem()], language: nil)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.language"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.language"
+            })
     }
 
     @Test("Missing itunes:type is info")
@@ -240,9 +250,10 @@ struct AppleValidationTests {
         )
         let feed = appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.items[0].guid"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].guid"
+            })
     }
 
     @Test("Item missing pubDate generates warning")
@@ -258,9 +269,10 @@ struct AppleValidationTests {
         )
         let feed = appleFeed(items: [item])
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.items[0].pubDate"
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].pubDate"
+            })
     }
 
     // MARK: - Length Checks
@@ -279,9 +291,10 @@ struct AppleValidationTests {
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.title" && $0.message.contains("255")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.title" && $0.message.contains("255")
+            })
     }
 
     @Test("Description over 4000 chars generates warning")
@@ -298,8 +311,45 @@ struct AppleValidationTests {
         )
         let feed = PodcastFeed(channel: channel)
         let report = validator.validate(feed, for: .apple)
-        #expect(report.warnings.contains {
-            $0.field == "channel.description" && $0.message.contains("4000")
-        })
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.description" && $0.message.contains("4000")
+            })
+    }
+
+    // MARK: - Cross-Field Validation
+
+    @Test("Duration without enclosure is warning")
+    func durationWithoutEnclosure() {
+        let item = Item(title: "Episode", itunesDuration: 600)
+        let feed = appleFeed(items: [item])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            report.warnings.contains {
+                $0.message.contains("duration") && $0.message.contains("enclosure")
+            })
+    }
+
+    @Test("Serial show without season/episode tags is info")
+    func serialNoSeasonEpisode() {
+        let item = validItem()
+        let feed = appleFeed(items: [item], itunesType: .serial)
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            report.infos.contains {
+                $0.message.contains("Serial") && $0.message.contains("season")
+            })
+    }
+
+    @Test("Serial show with season tag does not warn")
+    func serialWithSeason() {
+        var item = validItem()
+        item.itunesSeason = 1
+        let feed = appleFeed(items: [item], itunesType: .serial)
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            !report.infos.contains {
+                $0.message.contains("Serial") && $0.message.contains("season")
+            })
     }
 }

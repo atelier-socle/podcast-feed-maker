@@ -30,6 +30,7 @@ enum PodcastIndexValidation {
         results += validateChannelRecommended(channel)
         results += validateItems(channel)
         results += validateValue(channel)
+        results += validateCrossField(channel)
         return results
     }
 
@@ -127,6 +128,41 @@ enum PodcastIndexValidation {
                         platform: .podcastIndex
                     ))
             }
+        }
+
+        return results
+    }
+
+    // MARK: - Cross-Field
+
+    private static func validateCrossField(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+
+        if let value = channel.value {
+            for timeSplit in value.timeSplits {
+                if let remote = timeSplit.remoteItem, remote.feedGuid.isEmpty {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "valueTimeSplit remoteItem has empty feedGuid",
+                            field: "channel.value.timeSplits",
+                            platform: .podcastIndex
+                        ))
+                }
+            }
+        }
+
+        for (idx, item) in channel.items.enumerated()
+        where !item.alternateEnclosures.isEmpty {
+            results.append(
+                ValidationResult(
+                    severity: .info,
+                    message: "Item has alternate enclosures for enhanced delivery",
+                    field: "channel.items[\(idx)].alternateEnclosures",
+                    platform: .podcastIndex
+                ))
         }
 
         return results

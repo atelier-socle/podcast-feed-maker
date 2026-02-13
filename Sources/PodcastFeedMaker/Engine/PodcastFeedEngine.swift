@@ -117,6 +117,25 @@ public struct PodcastFeedEngine: Sendable {
         FeedValidator().validateAll(feed)
     }
 
+    // MARK: - Network Validation
+
+    /// Validates feed URLs by performing HTTP HEAD requests.
+    ///
+    /// Checks artwork, enclosures, Atom links, and funding URLs for
+    /// reachability and correct content types. Uses HEAD requests only
+    /// (no downloads).
+    ///
+    /// - Parameters:
+    ///   - feed: The feed to validate.
+    ///   - session: The URL session to use. Defaults to `.shared`.
+    /// - Returns: Validation results for all checked URLs.
+    public func validateNetwork(
+        _ feed: PodcastFeed,
+        session: URLSession = .shared
+    ) async throws -> [ValidationResult] {
+        try await NetworkValidator(session: session).checkAllURLs(feed)
+    }
+
     // MARK: - Combined Workflows
 
     /// Parses an XML string and validates the result against a platform.

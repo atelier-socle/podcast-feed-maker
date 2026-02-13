@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Amazon Sample Podcast</title>
+    <link>https://example.com/amazon</link>
+    <description>A feed optimized for Amazon Music and Audible with broader format support</description>
+    <atom:link href="https://example.com/amazon/feed.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <copyright>Copyright 2025 Amazon Sample</copyright>
+    <itunes:author>Amazon Host</itunes:author>
+    <itunes:category text="Arts">
+      <itunes:category text="Books" />
+    </itunes:category>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="https://example.com/amazon/artwork-3000x3000.jpg" />
+    <itunes:owner>
+      <itunes:name>Amazon Host</itunes:name>
+      <itunes:email>host@amazon-example.com</itunes:email>
+    </itunes:owner>
+    <itunes:type>episodic</itunes:type>
+    <item>
+      <title>Audiobook Review: Chapter 1</title>
+      <description>Reviewing the latest bestseller audiobook</description>
+      <enclosure url="https://example.com/amazon/ep1.m4a" length="45000000" type="audio/x-m4a" />
+      <guid isPermaLink="false">amazon-ep-001</guid>
+      <pubDate>Thu, 06 Feb 2025 10:00:00 +0000</pubDate>
+      <itunes:duration>2250</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/amazon/ep1-art.jpg" />
+    </item>
+    <item>
+      <title>Audiobook Review: Chapter 2</title>
+      <description>Continuing our deep dive into the bestseller</description>
+      <enclosure url="https://example.com/amazon/ep2.m4a" length="52000000" type="audio/x-m4a" />
+      <guid isPermaLink="false">amazon-ep-002</guid>
+      <pubDate>Thu, 13 Feb 2025 10:00:00 +0000</pubDate>
+      <itunes:duration>2600</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/amazon/ep2-art.jpg" />
+    </item>
+  </channel>
+</rss>

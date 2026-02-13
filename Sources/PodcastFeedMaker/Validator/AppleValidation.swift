@@ -41,6 +41,7 @@ enum AppleValidation {
         results += validateItems(channel)
         results += validateURLSchemes(channel)
         results += validateLengths(channel)
+        results += validateCrossField(channel)
         return results
     }
 
@@ -282,6 +283,36 @@ enum AppleValidation {
             }
         }
 
+        return results
+    }
+
+    // MARK: - Cross-Field
+
+    private static func validateCrossField(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+        for (idx, item) in channel.items.enumerated()
+        where item.itunesDuration != nil && item.enclosure == nil {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "Item has itunes:duration but no enclosure",
+                    field: "channel.items[\(idx)]",
+                    platform: .apple
+                ))
+        }
+        if channel.itunesType == .serial,
+            !channel.items.contains(where: { $0.itunesSeason != nil || $0.itunesEpisode != nil })
+        {
+            results.append(
+                ValidationResult(
+                    severity: .info,
+                    message: "Serial show has no items with itunes:season or itunes:episode",
+                    field: "channel.itunesType",
+                    platform: .apple
+                ))
+        }
         return results
     }
 

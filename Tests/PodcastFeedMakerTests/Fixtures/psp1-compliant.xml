@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:podcast="https://podcastindex.org/namespace/1.0"
+  xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PSP-1 Compliant Feed</title>
+    <link>https://example.com/psp1</link>
+    <description>A feed meeting all PSP-1 (Podcast Standards Project v1) requirements</description>
+    <atom:link href="https://example.com/psp1/feed.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <copyright>Copyright 2025 PSP1 Example</copyright>
+    <itunes:author>PSP1 Host</itunes:author>
+    <itunes:category text="Society &amp; Culture" />
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="https://example.com/psp1/artwork.jpg" />
+    <itunes:owner>
+      <itunes:name>PSP1 Host</itunes:name>
+      <itunes:email>host@psp1.example.com</itunes:email>
+    </itunes:owner>
+    <itunes:type>episodic</itunes:type>
+    <podcast:locked owner="host@psp1.example.com">yes</podcast:locked>
+    <podcast:guid>99887766-5544-3322-1100-aabbccddeeff</podcast:guid>
+    <item>
+      <title>PSP-1 Episode 1</title>
+      <description>Testing PSP-1 compliance</description>
+      <enclosure url="https://example.com/psp1/ep1.mp3" length="30000000" type="audio/mpeg" />
+      <guid isPermaLink="false">psp1-ep-001</guid>
+      <pubDate>Wed, 05 Feb 2025 09:00:00 +0000</pubDate>
+      <itunes:duration>1500</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+    <item>
+      <title>PSP-1 Episode 2</title>
+      <description>Continuing PSP-1 compliance testing</description>
+      <enclosure url="https://example.com/psp1/ep2.mp3" length="35000000" type="audio/mpeg" />
+      <guid isPermaLink="false">psp1-ep-002</guid>
+      <pubDate>Wed, 12 Feb 2025 09:00:00 +0000</pubDate>
+      <itunes:duration>1750</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:psc="http://podlove.org/simple-chapters">
+  <channel>
+    <title>Podlove Chapters Demo</title>
+    <link>https://example.com/podlove</link>
+    <description>A feed demonstrating Podlove Simple Chapters with various NPT formats</description>
+    <atom:link href="https://example.com/podlove/feed.xml" rel="self" type="application/rss+xml" />
+    <language>de</language>
+    <itunes:author>Podlove Host</itunes:author>
+    <itunes:category text="Education" />
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="https://example.com/podlove/artwork.jpg" />
+    <itunes:owner>
+      <itunes:name>Podlove Host</itunes:name>
+      <itunes:email>host@podlove.example.com</itunes:email>
+    </itunes:owner>
+    <item>
+      <title>Episode with Full NPT Chapters</title>
+      <description>Testing all Normal Play Time format variations</description>
+      <enclosure url="https://example.com/podlove/ep1.mp3" length="78000000" type="audio/mpeg" />
+      <guid isPermaLink="false">podlove-ep-001</guid>
+      <pubDate>Sat, 08 Feb 2025 14:00:00 +0000</pubDate>
+      <itunes:duration>3900</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <psc:chapters version="1.2">
+        <psc:chapter start="00:00:00.000" title="Intro" href="https://example.com/podlove/ch1" image="https://example.com/podlove/ch1.jpg" />
+        <psc:chapter start="00:02:30" title="Topic 1: Getting Started" />
+        <psc:chapter start="00:15:00.500" title="Topic 2: Deep Dive" href="https://example.com/podlove/ch3" />
+        <psc:chapter start="00:30:00" title="Topic 3: Advanced Concepts" image="https://example.com/podlove/ch4.jpg" />
+        <psc:chapter start="00:45:00" title="Q&amp;A Section" />
+        <psc:chapter start="1:00:00" title="Wrap Up and Goodbye" />
+      </psc:chapters>
+    </item>
+    <item>
+      <title>Episode with Short Chapters</title>
+      <description>A shorter episode with minimal chapter markers</description>
+      <enclosure url="https://example.com/podlove/ep2.mp3" length="24000000" type="audio/mpeg" />
+      <guid isPermaLink="false">podlove-ep-002</guid>
+      <pubDate>Sat, 15 Feb 2025 14:00:00 +0000</pubDate>
+      <itunes:duration>1200</itunes:duration>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <psc:chapters version="1.2">
+        <psc:chapter start="00:00:00.000" title="Start" />
+        <psc:chapter start="00:10:00.000" title="Main Topic" />
+        <psc:chapter start="00:18:00.000" title="Outro" />
+      </psc:chapters>
+    </item>
+  </channel>
+</rss>

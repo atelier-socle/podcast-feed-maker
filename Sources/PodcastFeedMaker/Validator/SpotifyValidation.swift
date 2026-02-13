@@ -36,6 +36,7 @@ enum SpotifyValidation {
         results += validateChannelRequired(channel)
         results += validateChannelRecommended(channel)
         results += validateItems(channel)
+        results += validateCrossField(channel)
         return results
     }
 
@@ -102,6 +103,43 @@ enum SpotifyValidation {
                     field: "channel.itunesImage",
                     platform: .spotify
                 ))
+        }
+
+        return results
+    }
+
+    // MARK: - Cross-Field
+
+    private static func validateCrossField(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+
+        for (idx, item) in channel.items.enumerated() {
+            let prefix = "channel.items[\(idx)]"
+            if let enclosure = item.enclosure,
+                enclosure.type != "audio/mpeg" && enclosure.type != "audio/mp3",
+                enclosure.length > maxEnclosureBytes
+            {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "Non-MP3 enclosure exceeds 200 MB; "
+                            + "may not be accepted by Spotify",
+                        field: "\(prefix).enclosure",
+                        platform: .spotify
+                    ))
+            }
+
+            if item.podloveChapters != nil {
+                results.append(
+                    ValidationResult(
+                        severity: .info,
+                        message: "Item has Podlove chapters for enhanced playback",
+                        field: "\(prefix).podloveChapters",
+                        platform: .spotify
+                    ))
+            }
         }
 
         return results

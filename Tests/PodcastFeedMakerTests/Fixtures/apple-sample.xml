@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:podcast="https://podcastindex.org/namespace/1.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Apple Sample Podcast</title>
+    <link>https://example.com/apple</link>
+    <description>A fully compliant Apple Podcasts feed with all iTunes tags</description>
+    <atom:link href="https://example.com/apple/feed.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <copyright>Copyright 2025 Apple Sample Inc.</copyright>
+    <managingEditor>editor@example.com (Editor)</managingEditor>
+    <pubDate>Mon, 10 Feb 2025 08:00:00 +0000</pubDate>
+    <lastBuildDate>Mon, 10 Feb 2025 08:00:00 +0000</lastBuildDate>
+    <generator>PodcastFeedMaker</generator>
+    <itunes:author>Apple Sample Host</itunes:author>
+    <itunes:category text="Technology">
+      <itunes:category text="Tech News" />
+    </itunes:category>
+    <itunes:category text="Business" />
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:image href="https://example.com/apple/artwork-3000x3000.jpg" />
+    <itunes:owner>
+      <itunes:name>Apple Sample Host</itunes:name>
+      <itunes:email>host@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:subtitle>Technology news and analysis</itunes:subtitle>
+    <itunes:summary>Weekly technology discussions covering the latest in software, hardware, and industry trends</itunes:summary>
+    <itunes:type>episodic</itunes:type>
+    <podcast:locked owner="host@example.com">yes</podcast:locked>
+    <podcast:guid>a1b2c3d4-e5f6-7890-abcd-ef1234567890</podcast:guid>
+    <item>
+      <title>Episode 3: The Future of AI</title>
+      <link>https://example.com/apple/ep3</link>
+      <description>Exploring artificial intelligence trends in 2025</description>
+      <enclosure url="https://example.com/apple/ep3.mp3" length="48000000" type="audio/mpeg" />
+      <guid isPermaLink="false">apple-ep-003</guid>
+      <pubDate>Mon, 10 Feb 2025 08:00:00 +0000</pubDate>
+      <itunes:author>Apple Sample Host</itunes:author>
+      <itunes:duration>2400</itunes:duration>
+      <itunes:episode>3</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/apple/ep3-art.jpg" />
+      <itunes:subtitle>AI trends and insights</itunes:subtitle>
+      <itunes:summary>A deep dive into the current state and future of artificial intelligence</itunes:summary>
+      <content:encoded><![CDATA[<p>In this episode, we explore <strong>artificial intelligence</strong> trends.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Episode 2: Cloud Computing</title>
+      <link>https://example.com/apple/ep2</link>
+      <description>Understanding cloud infrastructure</description>
+      <enclosure url="https://example.com/apple/ep2.mp3" length="36000000" type="audio/mpeg" />
+      <guid isPermaLink="false">apple-ep-002</guid>
+      <pubDate>Mon, 03 Feb 2025 08:00:00 +0000</pubDate>
+      <itunes:duration>1800</itunes:duration>
+      <itunes:episode>2</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/apple/ep2-art.jpg" />
+    </item>
+    <item>
+      <title>Episode 1: Welcome</title>
+      <link>https://example.com/apple/ep1</link>
+      <description>Welcome to our new technology podcast</description>
+      <enclosure url="https://example.com/apple/ep1.mp3" length="24000000" type="audio/mpeg" />
+      <guid isPermaLink="false">apple-ep-001</guid>
+      <pubDate>Mon, 27 Jan 2025 08:00:00 +0000</pubDate>
+      <itunes:duration>1200</itunes:duration>
+      <itunes:episode>1</itunes:episode>
+      <itunes:episodeType>full</itunes:episodeType>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:image href="https://example.com/apple/ep1-art.jpg" />
+    </item>
+  </channel>
+</rss>
