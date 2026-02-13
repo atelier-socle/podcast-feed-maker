@@ -33,7 +33,14 @@ let feed = PodcastFeed {
     .locked(owner: "jane@example.com")
     .guid("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
 
-    Item(title: "Episode 1")
+    Item(
+        title: "Episode 1",
+        enclosure: Enclosure.mp3(
+            url: "https://cdn.example.com/episodes/ep001.mp3",
+            length: 48_000_000
+        )
+    )
+        .guid("ep-001", isPermaLink: false)
         .description("The pilot episode")
         .duration(1800)
         .episode(1)
