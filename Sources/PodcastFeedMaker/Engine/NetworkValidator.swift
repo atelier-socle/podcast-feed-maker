@@ -21,13 +21,13 @@ import Foundation
 public struct NetworkValidator: Sendable {
 
     /// The URL session used for HEAD requests.
-    private let session: URLSession
+    let session: URLSession
 
     /// The timeout interval per request, in seconds.
-    private let timeout: TimeInterval
+    let timeout: TimeInterval
 
     /// Maximum number of concurrent requests.
-    private let maxConcurrency: Int
+    let maxConcurrency: Int
 
     /// Creates a new network validator.
     ///

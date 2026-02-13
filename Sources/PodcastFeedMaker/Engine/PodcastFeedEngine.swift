@@ -136,6 +136,45 @@ public struct PodcastFeedEngine: Sendable {
         try await NetworkValidator(session: session).checkAllURLs(feed)
     }
 
+    // MARK: - Media Verification
+
+    /// Verifies actual media file types by checking magic bytes.
+    ///
+    /// Downloads the first 12 bytes of each enclosure URL and compares
+    /// the detected file signature against the declared MIME type.
+    ///
+    /// - Parameters:
+    ///   - feed: The feed whose media URLs to verify.
+    ///   - session: The URL session to use. Defaults to `.shared`.
+    /// - Returns: Validation results for mismatches and errors.
+    public func verifyMediaTypes(
+        _ feed: PodcastFeed,
+        session: URLSession = .shared
+    ) async throws -> [ValidationResult] {
+        try await NetworkValidator(session: session).verifyMediaTypes(feed)
+    }
+
+    /// Checks artwork dimensions and aspect ratio against platform requirements.
+    ///
+    /// Downloads the first 1024 bytes of each artwork URL, parses the
+    /// image dimensions, and validates against the specified platform's
+    /// size and aspect ratio rules.
+    ///
+    /// - Parameters:
+    ///   - feed: The feed whose artwork URLs to check.
+    ///   - platform: The target platform for dimension requirements.
+    ///   - session: The URL session to use. Defaults to `.shared`.
+    /// - Returns: Validation results for dimension issues and errors.
+    public func checkArtworkDimensions(
+        _ feed: PodcastFeed,
+        for platform: ValidationPlatform,
+        session: URLSession = .shared
+    ) async throws -> [ValidationResult] {
+        try await NetworkValidator(session: session)
+            .checkArtworkDimensions(feed, for: platform)
+    }
+
+
     // MARK: - Combined Workflows
 
     /// Parses an XML string and validates the result against a platform.
