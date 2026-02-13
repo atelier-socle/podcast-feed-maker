@@ -14,6 +14,7 @@ extension FeedParserDelegate {
     ) {
         currentText = ""
         currentAttributes = attributeDict
+        currentElementUsedCDATA = false
 
         switch elementName {
         case "rss":
@@ -180,6 +181,14 @@ extension FeedParserDelegate {
 
     // swiftlint:disable:next cyclomatic_complexity
     private func dispatchEndElement(_ name: String, text: String) {
+        if currentElementUsedCDATA {
+            switch currentContext {
+            case .channel: channelCdataFields.insert(name)
+            case .item: currentItem?.cdataFields.insert(name)
+            default: break
+            }
+        }
+
         switch currentContext {
         case .channel:
             handleChannelEndElement(name, text: text)
@@ -259,8 +268,11 @@ extension FeedParserDelegate {
 
     func detectNamespaces(_ attrs: [String: String]) {
         var namespaces: [PodcastNamespace] = []
+        var prefixes: [String: String] = [:]
         for (key, value) in attrs {
             guard key.hasPrefix("xmlns:") else { continue }
+            let prefix = String(key.dropFirst(6))
+            prefixes[prefix] = value
             switch value {
             case "http://www.itunes.com/dtds/podcast-1.0.dtd":
                 namespaces.append(.itunes)
@@ -279,6 +291,7 @@ extension FeedParserDelegate {
             }
         }
         feed.namespaces = namespaces.sorted()
+        feed.namespacePrefixes = prefixes
     }
 }
 
@@ -357,7 +370,10 @@ extension FeedParserDelegate {
             trailers: chTrailers,
             liveItems: chLiveItems,
             publisher: chPublisher,
-            chat: chChat
+            chat: chChat,
+            unknownElements: channelUnknownElements,
+            xmlComments: channelComments,
+            cdataFields: channelCdataFields
         )
         feed.channel = channel
     }

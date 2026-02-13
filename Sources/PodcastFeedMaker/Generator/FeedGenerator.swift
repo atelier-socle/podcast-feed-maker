@@ -24,6 +24,8 @@ public struct FeedGenerator: Sendable {
         case feedDefined
         /// Use a specific set of namespaces.
         case explicit([PodcastNamespace])
+        /// Use the original namespace prefix-to-URI mappings from a parsed feed.
+        case parsed
     }
 
     // MARK: - Configuration
@@ -83,15 +85,8 @@ public struct FeedGenerator: Sendable {
         }
 
         // RSS open tag with namespaces
-        let namespaces = resolveNamespaces(feed)
-        let nsDecls = namespaces.map(\.xmlnsDeclaration).joined(separator: " ")
-        let rssAttrs: String
-        if nsDecls.isEmpty {
-            rssAttrs = "version=\"\(feed.version)\""
-        } else {
-            rssAttrs = "version=\"\(feed.version)\" \(nsDecls)"
-        }
-        lines.append("<rss \(rssAttrs)>")
+        let rssOpen = buildRSSOpenTag(feed)
+        lines.append(rssOpen)
 
         // Channel
         let b1 = b.indented()
@@ -109,7 +104,7 @@ public struct FeedGenerator: Sendable {
 
     // MARK: - Namespace Resolution
 
-    private func resolveNamespaces(_ feed: PodcastFeed) -> [PodcastNamespace] {
+    func resolveNamespaces(_ feed: PodcastFeed) -> [PodcastNamespace] {
         switch namespaceMode {
         case .auto:
             return NamespaceResolver.resolve(feed)
@@ -117,6 +112,8 @@ public struct FeedGenerator: Sendable {
             return feed.namespaces
         case .explicit(let namespaces):
             return namespaces
+        case .parsed:
+            return feed.namespaces
         }
     }
 
@@ -132,7 +129,7 @@ public struct FeedGenerator: Sendable {
         // RSS 2.0 Core (required)
         lines.append(b.element("title", content: channel.title))
         lines.append(b.element("link", content: XMLBuilder.encodeURL(channel.link)))
-        lines.append(b.smartElement("description", content: channel.description))
+        lines.append(emitElement("description", content: channel.description, cdataFields: channel.cdataFields, builder: b))
 
         // Atom links (early, important for validators)
         for atomLink in channel.atomLinks {
@@ -188,7 +185,9 @@ public struct FeedGenerator: Sendable {
             lines.append(contentsOf: generateITunesOwner(itunesOwner, builder: b))
         }
         if let itunesSubtitle = channel.itunesSubtitle { lines.append(b.element("itunes:subtitle", content: itunesSubtitle)) }
-        if let itunesSummary = channel.itunesSummary { lines.append(b.smartElement("itunes:summary", content: itunesSummary)) }
+        if let itunesSummary = channel.itunesSummary {
+            lines.append(emitElement("itunes:summary", content: itunesSummary, cdataFields: channel.cdataFields, builder: b))
+        }
         if let itunesTitle = channel.itunesTitle { lines.append(b.element("itunes:title", content: itunesTitle)) }
         if let itunesType = channel.itunesType { lines.append(b.element("itunes:type", content: itunesType.rawValue)) }
         if let itunesVerify = channel.itunesVerify {
@@ -257,6 +256,14 @@ public struct FeedGenerator: Sendable {
             lines.append(contentsOf: generateLiveItem(liveItem, builder: b))
         }
 
+        // Round-trip preservation
+        for unknown in channel.unknownElements {
+            lines.append(generateUnknownElement(unknown, builder: b))
+        }
+        for comment in channel.xmlComments {
+            lines.append("\(b.indent)<!-- \(comment) -->")
+        }
+
         return lines
     }
 
@@ -282,7 +289,9 @@ public struct FeedGenerator: Sendable {
         // RSS 2.0 Core
         if let title = item.title { lines.append(b2.element("title", content: title)) }
         if let link = item.link { lines.append(b2.element("link", content: XMLBuilder.encodeURL(link))) }
-        if let description = item.description { lines.append(b2.smartElement("description", content: description)) }
+        if let description = item.description {
+            lines.append(emitElement("description", content: description, cdataFields: item.cdataFields, builder: b2))
+        }
         if let author = item.author { lines.append(b2.element("author", content: author)) }
         for category in item.categories {
             lines.append(generateRSSCategory(category, builder: b2))
@@ -314,7 +323,9 @@ public struct FeedGenerator: Sendable {
         }
         if let itunesSeason = item.itunesSeason { lines.append(b2.element("itunes:season", content: "\(itunesSeason)")) }
         if let itunesSubtitle = item.itunesSubtitle { lines.append(b2.element("itunes:subtitle", content: itunesSubtitle)) }
-        if let itunesSummary = item.itunesSummary { lines.append(b2.smartElement("itunes:summary", content: itunesSummary)) }
+        if let itunesSummary = item.itunesSummary {
+            lines.append(emitElement("itunes:summary", content: itunesSummary, cdataFields: item.cdataFields, builder: b2))
+        }
         if let itunesTitle = item.itunesTitle { lines.append(b2.element("itunes:title", content: itunesTitle)) }
 
         // Atom
@@ -368,6 +379,14 @@ public struct FeedGenerator: Sendable {
         // Podlove Simple Chapters
         if let podloveChapters = item.podloveChapters {
             lines.append(contentsOf: generatePodloveChapters(podloveChapters, builder: b2))
+        }
+
+        // Round-trip preservation
+        for unknown in item.unknownElements {
+            lines.append(generateUnknownElement(unknown, builder: b2))
+        }
+        for comment in item.xmlComments {
+            lines.append("\(b2.indent)<!-- \(comment) -->")
         }
 
         // Content Module (last, always CDATA)

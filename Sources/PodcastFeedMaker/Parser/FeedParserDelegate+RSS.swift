@@ -91,7 +91,16 @@ extension FeedParserDelegate {
     private func handleChannelNonTextElement(
         _ name: String, text: String
     ) {
-        // Placeholder for future non-text elements
+        if !name.hasPrefix("itunes:") && !name.hasPrefix("dc:")
+            && !name.hasPrefix("podcast:") && !name.isEmpty
+            && !Self.attributeOnlyElements.contains(name)
+        {
+            channelUnknownElements.append(
+                UnknownElement(
+                    name: name, attributes: currentAttributes,
+                    textContent: nil
+                ))
+        }
     }
 
     // swiftlint:disable:next cyclomatic_complexity

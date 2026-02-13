@@ -189,6 +189,17 @@ public struct Channel: Sendable, Hashable, Equatable {
     /// Chat/discussion room information.
     public var chat: PodcastChat?
 
+    // MARK: - Round-Trip Preservation
+
+    /// Unknown XML elements captured during parsing for round-trip fidelity.
+    public var unknownElements: [UnknownElement]
+
+    /// XML comments captured during parsing for round-trip fidelity.
+    public var xmlComments: [String]
+
+    /// Element names whose content was originally wrapped in CDATA sections.
+    public var cdataFields: Set<String>
+
     // MARK: - Initializer
 
     /// Creates a new channel with all properties.
@@ -248,7 +259,10 @@ public struct Channel: Sendable, Hashable, Equatable {
         trailers: [Trailer] = [],
         liveItems: [PodcastLiveItem] = [],
         publisher: PodcastPublisher? = nil,
-        chat: PodcastChat? = nil
+        chat: PodcastChat? = nil,
+        unknownElements: [UnknownElement] = [],
+        xmlComments: [String] = [],
+        cdataFields: Set<String> = []
     ) {
         self.title = title
         self.link = link
@@ -302,6 +316,9 @@ public struct Channel: Sendable, Hashable, Equatable {
         self.liveItems = liveItems
         self.publisher = publisher
         self.chat = chat
+        self.unknownElements = unknownElements
+        self.xmlComments = xmlComments
+        self.cdataFields = cdataFields
     }
 }
 

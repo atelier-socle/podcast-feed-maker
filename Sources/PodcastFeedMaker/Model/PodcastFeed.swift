@@ -30,6 +30,12 @@ public struct PodcastFeed: Sendable, Hashable, Equatable {
     /// The feed's channel containing all podcast metadata and episodes.
     public var channel: Channel?
 
+    /// Original namespace prefix-to-URI mappings from parsed XML.
+    ///
+    /// Key: prefix (e.g., `"apple"`), Value: URI (e.g., `"http://www.itunes.com/dtds/podcast-1.0.dtd"`).
+    /// Used by ``FeedGenerator/NamespaceMode/parsed`` to reproduce original `<rss>` declarations.
+    public var namespacePrefixes: [String: String]
+
     /// Creates a new podcast feed.
     ///
     /// - Parameters:
@@ -39,10 +45,12 @@ public struct PodcastFeed: Sendable, Hashable, Equatable {
     public init(
         version: String = "2.0",
         namespaces: [PodcastNamespace] = PodcastNamespace.allStandard,
-        channel: Channel? = nil
+        channel: Channel? = nil,
+        namespacePrefixes: [String: String] = [:]
     ) {
         self.version = version
         self.namespaces = namespaces
         self.channel = channel
+        self.namespacePrefixes = namespacePrefixes
     }
 }

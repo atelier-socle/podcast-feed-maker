@@ -95,7 +95,13 @@ extension FeedParserDelegate {
             handleTrailer(text: text)
 
         default:
-            break
+            if !name.isEmpty, !Self.attributeOnlyElements.contains(name) {
+                channelUnknownElements.append(
+                    UnknownElement(
+                        name: name, attributes: currentAttributes,
+                        textContent: text.isEmpty ? nil : text
+                    ))
+            }
         }
     }
 
@@ -201,7 +207,13 @@ extension FeedParserDelegate {
             break
 
         default:
-            break
+            if !name.isEmpty, !Self.attributeOnlyElements.contains(name) {
+                currentItem?.unknownElements.append(
+                    UnknownElement(
+                        name: name, attributes: currentAttributes,
+                        textContent: text.isEmpty ? nil : text
+                    ))
+            }
         }
     }
 

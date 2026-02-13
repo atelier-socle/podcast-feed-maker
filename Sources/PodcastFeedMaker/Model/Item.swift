@@ -140,6 +140,17 @@ public struct Item: Sendable, Hashable, Equatable {
     /// Podlove chapter markers embedded in the feed.
     public var podloveChapters: PodloveChapters?
 
+    // MARK: - Round-Trip Preservation
+
+    /// Unknown XML elements captured during parsing for round-trip fidelity.
+    public var unknownElements: [UnknownElement]
+
+    /// XML comments captured during parsing for round-trip fidelity.
+    public var xmlComments: [String]
+
+    /// Element names whose content was originally wrapped in CDATA sections.
+    public var cdataFields: Set<String>
+
     // MARK: - Initializer
 
     /// Creates a new feed item (episode).
@@ -184,7 +195,10 @@ public struct Item: Sendable, Hashable, Equatable {
         txtRecords: [PodcastTxt] = [],
         podcastSeason: PodcastSeason? = nil,
         podcastEpisode: PodcastEpisode? = nil,
-        podloveChapters: PodloveChapters? = nil
+        podloveChapters: PodloveChapters? = nil,
+        unknownElements: [UnknownElement] = [],
+        xmlComments: [String] = [],
+        cdataFields: Set<String> = []
     ) {
         self.title = title
         self.link = link
@@ -224,6 +238,9 @@ public struct Item: Sendable, Hashable, Equatable {
         self.podcastSeason = podcastSeason
         self.podcastEpisode = podcastEpisode
         self.podloveChapters = podloveChapters
+        self.unknownElements = unknownElements
+        self.xmlComments = xmlComments
+        self.cdataFields = cdataFields
     }
 }
 

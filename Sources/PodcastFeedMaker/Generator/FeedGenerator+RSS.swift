@@ -117,6 +117,50 @@ extension FeedGenerator {
         return lines
     }
 
+    // MARK: - RSS Open Tag
+
+    func buildRSSOpenTag(_ feed: PodcastFeed) -> String {
+        let namespaces = resolveNamespaces(feed)
+        let nsDecls: String
+        if namespaceMode == .parsed, !feed.namespacePrefixes.isEmpty {
+            nsDecls = feed.namespacePrefixes
+                .sorted(by: { $0.key < $1.key })
+                .map { "xmlns:\($0.key)=\"\($0.value)\"" }
+                .joined(separator: " ")
+        } else {
+            nsDecls = namespaces.map(\.xmlnsDeclaration).joined(separator: " ")
+        }
+        if nsDecls.isEmpty {
+            return "<rss version=\"\(feed.version)\">"
+        }
+        return "<rss version=\"\(feed.version)\" \(nsDecls)>"
+    }
+
+    // MARK: - CDATA-Aware Element
+
+    /// Emits an element using CDATA wrapping if the field was originally CDATA,
+    /// otherwise falls back to ``XMLBuilder/smartElement(_:content:attributes:)``.
+    func emitElement(
+        _ name: String, content: String, cdataFields: Set<String>,
+        builder b: XMLBuilder, attributes: [(String, String)] = []
+    ) -> String {
+        if cdataFields.contains(name) {
+            let attrs = XMLBuilder.formatAttributes(attributes)
+            return "\(b.indent)<\(name)\(attrs)><![CDATA[\(content)]]></\(name)>"
+        }
+        return b.smartElement(name, content: content, attributes: attributes)
+    }
+
+    // MARK: - Unknown Element
+
+    func generateUnknownElement(_ element: UnknownElement, builder b: XMLBuilder) -> String {
+        let attrs = element.attributes.sorted(by: { $0.key < $1.key }).map { ($0.key, $0.value) }
+        if let text = element.textContent {
+            return b.element(element.name, content: text, attributes: attrs)
+        }
+        return b.selfClosingElement(element.name, attributes: attrs)
+    }
+
     // MARK: - Atom Types
 
     func generateAtomLink(_ link: AtomLink, builder b: XMLBuilder) -> String {

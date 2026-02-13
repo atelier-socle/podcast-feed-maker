@@ -93,6 +93,12 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     // Dublin Core channel
     var chDublinCore: DublinCore?
 
+    // Round-trip preservation
+    var channelUnknownElements: [UnknownElement] = []
+    var channelComments: [String] = []
+    var channelCdataFields: Set<String> = []
+    var currentElementUsedCDATA = false
+
     // Podcast NS channel
     var chPodcastGuid: PodcastGuid?
     var chLocked: Locked?
@@ -190,6 +196,17 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
         }
     }
 
+    // MARK: - Attribute-Only Elements
+
+    /// Element names handled entirely via start-element attributes.
+    /// These must not be captured as unknown elements on end-element.
+    static let attributeOnlyElements: Set<String> = [
+        "atom:link", "cloud", "enclosure", "itunes:image",
+        "podcast:transcript", "podcast:chapters", "podcast:source",
+        "podcast:integrity", "podcast:remoteItem",
+        "podcast:valueRecipient", "psc:chapter"
+    ]
+
     // MARK: - XMLParserDelegate — Characters
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
@@ -200,6 +217,20 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, foundCDATA cdataBlock: Data) {
         if let string = String(data: cdataBlock, encoding: .utf8) {
             currentText += string
+        }
+        currentElementUsedCDATA = true
+    }
+
+    func parser(_ parser: XMLParser, foundComment comment: String) {
+        let trimmed = comment.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        switch currentContext {
+        case .channel:
+            channelComments.append(trimmed)
+        case .item:
+            currentItem?.xmlComments.append(trimmed)
+        default:
+            break
         }
     }
 
