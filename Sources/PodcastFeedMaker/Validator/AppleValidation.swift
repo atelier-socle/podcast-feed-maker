@@ -2,20 +2,20 @@ import Foundation
 
 // MARK: - Apple Podcasts Validation
 
+// MARK: - Audio Types
+
+private let appleAllowedAudioTypes: Set<String> = [
+    "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/mp4",
+    "audio/m4a", "audio/aac", "audio/x-aac", "audio/wav",
+    "audio/x-wav", "audio/ogg", "audio/opus", "audio/flac",
+    "video/mp4", "video/quicktime", "video/x-m4v"
+]
+
 /// Validates a feed against Apple Podcasts requirements.
 ///
 /// Apple Podcasts has strict requirements including HTTPS-only URLs,
 /// iTunes tags, and artwork specifications.
 enum AppleValidation {
-
-    // MARK: - Audio Types
-
-    private static let allowedAudioTypes: Set<String> = [
-        "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/mp4",
-        "audio/m4a", "audio/aac", "audio/x-aac", "audio/wav",
-        "audio/x-wav", "audio/ogg", "audio/opus", "audio/flac",
-        "video/mp4", "video/quicktime", "video/x-m4v"
-    ]
 
     // MARK: - Public API
 
@@ -153,6 +153,16 @@ enum AppleValidation {
                     platform: .apple
                 ))
         }
+        if channel.itunesNewFeedUrl != nil {
+            results.append(
+                ValidationResult(
+                    severity: .info,
+                    message: "Feed migration URL is set. "
+                        + "Remove after migration is complete.",
+                    field: "channel.itunesNewFeedUrl",
+                    platform: .apple
+                ))
+        }
 
         return results
     }
@@ -180,7 +190,7 @@ enum AppleValidation {
                     ))
             }
             if let enclosure = item.enclosure {
-                if !allowedAudioTypes.contains(enclosure.type) {
+                if !appleAllowedAudioTypes.contains(enclosure.type) {
                     results.append(
                         ValidationResult(
                             severity: .error,

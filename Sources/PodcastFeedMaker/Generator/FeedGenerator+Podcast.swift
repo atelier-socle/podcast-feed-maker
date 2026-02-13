@@ -88,8 +88,10 @@ extension FeedGenerator {
 
     func generateLocation(_ location: PodcastLocation, builder b: XMLBuilder) -> String {
         var attrs: [(String, String)] = []
+        if let rel = location.rel { attrs.append(("rel", rel)) }
         if let geo = location.geo { attrs.append(("geo", geo)) }
         if let osm = location.osm { attrs.append(("osm", osm)) }
+        if let country = location.country { attrs.append(("country", country)) }
         return b.element("podcast:location", content: location.name, attributes: attrs)
     }
 
@@ -193,11 +195,13 @@ extension FeedGenerator {
         return b.selfClosingElement("podcast:updateFrequency", attributes: attrs)
     }
 
-    func generatePublisher(_ publisher: PodcastPublisher, builder b: XMLBuilder) -> String {
-        var attrs: [(String, String)] = []
-        if let guid = publisher.guid { attrs.append(("guid", guid)) }
-        if let url = publisher.url { attrs.append(("url", XMLBuilder.encodeURL(url))) }
-        return b.element("podcast:publisher", content: publisher.name, attributes: attrs)
+    func generatePublisher(_ publisher: PodcastPublisher, builder b: XMLBuilder) -> [String] {
+        var lines: [String] = []
+        lines.append(b.openTag("podcast:publisher"))
+        let b2 = b.indented()
+        lines.append(generateRemoteItem(publisher.remoteItem, builder: b2))
+        lines.append(b.closeTag("podcast:publisher"))
+        return lines
     }
 
     func generateChat(_ chat: PodcastChat, builder b: XMLBuilder) -> String {
@@ -359,5 +363,22 @@ extension FeedGenerator {
         if let href = chapter.href { attrs.append(("href", XMLBuilder.encodeURL(href))) }
         if let image = chapter.image { attrs.append(("image", XMLBuilder.encodeURL(image))) }
         return b.selfClosingElement("psc:chapter", attributes: attrs)
+    }
+
+    // MARK: - Podcast Image
+
+    func generatePodcastImage(_ image: PodcastImage, builder b: XMLBuilder) -> String {
+        var attrs: [(String, String)] = [("href", XMLBuilder.encodeURL(image.href))]
+        if let alt = image.alt { attrs.append(("alt", alt)) }
+        if let aspectRatio = image.aspectRatio { attrs.append(("aspect-ratio", aspectRatio)) }
+        if let width = image.width { attrs.append(("width", "\(width)")) }
+        if let height = image.height { attrs.append(("height", "\(height)")) }
+        if let type = image.type { attrs.append(("type", type)) }
+        if let purpose = image.purpose { attrs.append(("purpose", purpose)) }
+        return b.selfClosingElement("podcast:image", attributes: attrs)
+    }
+
+    func generatePodcastImagesSrcset(_ images: PodcastImages, builder b: XMLBuilder) -> String {
+        b.selfClosingElement("podcast:images", attributes: [("srcset", images.srcset)])
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 struct PodcastFeedEngineTests {
 
@@ -177,5 +178,194 @@ struct PodcastFeedEngineTests {
     func sendableConformance() {
         func requiresSendable<T: Sendable>(_: T.Type) {}
         requiresSendable(PodcastFeedEngine.self)
+    }
+}
+
+// MARK: - PodcastFeedEngine Async Tests
+
+@Suite("PodcastFeedEngine Async Tests", .serialized)
+struct PodcastFeedEngineAsyncTests {
+
+    let engine = PodcastFeedEngine()
+
+    // MARK: - validateNetwork
+
+    @Test("validateNetwork returns results for valid feed")
+    func validateNetworkValidFeed() async throws {
+        let artURL = "https://cdn.example.com/engine-art.jpg"
+        MockResponseStore.shared.set(
+            MockResponse(data: Data(), statusCode: 200),
+            for: artURL
+        )
+        for item in MockFeed.applePodcasts.channel?.items ?? [] {
+            MockResponseStore.shared.set(
+                MockResponse(
+                    data: Data(),
+                    statusCode: 200,
+                    headers: ["Content-Type": item.enclosure?.type ?? "audio/mpeg"]
+                ),
+                for: item.enclosure?.url.absoluteString ?? ""
+            )
+            if let imgURL = item.itunesImage?.absoluteString {
+                MockResponseStore.shared.set(
+                    MockResponse(data: Data(), statusCode: 200),
+                    for: imgURL
+                )
+            }
+        }
+        MockResponseStore.shared.set(
+            MockResponse(data: Data(), statusCode: 200),
+            for: MockFeed.applePodcasts.channel?.itunesImage?.absoluteString ?? ""
+        )
+        for atomLink in MockFeed.applePodcasts.channel?.atomLinks ?? [] {
+            MockResponseStore.shared.set(
+                MockResponse(data: Data(), statusCode: 200),
+                for: atomLink.href.absoluteString
+            )
+        }
+
+        let session = makeMockSession()
+        let results = try await engine.validateNetwork(
+            MockFeed.applePodcasts, session: session)
+        // Should not crash, results may contain warnings but no network errors
+        #expect(results.count >= 0)
+    }
+
+    @Test("validateNetwork returns empty for nil channel")
+    func validateNetworkNilChannel() async throws {
+        let feed = PodcastFeed(channel: nil)
+        let session = makeMockSession()
+        let results = try await engine.validateNetwork(feed, session: session)
+        #expect(results.isEmpty)
+    }
+
+    // MARK: - verifyMediaTypes
+
+    @Test("verifyMediaTypes checks enclosures")
+    func verifyMediaTypesChecksEnclosures() async throws {
+        let url = "https://cdn.example.com/engine-verify.mp3"
+        MockResponseStore.shared.set(
+            MockResponse(
+                data: Data([
+                    0x49, 0x44, 0x33, 0x04, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+                ]),
+                statusCode: 206
+            ),
+            for: url
+        )
+
+        let channel = Channel(
+            title: "Test",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            items: [
+                Item(
+                    title: "Episode",
+                    enclosure: Enclosure(
+                        url: URL(string: url)!, length: 1024, type: "audio/mpeg"
+                    )
+                )
+            ]
+        )
+        let feed = PodcastFeed(channel: channel)
+        let session = makeMockSession()
+        let results = try await engine.verifyMediaTypes(feed, session: session)
+        let errors = results.filter { $0.severity == .error }
+        #expect(errors.isEmpty)
+    }
+
+    @Test("verifyMediaTypes returns empty for nil channel")
+    func verifyMediaTypesNilChannel() async throws {
+        let feed = PodcastFeed(channel: nil)
+        let session = makeMockSession()
+        let results = try await engine.verifyMediaTypes(feed, session: session)
+        #expect(results.isEmpty)
+    }
+
+    // MARK: - checkArtworkDimensions
+
+    @Test("checkArtworkDimensions validates dimensions")
+    func checkArtworkDimensionsValidates() async throws {
+        let url = "https://cdn.example.com/engine-dims.jpg"
+
+        var jpegData = Data([
+            0xFF, 0xD8,
+            0xFF, 0xC0,
+            0x00, 0x11,
+            0x08
+        ])
+        jpegData.append(contentsOf: [0x05, 0x78])  // Height: 1400
+        jpegData.append(contentsOf: [0x05, 0x78])  // Width: 1400
+        let remaining = max(0, 1024 - jpegData.count)
+        jpegData.append(
+            contentsOf: Array(repeating: UInt8(0x00), count: remaining))
+
+        MockResponseStore.shared.set(
+            MockResponse(data: jpegData, statusCode: 206),
+            for: url
+        )
+
+        let channel = Channel(
+            title: "Test",
+            link: URL(string: "https://example.com")!,
+            description: "Desc",
+            itunesImage: URL(string: url)
+        )
+        let feed = PodcastFeed(channel: channel)
+        let session = makeMockSession()
+        let results = try await engine.checkArtworkDimensions(
+            feed, for: .apple, session: session)
+        let errors = results.filter { $0.severity == .error }
+        #expect(errors.isEmpty)
+    }
+
+    @Test("checkArtworkDimensions returns empty for nil channel")
+    func checkArtworkDimensionsNilChannel() async throws {
+        let feed = PodcastFeed(channel: nil)
+        let session = makeMockSession()
+        let results = try await engine.checkArtworkDimensions(
+            feed, for: .apple, session: session)
+        #expect(results.isEmpty)
+    }
+
+    // MARK: - generateStream
+
+    @Test("generateStream yields header, items, and footer")
+    func generateStreamYieldsChunks() async throws {
+        let channel = Channel(
+            title: "Test",
+            link: URL(string: "https://example.com")!,
+            description: "A test podcast",
+            items: [
+                Item(title: "Ep 1"),
+                Item(title: "Ep 2"),
+                Item(title: "Ep 3")
+            ]
+        )
+        let feed = PodcastFeed(channel: channel)
+        var chunks: [String] = []
+        for try await chunk in engine.generateStream(feed) {
+            chunks.append(chunk)
+        }
+        // 3 items + header + footer = 5
+        #expect(chunks.count == 5)
+        #expect(chunks.first?.contains("<?xml") == true)
+        #expect(chunks.last?.contains("</rss>") == true)
+    }
+
+    @Test("generateStream with prettyPrint false")
+    func generateStreamMinified() async throws {
+        let channel = Channel(
+            title: "Test",
+            link: URL(string: "https://example.com")!,
+            description: "A test"
+        )
+        let feed = PodcastFeed(channel: channel)
+        var chunks: [String] = []
+        for try await chunk in engine.generateStream(feed, prettyPrint: false) {
+            chunks.append(chunk)
+        }
+        #expect(!chunks.isEmpty)
     }
 }

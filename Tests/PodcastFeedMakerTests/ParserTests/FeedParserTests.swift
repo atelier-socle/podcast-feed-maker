@@ -496,10 +496,10 @@ struct FeedParserTests {
     func podcastPublisher() throws {
         let feed = try parser.parse(maximalFixture())
         let pub = try #require(feed.channel?.publisher)
-        #expect(pub.name == "Example Publisher")
-        #expect(pub.guid == "pub-guid-1")
-        #expect(pub.url?.absoluteString ==
-            "https://publisher.example.com")
+        #expect(pub.remoteItem.feedGuid == "pub-guid-1")
+        #expect(pub.remoteItem.feedUrl?.absoluteString ==
+            "https://publisher.example.com/feed.xml")
+        #expect(pub.remoteItem.medium == "publisher")
     }
 
     @Test("Parses podcast:chat")

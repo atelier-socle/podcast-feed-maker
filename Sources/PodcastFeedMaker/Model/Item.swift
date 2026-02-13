@@ -111,8 +111,18 @@ public struct Item: Sendable, Hashable, Equatable {
     /// People associated with this episode (hosts, guests, etc.).
     public var persons: [PodcastPerson]
 
-    /// Geographic location relevant to this episode.
-    public var location: PodcastLocation?
+    /// Geographic locations relevant to this episode.
+    ///
+    /// Up to 2 allowed: one with `rel="creator"` and one with `rel="subject"`.
+    public var locations: [PodcastLocation]
+
+    /// Convenience accessor for the first location.
+    ///
+    /// Gets the first location in the array; setting replaces the entire array.
+    public var location: PodcastLocation? {
+        get { locations.first }
+        set { locations = newValue.map { [$0] } ?? [] }
+    }
 
     /// License information for this episode.
     public var license: PodcastLicense?
@@ -134,6 +144,16 @@ public struct Item: Sendable, Hashable, Equatable {
 
     /// Rich episode metadata (`<podcast:episode>` with `display` attribute).
     public var podcastEpisode: PodcastEpisode?
+
+    /// Podcast Namespace 2.0 `podcast:image` tags.
+    ///
+    /// Multiple images allowed for different use cases (artwork, social, icon, canvas).
+    public var podcastImages: [PodcastImage]
+
+    /// Deprecated `podcast:images` tag with `srcset` attribute.
+    ///
+    /// Parsed for round-trip fidelity. Superseded by ``podcastImages``.
+    public var podcastImagesSrcset: PodcastImages?
 
     // MARK: - Podlove Simple Chapters
 
@@ -187,7 +207,7 @@ public struct Item: Sendable, Hashable, Equatable {
         chaptersLink: ChaptersLink? = nil,
         soundbites: [Soundbite] = [],
         persons: [PodcastPerson] = [],
-        location: PodcastLocation? = nil,
+        locations: [PodcastLocation] = [],
         license: PodcastLicense? = nil,
         alternateEnclosures: [AlternateEnclosure] = [],
         value: PodcastValue? = nil,
@@ -195,6 +215,8 @@ public struct Item: Sendable, Hashable, Equatable {
         txtRecords: [PodcastTxt] = [],
         podcastSeason: PodcastSeason? = nil,
         podcastEpisode: PodcastEpisode? = nil,
+        podcastImages: [PodcastImage] = [],
+        podcastImagesSrcset: PodcastImages? = nil,
         podloveChapters: PodloveChapters? = nil,
         unknownElements: [UnknownElement] = [],
         xmlComments: [String] = [],
@@ -229,7 +251,7 @@ public struct Item: Sendable, Hashable, Equatable {
         self.chaptersLink = chaptersLink
         self.soundbites = soundbites
         self.persons = persons
-        self.location = location
+        self.locations = locations
         self.license = license
         self.alternateEnclosures = alternateEnclosures
         self.value = value
@@ -237,6 +259,8 @@ public struct Item: Sendable, Hashable, Equatable {
         self.txtRecords = txtRecords
         self.podcastSeason = podcastSeason
         self.podcastEpisode = podcastEpisode
+        self.podcastImages = podcastImages
+        self.podcastImagesSrcset = podcastImagesSrcset
         self.podloveChapters = podloveChapters
         self.unknownElements = unknownElements
         self.xmlComments = xmlComments

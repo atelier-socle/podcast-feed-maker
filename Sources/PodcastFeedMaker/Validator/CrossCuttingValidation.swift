@@ -19,6 +19,8 @@ enum CrossCuttingValidation {
         results += checkItemMinimumContent(channel)
         results += checkFuturePubDate(channel)
         results += checkAtomSelfLink(channel)
+        results += checkNewFeedUrlScheme(channel)
+        results += checkItunesComplete(channel)
         return results
     }
 
@@ -157,6 +159,42 @@ enum CrossCuttingValidation {
         }
 
         return results
+    }
+
+    // MARK: - New Feed URL Scheme
+
+    private static func checkNewFeedUrlScheme(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        guard let url = channel.itunesNewFeedUrl else { return [] }
+        if url.scheme?.lowercased() != "https" {
+            return [
+                ValidationResult(
+                    severity: .warning,
+                    message: "itunes:new-feed-url should use HTTPS",
+                    field: "channel.itunesNewFeedUrl"
+                )
+            ]
+        }
+        return []
+    }
+
+    // MARK: - iTunes Complete
+
+    private static func checkItunesComplete(
+        _ channel: Channel
+    ) -> [ValidationResult] {
+        if channel.itunesComplete == true {
+            return [
+                ValidationResult(
+                    severity: .info,
+                    message: "Podcast is marked as complete. "
+                        + "No new episodes expected.",
+                    field: "channel.itunesComplete"
+                )
+            ]
+        }
+        return []
     }
 
     // MARK: - Item Minimum Content

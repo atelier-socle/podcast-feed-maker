@@ -99,7 +99,7 @@ public struct NamespaceResolver: Sendable {
             || channel.locked != nil
             || !channel.funding.isEmpty
             || !channel.persons.isEmpty
-            || channel.location != nil
+            || !channel.locations.isEmpty
             || channel.license != nil
             || channel.value != nil
             || channel.medium != nil
@@ -111,6 +111,8 @@ public struct NamespaceResolver: Sendable {
             || !channel.trailers.isEmpty
             || !channel.liveItems.isEmpty
             || channel.publisher != nil
+            || !channel.podcastImages.isEmpty
+            || channel.podcastImagesSrcset != nil
             || channel.chat != nil
             || channel.items.contains(where: { usesPodcastItem($0) })
     }
@@ -120,7 +122,7 @@ public struct NamespaceResolver: Sendable {
             || item.chaptersLink != nil
             || !item.soundbites.isEmpty
             || !item.persons.isEmpty
-            || item.location != nil
+            || !item.locations.isEmpty
             || item.license != nil
             || !item.alternateEnclosures.isEmpty
             || item.value != nil
@@ -128,6 +130,8 @@ public struct NamespaceResolver: Sendable {
             || !item.txtRecords.isEmpty
             || item.podcastSeason != nil
             || item.podcastEpisode != nil
+            || !item.podcastImages.isEmpty
+            || item.podcastImagesSrcset != nil
     }
 
     private static func usesDublinCore(channel: Channel) -> Bool {

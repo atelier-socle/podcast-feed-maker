@@ -56,6 +56,9 @@
     <itunes:complete>yes</itunes:complete>
     <itunes:explicit>true</itunes:explicit>
     <itunes:image href="https://example.com/itunes-art.jpg" />
+    <podcast:image href="https://example.com/art-3000.jpg" alt="Show artwork" aspect-ratio="1/1" width="3000" height="3000" type="image/jpeg" purpose="artwork" />
+    <podcast:image href="https://example.com/social-banner.png" alt="Social banner" aspect-ratio="16/9" width="1920" height="1080" type="image/png" purpose="social" />
+    <podcast:images srcset="https://example.com/art-3000.jpg 3000w, https://example.com/art-600.jpg 600w, https://example.com/art-300.jpg 300w" />
     <itunes:keywords>swift,development,podcast</itunes:keywords>
     <itunes:new-feed-url>https://example.com/new-feed.xml</itunes:new-feed-url>
     <itunes:owner>
@@ -88,7 +91,8 @@
     <podcast:funding url="https://example.com/donate">Support the show</podcast:funding>
     <podcast:person role="host" group="cast" img="https://example.com/john.jpg" href="https://example.com/john">John Doe</podcast:person>
     <podcast:person role="editor">Jane Doe</podcast:person>
-    <podcast:location geo="geo:37.7749,-122.4194" osm="R1234567">San Francisco</podcast:location>
+    <podcast:location rel="creator" geo="geo:37.7749,-122.4194" osm="R1234567" country="US">San Francisco</podcast:location>
+    <podcast:location rel="subject" geo="geo:48.8566,2.3522" osm="R7444" country="FR">Paris</podcast:location>
     <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
     <podcast:value type="lightning" method="keysend" suggested="100">
       <podcast:valueRecipient name="Host" type="node" address="abc123" split="90" fee="false" />
@@ -108,7 +112,9 @@
     </podcast:podroll>
     <podcast:updateFrequency rrule="FREQ=WEEKLY;BYDAY=MO" dtstart="2025-01-06" complete="false">Weekly on Mondays</podcast:updateFrequency>
     <podcast:podping>true</podcast:podping>
-    <podcast:publisher guid="pub-guid-1" url="https://publisher.example.com">Example Publisher</podcast:publisher>
+    <podcast:publisher>
+      <podcast:remoteItem feedGuid="pub-guid-1" feedUrl="https://publisher.example.com/feed.xml" medium="publisher" />
+    </podcast:publisher>
     <podcast:chat server="irc.example.com" protocol="irc" accountId="#podcast" space="main" embedUrl="https://chat.example.com/embed" />
     <podcast:trailer url="https://example.com/trailer.mp3" pubdate="Mon, 01 Jan 2025 00:00:00 +0000" length="5000000" type="audio/mpeg" season="1">Season 1 Trailer</podcast:trailer>
     <podcast:liveItem status="live" start="2026-02-12T20:00:00Z" end="2026-02-12T22:00:00Z">
@@ -147,6 +153,7 @@
       <itunes:episodeType>full</itunes:episodeType>
       <itunes:explicit>false</itunes:explicit>
       <itunes:image href="https://example.com/ep1-art.jpg" />
+      <podcast:image href="https://example.com/ep1-art-3000.jpg" alt="Episode 1 artwork" aspect-ratio="1/1" width="3000" type="image/jpeg" purpose="artwork" />
       <itunes:keywords>intro,welcome</itunes:keywords>
       <itunes:season>1</itunes:season>
       <itunes:subtitle>Welcome to the show</itunes:subtitle>
@@ -161,7 +168,7 @@
       <podcast:soundbite startTime="30.5" duration="45.0">Best Moment</podcast:soundbite>
       <podcast:soundbite startTime="120.0" duration="15.0" />
       <podcast:person role="guest" group="cast" img="https://example.com/guest.jpg" href="https://example.com/guest">Guest Speaker</podcast:person>
-      <podcast:location geo="geo:48.8566,2.3522" osm="R123">Paris</podcast:location>
+      <podcast:location rel="subject" geo="geo:48.8566,2.3522" osm="R123" country="FR">Paris</podcast:location>
       <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
       <podcast:alternateEnclosure type="audio/opus" length="30000000" bitrate="96" title="Opus Version" default="true">
         <podcast:source uri="https://example.com/ep1.opus" contentType="audio/opus" />

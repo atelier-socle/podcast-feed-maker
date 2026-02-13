@@ -572,9 +572,16 @@ struct FeedGeneratorPodcastTests {
     @Test("Podcast publisher")
     func publisher() throws {
         var ch = minimalChannel()
-        ch.publisher = PodcastPublisher(name: "Network Name", guid: "pub-guid-123", url: URL(string: "https://network.com")!)
+        ch.publisher = PodcastPublisher(remoteItem: RemoteItem(
+            feedGuid: "pub-guid-123",
+            feedUrl: URL(string: "https://network.com/feed.xml"),
+            medium: "publisher"
+        ))
         let xml = try FeedGenerator().generate(minimalFeed(channel: ch))
-        #expect(xml.contains(#"<podcast:publisher guid="pub-guid-123" url="https://network.com">Network Name</podcast:publisher>"#))
+        #expect(xml.contains("<podcast:publisher>"))
+        #expect(xml.contains(#"feedGuid="pub-guid-123""#))
+        #expect(xml.contains(#"medium="publisher""#))
+        #expect(xml.contains("</podcast:publisher>"))
     }
 
     @Test("Podcast chat")

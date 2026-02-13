@@ -137,7 +137,7 @@ struct IntegrationTests {
         #expect(channel.podroll != nil)
         #expect(channel.updateFrequency != nil)
         #expect(channel.podpingEnabled == true)
-        #expect(channel.publisher?.name == "Example Network")
+        #expect(channel.publisher?.remoteItem.feedGuid == "publisher-guid-001")
 
         let ep1 = channel.items[0]
         #expect(!ep1.transcripts.isEmpty)

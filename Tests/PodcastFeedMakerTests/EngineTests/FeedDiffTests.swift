@@ -1,6 +1,7 @@
 import Foundation
-@testable import PodcastFeedMaker
 import Testing
+
+@testable import PodcastFeedMaker
 
 // MARK: - FeedDifference Tests
 
@@ -136,6 +137,7 @@ struct FeedDiffChannelTests {
         #expect(diffs[0].changeType == .added)
         #expect(diffs[0].field == "channel")
     }
+
 }
 
 // MARK: - FeedDiff Item Tests
@@ -230,6 +232,7 @@ struct FeedDiffItemTests {
         let encDiff = diffs.first { $0.field.contains("enclosure.url") }
         #expect(encDiff?.changeType == .modified)
     }
+
 }
 
 // MARK: - FeedDiff XML Tests
@@ -240,25 +243,25 @@ struct FeedDiffXMLTests {
     @Test("diff(xml:xml:) parses and compares")
     func diffXMLParsesAndCompares() throws {
         let xml1 = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-          <channel>
-            <title>Old Title</title>
-            <link>https://example.com</link>
-            <description>Description</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <title>Old Title</title>
+                <link>https://example.com</link>
+                <description>Description</description>
+              </channel>
+            </rss>
+            """
         let xml2 = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-          <channel>
-            <title>New Title</title>
-            <link>https://example.com</link>
-            <description>Description</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <title>New Title</title>
+                <link>https://example.com</link>
+                <description>Description</description>
+              </channel>
+            </rss>
+            """
         let diffs = try FeedDiff().diff(xml: xml1, xml: xml2)
         let titleDiff = diffs.first { $0.field == "channel.title" }
         #expect(titleDiff?.changeType == .modified)
@@ -304,25 +307,25 @@ struct PodcastFeedEngineDiffTests {
     func engineDiffXML() throws {
         let engine = PodcastFeedEngine()
         let xml1 = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-          <channel>
-            <title>Title</title>
-            <link>https://example.com</link>
-            <description>Old Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <title>Title</title>
+                <link>https://example.com</link>
+                <description>Old Desc</description>
+              </channel>
+            </rss>
+            """
         let xml2 = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-          <channel>
-            <title>Title</title>
-            <link>https://example.com</link>
-            <description>New Desc</description>
-          </channel>
-        </rss>
-        """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+              <channel>
+                <title>Title</title>
+                <link>https://example.com</link>
+                <description>New Desc</description>
+              </channel>
+            </rss>
+            """
         let diffs = try engine.diff(xml: xml1, xml: xml2)
         let descDiff = diffs.first { $0.field == "channel.description" }
         #expect(descDiff?.changeType == .modified)

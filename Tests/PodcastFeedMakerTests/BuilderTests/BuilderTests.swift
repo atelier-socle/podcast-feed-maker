@@ -109,9 +109,10 @@ struct ChannelBuilderTests {
 
     @Test("publisher sets publisher")
     func publisherSetsPublisher() {
-        let channel = baseChannel().publisher(name: "Network", url: "https://network.com")
-        #expect(channel.publisher?.name == "Network")
-        #expect(channel.publisher?.url?.absoluteString == "https://network.com")
+        let channel = baseChannel().publisher(feedGuid: "pub-guid-1", feedUrl: "https://network.com/feed.xml")
+        #expect(channel.publisher?.remoteItem.feedGuid == "pub-guid-1")
+        #expect(channel.publisher?.remoteItem.feedUrl?.absoluteString == "https://network.com/feed.xml")
+        #expect(channel.publisher?.remoteItem.medium == "publisher")
     }
 
     @Test("chained modifiers produce correct model")

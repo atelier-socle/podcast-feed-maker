@@ -34,11 +34,14 @@ extension FeedParserDelegate {
 
         case "podcast:location":
             if !text.isEmpty {
-                chLocation = PodcastLocation(
-                    name: text,
-                    geo: currentAttributes["geo"],
-                    osm: currentAttributes["osm"]
-                )
+                chLocations.append(
+                    PodcastLocation(
+                        name: text,
+                        geo: currentAttributes["geo"],
+                        osm: currentAttributes["osm"],
+                        rel: currentAttributes["rel"],
+                        country: currentAttributes["country"]
+                    ))
             }
 
         case "podcast:license":
@@ -79,14 +82,7 @@ extension FeedParserDelegate {
             chPodpingEnabled = parseBool(text)
 
         case "podcast:publisher":
-            if !text.isEmpty {
-                chPublisher = PodcastPublisher(
-                    name: text,
-                    guid: currentAttributes["guid"],
-                    url: currentAttributes["url"]
-                        .flatMap { URL(string: $0) }
-                )
-            }
+            break  // Handled as container context in didStartElement/didEndElement
 
         case "podcast:chat":
             handlePodcastChat()
@@ -142,7 +138,7 @@ extension FeedParserDelegate {
 
 extension FeedParserDelegate {
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func handlePodcastItemEndElement(
         _ name: String, text: String
     ) {
@@ -159,11 +155,14 @@ extension FeedParserDelegate {
 
         case "podcast:location":
             if !text.isEmpty {
-                currentItem?.location = PodcastLocation(
-                    name: text,
-                    geo: currentAttributes["geo"],
-                    osm: currentAttributes["osm"]
-                )
+                currentItem?.locations.append(
+                    PodcastLocation(
+                        name: text,
+                        geo: currentAttributes["geo"],
+                        osm: currentAttributes["osm"],
+                        rel: currentAttributes["rel"],
+                        country: currentAttributes["country"]
+                    ))
             }
 
         case "podcast:license":
@@ -512,6 +511,8 @@ extension FeedParserDelegate {
             podrollItems.append(remote)
         case .valueTimeSplit:
             timeSplitRemoteItem = remote
+        case .podcastPublisher:
+            chPublisherRemoteItem = remote
         default: break
         }
     }
@@ -557,23 +558,5 @@ extension FeedParserDelegate {
             image: attrs["image"].flatMap { URL(string: $0) }
         )
         podloveChapterList.append(chapter)
-    }
-}
-
-// MARK: - Shared Helpers
-
-extension FeedParserDelegate {
-
-    func buildPerson(
-        text: String, attrs: [String: String]
-    ) -> PodcastPerson? {
-        guard !text.isEmpty else { return nil }
-        return PodcastPerson(
-            name: text,
-            role: attrs["role"],
-            group: attrs["group"],
-            href: attrs["href"].flatMap { URL(string: $0) },
-            img: attrs["img"].flatMap { URL(string: $0) }
-        )
     }
 }

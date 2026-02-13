@@ -19,6 +19,7 @@ enum ParserContext {
     case alternateEnclosure
     case liveItem
     case podloveChapters
+    case podcastPublisher
 }
 
 // MARK: - FeedParserDelegate
@@ -104,7 +105,7 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     var chLocked: Locked?
     var chFunding: [Funding] = []
     var chPersons: [PodcastPerson] = []
-    var chLocation: PodcastLocation?
+    var chLocations: [PodcastLocation] = []
     var chLicense: PodcastLicense?
     var chValue: PodcastValue?
     var chMedium: PodcastMedium?
@@ -116,6 +117,9 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
     var chTrailers: [Trailer] = []
     var chLiveItems: [PodcastLiveItem] = []
     var chPublisher: PodcastPublisher?
+    var chPublisherRemoteItem: RemoteItem?
+    var chPodcastImages: [PodcastImage] = []
+    var chPodcastImagesSrcset: PodcastImages?
     var chChat: PodcastChat?
 
     // MARK: - Item Building
@@ -204,7 +208,8 @@ final class FeedParserDelegate: NSObject, XMLParserDelegate {
         "atom:link", "cloud", "enclosure", "itunes:image",
         "podcast:transcript", "podcast:chapters", "podcast:source",
         "podcast:integrity", "podcast:remoteItem",
-        "podcast:valueRecipient", "psc:chapter"
+        "podcast:valueRecipient", "psc:chapter",
+        "podcast:image", "podcast:images"
     ]
 
     // MARK: - XMLParserDelegate — Characters

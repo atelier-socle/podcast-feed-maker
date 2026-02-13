@@ -150,8 +150,18 @@ public struct Channel: Sendable, Hashable, Equatable {
     /// People associated with the podcast (hosts, producers, etc.).
     public var persons: [PodcastPerson]
 
-    /// Geographic location relevant to the podcast.
-    public var location: PodcastLocation?
+    /// Geographic locations relevant to the podcast.
+    ///
+    /// Up to 2 allowed: one with `rel="creator"` and one with `rel="subject"`.
+    public var locations: [PodcastLocation]
+
+    /// Convenience accessor for the first location.
+    ///
+    /// Gets the first location in the array; setting replaces the entire array.
+    public var location: PodcastLocation? {
+        get { locations.first }
+        set { locations = newValue.map { [$0] } ?? [] }
+    }
 
     /// License information for the podcast.
     public var license: PodcastLicense?
@@ -185,6 +195,16 @@ public struct Channel: Sendable, Hashable, Equatable {
 
     /// The publisher or network.
     public var publisher: PodcastPublisher?
+
+    /// Podcast Namespace 2.0 `podcast:image` tags.
+    ///
+    /// Multiple images allowed for different use cases (artwork, social, icon, canvas).
+    public var podcastImages: [PodcastImage]
+
+    /// Deprecated `podcast:images` tag with `srcset` attribute.
+    ///
+    /// Parsed for round-trip fidelity. Superseded by ``podcastImages``.
+    public var podcastImagesSrcset: PodcastImages?
 
     /// Chat/discussion room information.
     public var chat: PodcastChat?
@@ -247,7 +267,7 @@ public struct Channel: Sendable, Hashable, Equatable {
         locked: Locked? = nil,
         funding: [Funding] = [],
         persons: [PodcastPerson] = [],
-        location: PodcastLocation? = nil,
+        locations: [PodcastLocation] = [],
         license: PodcastLicense? = nil,
         value: PodcastValue? = nil,
         medium: PodcastMedium? = nil,
@@ -259,6 +279,8 @@ public struct Channel: Sendable, Hashable, Equatable {
         trailers: [Trailer] = [],
         liveItems: [PodcastLiveItem] = [],
         publisher: PodcastPublisher? = nil,
+        podcastImages: [PodcastImage] = [],
+        podcastImagesSrcset: PodcastImages? = nil,
         chat: PodcastChat? = nil,
         unknownElements: [UnknownElement] = [],
         xmlComments: [String] = [],
@@ -303,7 +325,7 @@ public struct Channel: Sendable, Hashable, Equatable {
         self.locked = locked
         self.funding = funding
         self.persons = persons
-        self.location = location
+        self.locations = locations
         self.license = license
         self.value = value
         self.medium = medium
@@ -315,6 +337,8 @@ public struct Channel: Sendable, Hashable, Equatable {
         self.trailers = trailers
         self.liveItems = liveItems
         self.publisher = publisher
+        self.podcastImages = podcastImages
+        self.podcastImagesSrcset = podcastImagesSrcset
         self.chat = chat
         self.unknownElements = unknownElements
         self.xmlComments = xmlComments

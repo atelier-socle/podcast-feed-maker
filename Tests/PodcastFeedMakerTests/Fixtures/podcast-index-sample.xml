@@ -28,7 +28,8 @@
       <podcast:valueRecipient name="Producer" type="node" address="node-pubkey-producer" split="30" />
     </podcast:value>
     <podcast:person role="host" img="https://example.com/podcastindex/host.jpg">Index Host</podcast:person>
-    <podcast:location geo="geo:40.7128,-74.0060">New York</podcast:location>
+    <podcast:location rel="creator" geo="geo:40.7128,-74.0060" country="US">New York</podcast:location>
+    <podcast:image href="https://example.com/podcastindex/art-3000.jpg" alt="Index show artwork" aspect-ratio="1/1" width="3000" type="image/jpeg" purpose="artwork" />
     <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
     <podcast:podroll>
       <podcast:remoteItem feedGuid="friend-guid-001" feedUrl="https://friend1.example.com/feed.xml" />
@@ -36,7 +37,9 @@
     </podcast:podroll>
     <podcast:updateFrequency rrule="FREQ=WEEKLY;BYDAY=TU">Weekly on Tuesdays</podcast:updateFrequency>
     <podcast:podping>true</podcast:podping>
-    <podcast:publisher url="https://publisher.example.com">Example Network</podcast:publisher>
+    <podcast:publisher>
+      <podcast:remoteItem feedGuid="publisher-guid-001" feedUrl="https://publisher.example.com/feed.xml" medium="publisher" />
+    </podcast:publisher>
     <item>
       <title>Episode 1: Podcasting 2.0</title>
       <description>Everything about the Podcast Namespace 2.0</description>
@@ -51,7 +54,7 @@
       <podcast:soundbite startTime="120.5" duration="30.0">Key Insight</podcast:soundbite>
       <podcast:person role="host" img="https://example.com/podcastindex/host.jpg">Index Host</podcast:person>
       <podcast:person role="guest" img="https://example.com/podcastindex/guest.jpg">Special Guest</podcast:person>
-      <podcast:location geo="geo:40.7128,-74.0060">New York</podcast:location>
+      <podcast:location rel="subject" geo="geo:40.7128,-74.0060" country="US">New York</podcast:location>
       <podcast:license url="https://creativecommons.org/licenses/by/4.0/">cc-by-4.0</podcast:license>
       <podcast:alternateEnclosure type="audio/opus" length="28000000" bitrate="96" title="Opus Version" default="true">
         <podcast:source uri="https://example.com/podcastindex/ep1.opus" />

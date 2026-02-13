@@ -154,18 +154,65 @@ extension Channel {
         return copy
     }
 
-    /// Sets the publisher (`podcast:publisher`).
+    /// Sets the publisher (`podcast:publisher`) using a remote item reference.
     ///
     /// - Parameters:
-    ///   - name: The publisher name.
-    ///   - url: Optional publisher website URL as a string.
+    ///   - feedGuid: The podcast:guid of the publisher's feed.
+    ///   - feedUrl: Optional URL of the publisher's feed as a string.
     /// - Returns: A modified copy of the channel.
-    public func publisher(name: String, url: String? = nil) -> Channel {
+    public func publisher(feedGuid: String, feedUrl: String? = nil) -> Channel {
         var copy = self
         copy.publisher = PodcastPublisher(
-            name: name,
-            url: url.flatMap { URL(string: $0) }
+            remoteItem: RemoteItem(
+                feedGuid: feedGuid,
+                feedUrl: feedUrl.flatMap { URL(string: $0) },
+                medium: "publisher"
+            )
         )
+        return copy
+    }
+
+    /// Sets a new feed URL for migration (`itunes:new-feed-url`).
+    ///
+    /// - Parameter urlString: The new feed URL as a string.
+    /// - Returns: A modified copy of the channel.
+    public func newFeedUrl(_ urlString: String) -> Channel {
+        var copy = self
+        copy.itunesNewFeedUrl = URL(string: urlString)
+        return copy
+    }
+
+    /// Marks the podcast as complete — no more new episodes (`itunes:complete`).
+    ///
+    /// - Parameter value: Whether the podcast is complete.
+    /// - Returns: A modified copy of the channel.
+    public func complete(_ value: Bool) -> Channel {
+        var copy = self
+        copy.itunesComplete = value
+        return copy
+    }
+
+    /// Appends a podcast location.
+    ///
+    /// - Parameters:
+    ///   - name: The place name.
+    ///   - geo: Optional geo URI.
+    ///   - osm: Optional OpenStreetMap identifier.
+    ///   - rel: Optional relationship type (`"creator"` or `"subject"`).
+    ///   - country: Optional ISO 3166-1 alpha-2 country code.
+    /// - Returns: A modified copy of the channel.
+    public func location(
+        name: String,
+        geo: String? = nil,
+        osm: String? = nil,
+        rel: String? = nil,
+        country: String? = nil
+    ) -> Channel {
+        var copy = self
+        copy.locations.append(
+            PodcastLocation(
+                name: name, geo: geo, osm: osm, rel: rel, country: country
+            ))
         return copy
     }
 }

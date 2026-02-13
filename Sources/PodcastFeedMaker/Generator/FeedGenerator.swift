@@ -175,6 +175,12 @@ public struct FeedGenerator: Sendable {
         if let itunesImage = channel.itunesImage {
             lines.append(b.selfClosingElement("itunes:image", attributes: [("href", XMLBuilder.encodeURL(itunesImage))]))
         }
+        for podcastImage in channel.podcastImages {
+            lines.append(generatePodcastImage(podcastImage, builder: b))
+        }
+        if let podcastImagesSrcset = channel.podcastImagesSrcset {
+            lines.append(generatePodcastImagesSrcset(podcastImagesSrcset, builder: b))
+        }
         if !channel.itunesKeywords.isEmpty {
             lines.append(b.element("itunes:keywords", content: channel.itunesKeywords.joined(separator: ",")))
         }
@@ -215,7 +221,7 @@ public struct FeedGenerator: Sendable {
         for person in channel.persons {
             lines.append(generatePerson(person, builder: b))
         }
-        if let location = channel.location {
+        for location in channel.locations {
             lines.append(generateLocation(location, builder: b))
         }
         if let license = channel.license {
@@ -240,7 +246,7 @@ public struct FeedGenerator: Sendable {
             lines.append(b.element("podcast:podping", content: XMLBuilder.boolTrueFalse(podpingEnabled)))
         }
         if let publisher = channel.publisher {
-            lines.append(generatePublisher(publisher, builder: b))
+            lines.append(contentsOf: generatePublisher(publisher, builder: b))
         }
         if let chat = channel.chat {
             lines.append(generateChat(chat, builder: b))
@@ -318,6 +324,12 @@ public struct FeedGenerator: Sendable {
         if let itunesImage = item.itunesImage {
             lines.append(b2.selfClosingElement("itunes:image", attributes: [("href", XMLBuilder.encodeURL(itunesImage))]))
         }
+        for podcastImage in item.podcastImages {
+            lines.append(generatePodcastImage(podcastImage, builder: b2))
+        }
+        if let podcastImagesSrcset = item.podcastImagesSrcset {
+            lines.append(generatePodcastImagesSrcset(podcastImagesSrcset, builder: b2))
+        }
         if !item.itunesKeywords.isEmpty {
             lines.append(b2.element("itunes:keywords", content: item.itunesKeywords.joined(separator: ",")))
         }
@@ -351,7 +363,7 @@ public struct FeedGenerator: Sendable {
         for person in item.persons {
             lines.append(generatePerson(person, builder: b2))
         }
-        if let location = item.location {
+        for location in item.locations {
             lines.append(generateLocation(location, builder: b2))
         }
         if let license = item.license {

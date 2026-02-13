@@ -73,6 +73,10 @@ extension FeedParserDelegate {
         case "podcast:alternateEnclosure":
             handleAlternateEnclosureStart(attributeDict)
 
+        case "podcast:publisher" where currentContext == .channel:
+            chPublisherRemoteItem = nil
+            pushContext(.podcastPublisher)
+
         case "podcast:liveItem" where currentContext == .channel:
             handleLiveItemStart(attributeDict)
 
@@ -158,6 +162,11 @@ extension FeedParserDelegate {
             finalizeAlternateEnclosure()
             popContext()
 
+        case "podcast:publisher"
+        where currentContext == .podcastPublisher:
+            finalizePublisher()
+            popContext()
+
         case "podcast:liveItem"
         where currentContext == .liveItem:
             finalizeLiveItem()
@@ -218,6 +227,8 @@ extension FeedParserDelegate {
             handleLiveItemEndElement(name, text: text)
         case .podloveChapters:
             break
+        case .podcastPublisher:
+            break
         case .root:
             break
         }
@@ -256,6 +267,10 @@ extension FeedParserDelegate {
             handleCloudAttributes(attrs)
         case "itunes:image":
             handleITunesImageAttributes(attrs)
+        case "podcast:image":
+            handlePodcastImageAttributes(attrs)
+        case "podcast:images":
+            handlePodcastImagesSrcsetAttributes(attrs)
         default:
             break
         }
@@ -358,7 +373,7 @@ extension FeedParserDelegate {
             locked: chLocked,
             funding: chFunding,
             persons: chPersons,
-            location: chLocation,
+            locations: chLocations,
             license: chLicense,
             value: chValue,
             medium: chMedium,
@@ -370,6 +385,8 @@ extension FeedParserDelegate {
             trailers: chTrailers,
             liveItems: chLiveItems,
             publisher: chPublisher,
+            podcastImages: chPodcastImages,
+            podcastImagesSrcset: chPodcastImagesSrcset,
             chat: chChat,
             unknownElements: channelUnknownElements,
             xmlComments: channelComments,
