@@ -167,4 +167,122 @@ struct StreamingFeedParserTests {
         }
         return try String(contentsOf: url, encoding: .utf8)
     }
+
+    // MARK: - Missing Channel Error Specifics
+
+    @Test("String variant missing channel throws ParserError.missingChannel specifically")
+    func stringVariantMissingChannelSpecificError() async {
+        let parser = StreamingFeedParser()
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"></rss>
+            """
+        let stream = parser.parseItems(from: xml)
+        do {
+            for try await _ in stream {
+                Issue.record("Expected error to be thrown")
+            }
+            Issue.record("Expected error to be thrown")
+        } catch let parserError as ParserError {
+            #expect(parserError == .missingChannel)
+        } catch {
+            Issue.record("Expected ParserError.missingChannel, got \(error)")
+        }
+    }
+
+    @Test("Data variant missing channel throws ParserError.missingChannel specifically")
+    func dataVariantMissingChannelSpecificError() async {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"></rss>
+            """
+        let data = xml.data(using: .utf8) ?? Data()
+        let parser = StreamingFeedParser()
+        let stream = parser.parseItems(from: data)
+        do {
+            for try await _ in stream {
+                Issue.record("Expected error to be thrown")
+            }
+            Issue.record("Expected error to be thrown")
+        } catch let parserError as ParserError {
+            #expect(parserError == .missingChannel)
+        } catch {
+            Issue.record("Expected ParserError.missingChannel, got \(error)")
+        }
+    }
+
+    @Test("String variant with RSS element but no channel yields no items and throws")
+    func stringVariantRssNoChannelNoItems() async {
+        let parser = StreamingFeedParser()
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0">
+            </rss>
+            """
+        let stream = parser.parseItems(from: xml)
+        var itemCount = 0
+        do {
+            for try await _ in stream {
+                itemCount += 1
+            }
+            Issue.record("Expected error to be thrown")
+        } catch {
+            #expect(itemCount == 0)
+            #expect(error is ParserError)
+        }
+    }
+
+    @Test("Data variant invalid XML throws ParserError")
+    func dataVariantInvalidXML() async {
+        let data = "<<<not xml>>>".data(using: .utf8) ?? Data()
+        let parser = StreamingFeedParser()
+        let stream = parser.parseItems(from: data)
+        do {
+            for try await _ in stream {
+                Issue.record("Expected error to be thrown")
+            }
+            Issue.record("Expected error to be thrown")
+        } catch {
+            #expect(error is ParserError)
+        }
+    }
+
+    // MARK: - Missing Channel Guard Path
+
+    @Test("parseItems from string with no channel throws missingChannel")
+    func parseItemsStringNoChannel() async throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"></rss>
+            """
+        let parser = StreamingFeedParser()
+        var thrownError: (any Error)?
+        do {
+            for try await _ in parser.parseItems(from: xml) {
+                Issue.record("Should not yield items")
+            }
+        } catch {
+            thrownError = error
+        }
+        #expect(thrownError is ParserError)
+    }
+
+    @Test("parseItems from data with no channel throws missingChannel")
+    func parseItemsDataNoChannel() async throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"></rss>
+            """
+        let data = Data(xml.utf8)
+        let parser = StreamingFeedParser()
+        var thrownError: (any Error)?
+        do {
+            for try await _ in parser.parseItems(from: data) {
+                Issue.record("Should not yield items")
+            }
+        } catch {
+            thrownError = error
+        }
+        #expect(thrownError is ParserError)
+    }
 }

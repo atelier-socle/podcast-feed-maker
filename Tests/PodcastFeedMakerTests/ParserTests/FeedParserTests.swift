@@ -747,6 +747,123 @@ struct FeedParserTests {
         #expect(feed.channel?.title == "Test")
     }
 
+    // MARK: - File URL Parsing
+
+    @Test("Parse from file URL")
+    func parseFromFileURL() async throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"><channel>
+                <title>File URL Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+            </channel></rss>
+            """
+        let path = "/tmp/pfm_url_test_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        try xml.write(toFile: path, atomically: true, encoding: .utf8)
+
+        let url = URL(fileURLWithPath: path)
+        let feed = try await FeedParser().parse(url: url)
+        #expect(feed.channel?.title == "File URL Test")
+    }
+
+    // MARK: - Duration MM:SS Format
+
+    @Test("Parse itunes:duration in MM:SS format")
+    func parseDurationMMSS() throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+                <item>
+                    <title>Episode</title>
+                    <itunes:duration>25:30</itunes:duration>
+                </item>
+            </channel></rss>
+            """
+        let feed = try parser.parse(xml)
+        let duration = try #require(feed.channel?.items.first?.itunesDuration)
+        #expect(duration == 1530)
+    }
+
+    // MARK: - Invalid Duration
+
+    @Test("Parse invalid itunes:duration returns nil duration")
+    func parseInvalidDuration() throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+                <item>
+                    <title>Ep</title>
+                    <itunes:duration>not-a-number</itunes:duration>
+                </item>
+            </channel>
+            </rss>
+            """
+        let feed = try parser.parse(xml)
+        let item = try #require(feed.channel?.items.first)
+        #expect(item.itunesDuration == nil)
+    }
+
+    // MARK: - XML Comment Outside Channel
+
+    @Test("XML comment before channel is not captured in channel comments")
+    func parseCommentBeforeChannel() throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!-- Pre-channel comment -->
+            <rss version="2.0">
+            <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+            </channel>
+            </rss>
+            """
+        let feed = try parser.parse(xml)
+        // The comment before <channel> is in a non-channel/non-item context
+        // so it exercises the default: break path in foundComment
+        let channel = try #require(feed.channel)
+        // Channel comments only include comments INSIDE <channel>
+        #expect(!channel.xmlComments.contains("Pre-channel comment"))
+    }
+
+    // MARK: - Item Podcast Block
+
+    @Test("Parse item-level podcast:block exercises break path without unknown capture")
+    func parseItemPodcastBlock() throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"
+                 xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+                 xmlns:podcast="https://podcastindex.org/namespace/1.0">
+            <channel>
+                <title>Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+                <item>
+                    <title>Ep</title>
+                    <podcast:block id="google">yes</podcast:block>
+                </item>
+            </channel>
+            </rss>
+            """
+        let feed = try parser.parse(xml)
+        let item = try #require(feed.channel?.items.first)
+        // podcast:block at item level hits the break path in didEndElement,
+        // and must NOT be captured as an unknown element
+        let hasBlockUnknown = item.unknownElements.contains { $0.name == "podcast:block" }
+        #expect(!hasBlockUnknown)
+    }
+
     // MARK: - Helpers
 
     private var minimalXML: String {

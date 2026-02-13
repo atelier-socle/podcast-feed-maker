@@ -267,6 +267,14 @@ struct XMLBuilderURLTests {
             try XMLBuilder.validateURL(URL(string: "ftp://example.com")!, context: "test")
         }
     }
+
+    @Test("validateURL throws for URL without host")
+    func validateURLNoHost() throws {
+        let url = try #require(URL(string: "https:///path"))
+        #expect(throws: GeneratorError.self) {
+            try XMLBuilder.validateURL(url, context: "test")
+        }
+    }
 }
 
 // MARK: - Element Building Tests

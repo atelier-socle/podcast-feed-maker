@@ -614,4 +614,65 @@ struct ItemTests {
         let set: Set = [item1, item2]
         #expect(set.count == 2)
     }
+
+    // MARK: - Location Computed Setter
+
+    @Test("Setting location to a value replaces locations array with single element")
+    func locationSetterSetsValue() {
+        var item = Item(title: "Geo Episode")
+        let loc = PodcastLocation(name: "Paris", geo: "geo:48.8566,2.3522")
+        item.location = loc
+        #expect(item.locations.count == 1)
+        #expect(item.locations[0].name == "Paris")
+        #expect(item.locations[0].geo == "geo:48.8566,2.3522")
+        #expect(item.location?.name == "Paris")
+    }
+
+    @Test("Setting location to nil clears locations array")
+    func locationSetterClearsArray() {
+        var item = Item(
+            title: "Geo Episode",
+            locations: [
+                PodcastLocation(name: "Austin", rel: "creator"),
+                PodcastLocation(name: "London", rel: "subject")
+            ]
+        )
+        #expect(item.locations.count == 2)
+        item.location = nil
+        #expect(item.locations.isEmpty)
+        #expect(item.location == nil)
+    }
+
+    @Test("Setting location replaces existing multi-location array")
+    func locationSetterReplacesMultiple() {
+        var item = Item(
+            title: "Multi-Location",
+            locations: [
+                PodcastLocation(name: "Place A"),
+                PodcastLocation(name: "Place B")
+            ]
+        )
+        let newLoc = PodcastLocation(name: "Place C", country: "US")
+        item.location = newLoc
+        #expect(item.locations.count == 1)
+        #expect(item.locations[0].name == "Place C")
+        #expect(item.locations[0].country == "US")
+    }
+
+    @Test("Location getter returns first element of locations array")
+    func locationGetterReturnsFirst() {
+        let item = Item(
+            locations: [
+                PodcastLocation(name: "First"),
+                PodcastLocation(name: "Second")
+            ]
+        )
+        #expect(item.location?.name == "First")
+    }
+
+    @Test("Location getter returns nil for empty locations")
+    func locationGetterReturnsNilForEmpty() {
+        let item = Item()
+        #expect(item.location == nil)
+    }
 }

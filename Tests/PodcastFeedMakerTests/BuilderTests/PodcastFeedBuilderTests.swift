@@ -210,4 +210,173 @@ struct PodcastFeedBuilderTests {
         }
         #expect(feed.version == "2.0")
     }
+
+    // MARK: - buildBlock Array Variant
+
+    @Test("buildBlock array variant assembles feed from array of components")
+    func buildBlockArrayVariant() {
+        let components: [FeedComponent] = [
+            Channel(
+                title: "Array Show",
+                link: URL(string: "https://example.com")!,
+                description: "Built from array"
+            ),
+            Item(title: "Array Episode 1"),
+            Item(title: "Array Episode 2")
+        ]
+        let feed = PodcastFeedBuilder.buildBlock(components)
+        #expect(feed.channel?.title == "Array Show")
+        #expect(feed.channel?.items.count == 2)
+        #expect(feed.channel?.items[0].title == "Array Episode 1")
+        #expect(feed.channel?.items[1].title == "Array Episode 2")
+    }
+
+    @Test("buildBlock array variant with items only and no channel returns empty feed")
+    func buildBlockArrayNoChannel() {
+        let components: [FeedComponent] = [
+            Item(title: "Orphan 1"),
+            Item(title: "Orphan 2")
+        ]
+        let feed = PodcastFeedBuilder.buildBlock(components)
+        #expect(feed.channel == nil)
+    }
+
+    // MARK: - buildOptional Nil Case
+
+    @Test("buildOptional with nil returns empty array")
+    func buildOptionalNil() {
+        let result = PodcastFeedBuilder.buildOptional(nil)
+        #expect(result.isEmpty)
+    }
+
+    @Test("buildOptional with value returns single-element array")
+    func buildOptionalWithValue() {
+        let item: FeedComponent = Item(title: "Optional Episode")
+        let result = PodcastFeedBuilder.buildOptional(item)
+        #expect(result.count == 1)
+    }
+
+    // MARK: - buildEither
+
+    @Test("buildEither first returns the component unchanged")
+    func buildEitherFirst() {
+        let item = Item(title: "First Branch")
+        let result = PodcastFeedBuilder.buildEither(first: item)
+        #expect((result as? Item)?.title == "First Branch")
+    }
+
+    @Test("buildEither second returns the component unchanged")
+    func buildEitherSecond() {
+        let channel = Channel(
+            title: "Second Branch",
+            link: URL(string: "https://example.com")!,
+            description: "Else branch"
+        )
+        let result = PodcastFeedBuilder.buildEither(second: channel)
+        #expect((result as? Channel)?.title == "Second Branch")
+    }
+
+    // MARK: - Assemble Zero Channels Fallback
+
+    @Test("Assemble with zero channels returns empty PodcastFeed")
+    func assembleZeroChannels() {
+        let feed = PodcastFeedBuilder.buildBlock([])
+        #expect(feed.channel == nil)
+        #expect(feed.version == "2.0")
+    }
+
+    @Test("Assemble with only items and no channel returns empty feed")
+    func assembleOnlyItems() {
+        let components: [FeedComponent] = [
+            Item(title: "Ep 1"),
+            Item(title: "Ep 2")
+        ]
+        let feed = PodcastFeedBuilder.buildBlock(components)
+        #expect(feed.channel == nil)
+    }
+
+    // MARK: - Assemble Multiple Channels Fallback
+
+    @Test("Assemble with multiple channels uses first and assigns items")
+    func assembleMultipleChannels() {
+        let components: [FeedComponent] = [
+            Channel(
+                title: "First Channel",
+                link: URL(string: "https://example.com/1")!,
+                description: "First"
+            ),
+            Channel(
+                title: "Second Channel",
+                link: URL(string: "https://example.com/2")!,
+                description: "Second"
+            ),
+            Item(title: "Episode A")
+        ]
+        let feed = PodcastFeedBuilder.buildBlock(components)
+        #expect(feed.channel?.title == "First Channel")
+        #expect(feed.channel?.items.count == 1)
+        #expect(feed.channel?.items[0].title == "Episode A")
+    }
+
+    // MARK: - buildEither Direct Calls
+
+    @Test("buildEither first with Item preserves identity")
+    func buildEitherFirstItem() {
+        let item = Item(title: "First Branch Item")
+        let result = PodcastFeedBuilder.buildEither(first: item)
+        let asItem = result as? Item
+        #expect(asItem?.title == "First Branch Item")
+    }
+
+    @Test("buildEither second with Item preserves identity")
+    func buildEitherSecondItem() {
+        let item = Item(title: "Second Branch Item")
+        let result = PodcastFeedBuilder.buildEither(second: item)
+        let asItem = result as? Item
+        #expect(asItem?.title == "Second Branch Item")
+    }
+
+    @Test("buildEither first with Channel preserves identity")
+    func buildEitherFirstChannel() {
+        let channel = Channel(
+            title: "Either First",
+            link: URL(string: "https://example.com")!,
+            description: "First branch channel"
+        )
+        let result = PodcastFeedBuilder.buildEither(first: channel)
+        let asChannel = result as? Channel
+        #expect(asChannel?.title == "Either First")
+    }
+
+    @Test("buildEither second with Channel preserves identity")
+    func buildEitherSecondChannel() {
+        let channel = Channel(
+            title: "Either Second",
+            link: URL(string: "https://example.com")!,
+            description: "Second branch channel"
+        )
+        let result = PodcastFeedBuilder.buildEither(second: channel)
+        let asChannel = result as? Channel
+        #expect(asChannel?.title == "Either Second")
+    }
+
+    // MARK: - buildExpression
+
+    @Test("buildExpression wraps Item as FeedComponent")
+    func buildExpressionItem() {
+        let item = Item(title: "Wrapped")
+        let result = PodcastFeedBuilder.buildExpression(item)
+        #expect((result as? Item)?.title == "Wrapped")
+    }
+
+    @Test("buildExpression wraps Channel as FeedComponent")
+    func buildExpressionChannel() {
+        let channel = Channel(
+            title: "Wrapped Channel",
+            link: URL(string: "https://example.com")!,
+            description: "Desc"
+        )
+        let result = PodcastFeedBuilder.buildExpression(channel)
+        #expect((result as? Channel)?.title == "Wrapped Channel")
+    }
 }

@@ -923,6 +923,120 @@ struct CommandIntegrationTests {
         #expect(table.contains("full"))
         #expect(table.contains("2:00:00"))
     }
+
+    // MARK: - OutputFormatter: formatChapters empty
+
+    @Test("formatChapters with empty array returns no-chapters message")
+    func formatChaptersEmpty() {
+        let result = OutputFormatter.formatChapters([])
+        #expect(result == "No chapters found.")
+    }
+
+    // MARK: - OutputFormatter: formatJSONChapters empty
+
+    @Test("formatJSONChapters with empty array returns no-chapters message")
+    func formatJSONChaptersEmpty() {
+        let result = OutputFormatter.formatJSONChapters([])
+        #expect(result == "No chapters found.")
+    }
+
+    // MARK: - OutputFormatter: formatTemplateReport verbose all severities
+
+    @Test("formatTemplateReport verbose shows all severity levels")
+    func formatTemplateReportVerboseAllSeverities() {
+        let report = TemplateValidationReport(
+            level: .standard,
+            results: [
+                TemplateValidationResult(
+                    severity: .error,
+                    tag: .podcastLocked,
+                    message: "Missing required tag: podcastLocked"
+                ),
+                TemplateValidationResult(
+                    severity: .warning,
+                    tag: .podcastFunding,
+                    message: "Recommended tag missing: podcastFunding"
+                ),
+                TemplateValidationResult(
+                    severity: .info,
+                    tag: .podcastTranscript,
+                    message: "podcastTranscript is an advanced-level feature.",
+                    suggestedLevel: .advanced
+                )
+            ]
+        )
+        let formatted = OutputFormatter.formatTemplateReport(report, verbose: true)
+        #expect(formatted.contains("ERROR"))
+        #expect(formatted.contains("WARNING"))
+        #expect(formatted.contains("INFO"))
+        #expect(formatted.contains("podcastLocked"))
+        #expect(formatted.contains("podcastFunding"))
+        #expect(formatted.contains("podcastTranscript"))
+    }
+
+    // MARK: - OutputFormatter: formatTemplateReport compliant
+
+    @Test("formatTemplateReport with compliant template shows success line")
+    func formatTemplateReportCompliant() {
+        let report = TemplateValidationReport(
+            level: .basic,
+            results: []
+        )
+        let formatted = OutputFormatter.formatTemplateReport(report)
+        #expect(formatted.contains("Template (basic): compliant"))
+    }
+
+    // MARK: - OutputFormatter: formatTemplateReport non-compliant summary
+
+    @Test("formatTemplateReport non-compliant shows error count summary")
+    func formatTemplateReportNonCompliant() {
+        let report = TemplateValidationReport(
+            level: .expert,
+            results: [
+                TemplateValidationResult(
+                    severity: .error,
+                    tag: .podcastLocked,
+                    message: "Missing required tag"
+                ),
+                TemplateValidationResult(
+                    severity: .warning,
+                    tag: .podcastFunding,
+                    message: "Recommended tag missing"
+                )
+            ]
+        )
+        let formatted = OutputFormatter.formatTemplateReport(report)
+        #expect(formatted.contains("1 error(s)"))
+        #expect(formatted.contains("1 warning(s)"))
+    }
+
+    // MARK: - OutputFormatter: formatTemplateReport compliant with warnings
+
+    @Test("formatTemplateReport compliant with warnings shows warning summary")
+    func formatTemplateReportCompliantWithWarnings() {
+        let report = TemplateValidationReport(
+            level: .standard,
+            results: [
+                TemplateValidationResult(
+                    severity: .warning,
+                    tag: .podcastFunding,
+                    message: "Recommended tag missing"
+                )
+            ]
+        )
+        let formatted = OutputFormatter.formatTemplateReport(report)
+        #expect(formatted.contains("1 warning(s)"))
+        // Should NOT contain "error(s)" since there are no errors
+        #expect(!formatted.contains("error(s)"))
+    }
+
+    // MARK: - OutputError.encodingFailed description
+
+    @Test("OutputError.encodingFailed has correct description")
+    func outputErrorEncodingFailedDescription() {
+        let error = OutputError.encodingFailed
+        #expect(error.description == "Failed to encode output as UTF-8")
+    }
 }
 
 // swiftlint:enable type_body_length file_length

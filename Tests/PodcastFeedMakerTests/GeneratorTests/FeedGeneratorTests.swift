@@ -846,6 +846,33 @@ struct FeedGeneratorSpecialCharTests {
 
 struct FeedGeneratorOmissionTests {
 
+    @Test("Generate item with deprecated podcastImagesSrcset")
+    func generateItemPodcastImagesSrcset() throws {
+        var ch = minimalChannel()
+        var item = Item(title: "Ep1")
+        item.podcastImagesSrcset = PodcastImages(
+            srcset: "https://example.com/img1.jpg 200w, https://example.com/img2.jpg 600w"
+        )
+        ch.items = [item]
+        let feed = PodcastFeed(namespaces: [.podcast], channel: ch)
+        let xml = try FeedGenerator().generate(feed)
+        #expect(xml.contains("podcast:images"))
+        #expect(xml.contains("srcset"))
+        #expect(xml.contains("200w"))
+    }
+
+    @Test("Generate channel with deprecated podcastImagesSrcset")
+    func generateChannelPodcastImagesSrcset() throws {
+        var ch = minimalChannel()
+        ch.podcastImagesSrcset = PodcastImages(
+            srcset: "https://example.com/art-1500.jpg 1500w, https://example.com/art-600.jpg 600w"
+        )
+        let feed = PodcastFeed(namespaces: [.podcast], channel: ch)
+        let xml = try FeedGenerator().generate(feed)
+        #expect(xml.contains("podcast:images"))
+        #expect(xml.contains("1500w"))
+    }
+
     @Test("Nil optional fields are omitted")
     func nilFieldsOmitted() throws {
         let xml = try FeedGenerator().generate(minimalFeed())
@@ -862,5 +889,25 @@ struct FeedGeneratorOmissionTests {
         #expect(!xml.contains("<item>"))
         #expect(!xml.contains("<itunes:category"))
         #expect(!xml.contains("<podcast:funding"))
+    }
+
+    // MARK: - Unknown Self-Closing Element
+
+    @Test("Generate unknown element without text content produces self-closing tag")
+    func generateUnknownSelfClosing() throws {
+        var channel = Channel(
+            title: "Test",
+            link: URL(string: "https://example.com")!,
+            description: "Test"
+        )
+        // Add an unknown element with NO text content (just attributes)
+        channel.unknownElements.append(
+            UnknownElement(name: "custom:tag", attributes: ["key": "value"], textContent: nil)
+        )
+        let feed = PodcastFeed(version: "2.0", namespaces: [], channel: channel)
+        let generator = FeedGenerator()
+        let xml = try generator.generate(feed)
+        #expect(xml.contains("custom:tag"))
+        #expect(xml.contains("key=\"value\""))
     }
 }

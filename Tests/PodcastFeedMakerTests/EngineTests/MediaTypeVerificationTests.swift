@@ -387,6 +387,44 @@ struct ImageDimensionParserTests {
         #expect(dims.aspectRatio == 2.0)
     }
 
+    // MARK: - JPEG Edge Cases
+
+    @Test("JPEG with non-0xFF byte before marker skips correctly")
+    func jpegNonFFByte() {
+        // SOI (FF D8), then garbage byte (42), then SOF0 marker with dimensions
+        var data = Data([0xFF, 0xD8])  // SOI
+        data.append(contentsOf: [0x42])  // Non-0xFF byte -> triggers offset += 1; continue
+        data.append(contentsOf: [0xFF, 0xC0])  // SOF0 marker
+        // SOF0 segment: length(2) + precision(1) + height(2) + width(2)
+        data.append(contentsOf: [0x00, 0x0B])  // segment length = 11
+        data.append(contentsOf: [0x08])  // precision
+        data.append(contentsOf: [0x00, 0x64])  // height = 100
+        data.append(contentsOf: [0x00, 0xC8])  // width = 200
+        // Pad to ensure enough data
+        data.append(contentsOf: [0x00, 0x00, 0x00])
+
+        let dims = ImageDimensionParser.parseJPEG(data)
+        #expect(dims?.width == 200)
+        #expect(dims?.height == 100)
+    }
+
+    @Test("JPEG with fill bytes (0xFF 0x00) skips correctly")
+    func jpegFillBytes() {
+        // SOI (FF D8), then fill byte sequence (FF 00), then SOF0 with dimensions
+        var data = Data([0xFF, 0xD8])  // SOI
+        data.append(contentsOf: [0xFF, 0x00])  // FF followed by 0x00 fill -> triggers offset += 1; continue
+        data.append(contentsOf: [0xFF, 0xC0])  // SOF0 marker
+        data.append(contentsOf: [0x00, 0x0B])  // segment length
+        data.append(contentsOf: [0x08])  // precision
+        data.append(contentsOf: [0x01, 0x00])  // height = 256
+        data.append(contentsOf: [0x02, 0x00])  // width = 512
+        data.append(contentsOf: [0x00, 0x00, 0x00])
+
+        let dims = ImageDimensionParser.parseJPEG(data)
+        #expect(dims?.width == 512)
+        #expect(dims?.height == 256)
+    }
+
     // MARK: - Helpers
 
     private func makePNGHeaderData(width: Int, height: Int) -> Data {

@@ -1,4 +1,6 @@
 import ArgumentParser
+import Foundation
+import PodcastFeedMaker
 import Testing
 
 @testable import PodcastFeedCommands
@@ -57,5 +59,62 @@ struct InitCommandTests {
         #expect(throws: (any Error).self) {
             _ = try InitCommand.parse([])
         }
+    }
+
+    // MARK: - Scaffold Episode Verification
+
+    @Test(
+        "All template levels produce feeds with at least one episode",
+        arguments: ["basic", "standard", "advanced", "expert"]
+    )
+    func scaffoldHasEpisode(level: String) throws {
+        let outputPath = "/tmp/pfm_scaffold_\(level)_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: outputPath) }
+
+        var command = try InitCommand.parse([
+            "--template", level, "--format", "xml", "--output", outputPath
+        ])
+        try command.run()
+
+        let xml = try String(contentsOfFile: outputPath, encoding: .utf8)
+        let feed = try FeedParser().parse(xml)
+        let itemCount = feed.channel?.items.count ?? 0
+        #expect(itemCount >= 1, "Template \(level) should produce at least 1 episode, got \(itemCount)")
+    }
+
+    @Test("Basic scaffold episode has title, enclosure, and guid")
+    func basicScaffoldEpisodeFields() throws {
+        let outputPath = "/tmp/pfm_basic_fields_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: outputPath) }
+
+        var command = try InitCommand.parse([
+            "--template", "basic", "--format", "xml", "--output", outputPath
+        ])
+        try command.run()
+
+        let xml = try String(contentsOfFile: outputPath, encoding: .utf8)
+        let feed = try FeedParser().parse(xml)
+        let item = try #require(feed.channel?.items.first)
+        #expect(item.title != nil)
+        #expect(item.enclosure != nil)
+        #expect(item.guid != nil)
+    }
+
+    @Test("Standard scaffold episode has pubDate, duration, and explicit")
+    func standardScaffoldEpisodeFields() throws {
+        let outputPath = "/tmp/pfm_standard_fields_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: outputPath) }
+
+        var command = try InitCommand.parse([
+            "--template", "standard", "--format", "xml", "--output", outputPath
+        ])
+        try command.run()
+
+        let xml = try String(contentsOfFile: outputPath, encoding: .utf8)
+        let feed = try FeedParser().parse(xml)
+        let item = try #require(feed.channel?.items.first)
+        #expect(item.pubDate != nil)
+        #expect(item.itunesDuration != nil)
+        #expect(item.itunesExplicit != nil)
     }
 }

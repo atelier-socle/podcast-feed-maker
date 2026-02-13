@@ -138,7 +138,7 @@ extension LintCommand {
         }
         let hasWarnings = !allWarnings.isEmpty || !templateWarnings.isEmpty
         if strict && hasWarnings {
-            throw ExitCode(rawValue: ExitCodes.warningsOnly)
+            throw ExitCode(rawValue: ExitCodes.error)
         }
         if hasWarnings {
             throw ExitCode(rawValue: ExitCodes.warningsOnly)

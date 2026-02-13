@@ -81,4 +81,31 @@ struct InputResolverTests {
         )
         #expect(readError.description.contains("Cannot read file"))
     }
+
+    // MARK: - Invalid URL throws InputError.invalidURL
+
+    @Test("InputResolver throws invalidURL for URL-like string that is not a valid URL")
+    func resolveInvalidURL() {
+        // "http://[invalid" starts with "http://" so it enters the URL branch,
+        // but URL(string:) returns nil for this malformed string, triggering
+        // the throw at InputResolver line 26.
+        #expect(throws: InputError.self) {
+            _ = try InputResolver.resolve("http://[invalid")
+        }
+    }
+
+    @Test("InputResolver throws invalidURL for HTTPS malformed URL")
+    func resolveInvalidHTTPSURL() {
+        #expect(throws: InputError.self) {
+            _ = try InputResolver.resolve("https://[also invalid")
+        }
+    }
+
+    @Test("InputResolver throws invalidURL for file:// malformed URL")
+    func resolveInvalidFileURL() {
+        // file:// with invalid characters that URL(string:) rejects
+        #expect(throws: InputError.self) {
+            _ = try InputResolver.resolve("file://[bad path")
+        }
+    }
 }

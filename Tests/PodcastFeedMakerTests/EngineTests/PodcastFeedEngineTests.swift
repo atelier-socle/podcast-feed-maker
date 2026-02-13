@@ -172,6 +172,27 @@ struct PodcastFeedEngineTests {
         #expect(try !engine.isEquivalent(xml1, xml2))
     }
 
+    // MARK: - Parse from URL
+
+    @Test("Engine parse from file URL")
+    func engineParseFromFileURL() async throws {
+        let xml = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"><channel>
+                <title>Engine URL Test</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+            </channel></rss>
+            """
+        let path = "/tmp/pfm_engine_url_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        try xml.write(toFile: path, atomically: true, encoding: .utf8)
+
+        let engine = PodcastFeedEngine()
+        let feed = try await engine.parse(url: URL(fileURLWithPath: path))
+        #expect(feed.channel?.title == "Engine URL Test")
+    }
+
     // MARK: - Sendable
 
     @Test("PodcastFeedEngine is Sendable")

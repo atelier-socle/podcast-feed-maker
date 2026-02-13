@@ -352,4 +352,103 @@ struct AppleValidationTests {
                 $0.message.contains("Serial") && $0.message.contains("season")
             })
     }
+
+    // MARK: - Item Without Title or Description
+
+    @Test("Item with neither title nor description is error for Apple")
+    func itemNoTitleNoDescription() {
+        let item = Item(
+            enclosure: Enclosure(
+                url: URL(string: "https://example.com/ep.mp3")!,
+                length: 1024,
+                type: "audio/mpeg"
+            )
+        )
+        let feed = appleFeed(items: [item])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            report.errors.contains {
+                $0.field == "channel.items[0]"
+                    && $0.message.contains("title or description")
+            })
+    }
+
+    @Test("Item with only description but no title passes Apple title check")
+    func itemWithDescriptionOnly() {
+        let item = Item(
+            description: "An episode description",
+            enclosure: Enclosure(
+                url: URL(string: "https://example.com/ep.mp3")!,
+                length: 1024,
+                type: "audio/mpeg"
+            ),
+            guid: GUID(value: "ep-desc", isPermaLink: false),
+            pubDate: Date(),
+            itunesDuration: 300,
+            itunesEpisodeType: .full,
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/ep.jpg")
+        )
+        let feed = appleFeed(items: [item])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            !report.errors.contains {
+                $0.field == "channel.items[0]"
+                    && $0.message.contains("title or description")
+            })
+    }
+
+    // MARK: - Non-ASCII Enclosure URL
+
+    @Test("Percent-encoded URL does not trigger non-ASCII warning")
+    func percentEncodedEnclosureURL() {
+        // Foundation's URL(string:) percent-encodes non-ASCII chars,
+        // so absoluteString remains ASCII. Verify no false positive.
+        let encodedURL = URL(string: "https://example.com/%C3%A9pisode.mp3")!
+        let item = Item(
+            title: "Episode",
+            enclosure: Enclosure(
+                url: encodedURL,
+                length: 1024,
+                type: "audio/mpeg"
+            ),
+            guid: GUID(value: "ep-enc", isPermaLink: false),
+            pubDate: Date(),
+            itunesDuration: 300,
+            itunesEpisodeType: .full,
+            itunesExplicit: false,
+            itunesImage: URL(string: "https://example.com/ep.jpg")
+        )
+        let feed = appleFeed(items: [item])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            !report.warnings.contains {
+                $0.message.contains("non-ASCII")
+            })
+    }
+
+    @Test("ASCII enclosure URL does not trigger non-ASCII warning")
+    func asciiEnclosureURL() {
+        let feed = appleFeed(items: [validItem()])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            !report.warnings.contains {
+                $0.message.contains("non-ASCII")
+            })
+    }
+
+    // MARK: - Item Description Length
+
+    @Test("Item description over 4000 bytes generates warning")
+    func itemLongDescription() {
+        var item = validItem()
+        item.description = String(repeating: "x", count: 4500)
+        let feed = appleFeed(items: [item])
+        let report = validator.validate(feed, for: .apple)
+        #expect(
+            report.warnings.contains {
+                $0.field == "channel.items[0].description"
+                    && $0.message.contains("4000")
+            })
+    }
 }

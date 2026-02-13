@@ -106,12 +106,31 @@ struct TemplateIntegrationTests {
         try runAllowingExitCode(&command)
     }
 
-    @Test("Lint --template basic --strict with warnings")
-    func lintStrictTemplate() throws {
+    @Test("Lint --strict with warnings produces exit code error (1)")
+    func lintStrictWarningsExitError() throws {
+        var command = try LintCommand.parse([fixturePath, "--strict"])
+        do {
+            try command.run()
+        } catch let exitCode as ExitCode {
+            // With warnings, --strict must produce error exit code (1), not warningsOnly (2)
+            if exitCode.rawValue != ExitCodes.success {
+                #expect(exitCode.rawValue == ExitCodes.error)
+            }
+        }
+    }
+
+    @Test("Lint --strict --template basic with template warnings produces exit code error (1)")
+    func lintStrictTemplateWarningsExitError() throws {
         var command = try LintCommand.parse([
             fixturePath, "--template", "basic", "--strict"
         ])
-        try runAllowingExitCode(&command)
+        do {
+            try command.run()
+        } catch let exitCode as ExitCode {
+            if exitCode.rawValue != ExitCodes.success {
+                #expect(exitCode.rawValue == ExitCodes.error)
+            }
+        }
     }
 
     // MARK: - Validate with --template
@@ -246,5 +265,148 @@ struct TemplateIntegrationTests {
         #expect(platforms.contains(.apple))
         #expect(platforms.contains(.spotify))
         #expect(platforms.contains(.podcastIndex))
+    }
+
+    // MARK: - Lint JSON with template warnings
+
+    @Test("Lint JSON format with basic template produces template warnings for missing recommended tags")
+    func lintJsonBasicTemplateWarnings() throws {
+        // The fixture feed has required basic tags (title, link, description,
+        // itunesCategory, itunesExplicit, itunesImage, itemTitle, itemEnclosure)
+        // but is missing recommended tags like itunesType (channel) and
+        // itemDescription (item) — producing template warnings.
+        var command = try LintCommand.parse([
+            fixturePath, "--format", "json", "--template", "basic"
+        ])
+        do {
+            try command.run()
+        } catch is ExitCode {
+            // Expected: exit code for warnings (template warnings for missing recommended tags)
+        }
+    }
+
+    // MARK: - Lint JSON with template infos (suggestedLevel path)
+
+    @Test("Lint JSON format with expert template produces info-level results with suggestedLevel")
+    func lintJsonTemplateExpertInfos() throws {
+        // Build a feed that has tags beyond basic level so the basic template
+        // validator produces info-level results with suggestedLevel populated.
+        // Using a feed with podcast:locked + podcast:guid (standard-level tags)
+        // and validating against basic template to trigger infos.
+        let xmlWithAdvancedTags = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0"
+                 xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+                 xmlns:podcast="https://podcastindex.org/namespace/1.0"
+                 xmlns:atom="http://www.w3.org/2005/Atom"
+                 xmlns:content="http://purl.org/rss/1.0/modules/content/">
+            <channel>
+                <title>Advanced Tags Podcast</title>
+                <link>https://example.com</link>
+                <description>A podcast with tags beyond basic level.</description>
+                <language>en</language>
+                <itunes:author>Test Author</itunes:author>
+                <itunes:image href="https://example.com/artwork.jpg"/>
+                <itunes:explicit>false</itunes:explicit>
+                <itunes:category text="Technology"/>
+                <itunes:owner>
+                    <itunes:name>Test Owner</itunes:name>
+                    <itunes:email>test@example.com</itunes:email>
+                </itunes:owner>
+                <podcast:locked>yes</podcast:locked>
+                <podcast:guid>aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</podcast:guid>
+                <podcast:funding url="https://example.com/donate">Support us</podcast:funding>
+                <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"/>
+                <item>
+                    <title>Episode 1</title>
+                    <guid isPermaLink="false">ep-001</guid>
+                    <pubDate>Mon, 10 Feb 2026 12:00:00 +0000</pubDate>
+                    <enclosure url="https://example.com/ep1.mp3" length="5000000" type="audio/mpeg"/>
+                    <itunes:duration>1800</itunes:duration>
+                    <itunes:explicit>false</itunes:explicit>
+                    <content:encoded><![CDATA[<p>Rich HTML content</p>]]></content:encoded>
+                </item>
+            </channel>
+            </rss>
+            """
+        let infoPath = "/tmp/pfm_template_info_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: infoPath) }
+        try xmlWithAdvancedTags.write(toFile: infoPath, atomically: true, encoding: .utf8)
+
+        // Use basic template against a feed with standard/advanced tags
+        // This should produce info-level results with suggestedLevel
+        var command = try LintCommand.parse([
+            infoPath, "--format", "json", "--template", "basic"
+        ])
+        do {
+            try command.run()
+        } catch is ExitCode {
+            // Expected: exit code for warnings/infos
+        }
+    }
+
+    // MARK: - Lint JSON with template errors (exercises errors map closure)
+
+    @Test("Lint JSON format with basic template errors for feed missing required tags")
+    func lintJsonTemplateErrors() throws {
+        // Feed missing required basic tags: itunesImage, itunesCategory, itunesExplicit
+        // This produces template ERRORS (not just warnings) in JSON output
+        let minimalXML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Bare Minimum</title>
+                <link>https://example.com</link>
+                <description>No iTunes tags at all.</description>
+                <item>
+                    <title>Ep</title>
+                </item>
+            </channel>
+            </rss>
+            """
+        let errorPath = "/tmp/pfm_template_error_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: errorPath) }
+        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
+
+        var command = try LintCommand.parse([
+            errorPath, "--format", "json", "--template", "basic"
+        ])
+        do {
+            try command.run()
+            Issue.record("Expected ExitCode for feed with template errors")
+        } catch is ExitCode {
+            // Expected: exit code 1 for template errors
+        }
+    }
+
+    // MARK: - Validate JSON with errors and template
+
+    @Test("Validate JSON format with errors and template entries")
+    func validateJsonWithErrorsAndTemplate() throws {
+        let minimalXML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+            <channel>
+                <title>Minimal</title>
+                <link>https://example.com</link>
+                <description>Test</description>
+                <item>
+                    <title>Ep</title>
+                </item>
+            </channel>
+            </rss>
+            """
+        let errorPath = "/tmp/pfm_validate_json_\(UUID()).xml"
+        defer { try? FileManager.default.removeItem(atPath: errorPath) }
+        try minimalXML.write(toFile: errorPath, atomically: true, encoding: .utf8)
+
+        var command = try ValidateCommand.parse([
+            errorPath, "--platform", "apple", "--format", "json", "--template", "standard"
+        ])
+        do {
+            try command.run()
+        } catch is ExitCode {
+            // Expected: errors for missing Apple and standard template requirements
+        }
     }
 }

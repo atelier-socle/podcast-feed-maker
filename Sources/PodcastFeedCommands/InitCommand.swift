@@ -70,7 +70,7 @@ struct InitCommand: ParsableCommand {
 
         switch template.level {
         case .basic:
-            return PodcastFeed.basic(
+            var feed = PodcastFeed.basic(
                 title: "My Podcast",
                 link: url,
                 description: "A podcast about..."
@@ -79,9 +79,18 @@ struct InitCommand: ParsableCommand {
                     .explicit(false)
                     .image(imageURL)
             }
+            feed.channel?.items = [
+                Item(
+                    title: "Episode 1",
+                    enclosure: Enclosure.mp3(
+                        url: "https://example.com/episodes/ep001.mp3", length: 50_000_000),
+                    guid: GUID(value: "ep-001", isPermaLink: false)
+                )
+            ]
+            return feed
 
         case .standard:
-            return PodcastFeed.standard(
+            var feed = PodcastFeed.standard(
                 title: "My Podcast",
                 link: url,
                 description: "A podcast about..."
@@ -96,6 +105,19 @@ struct InitCommand: ParsableCommand {
                     .image(imageURL)
                     .language("en")
             }
+            feed.channel?.items = [
+                Item(
+                    title: "Episode 1",
+                    description: "Episode description...",
+                    enclosure: Enclosure.mp3(
+                        url: "https://example.com/episodes/ep001.mp3", length: 50_000_000),
+                    guid: GUID(value: "ep-001", isPermaLink: false),
+                    pubDate: Date(),
+                    itunesDuration: 1800,
+                    itunesExplicit: false
+                )
+            ]
+            return feed
 
         case .advanced:
             var feed = PodcastFeed.advanced(
