@@ -11,6 +11,7 @@ public struct PodcastFeedCommand: ParsableCommand {
         abstract: "A toolkit for generating, parsing, and validating podcast RSS feeds.",
         version: "0.1.0",
         subcommands: [
+            InitCommand.self,
             LintCommand.self,
             ValidateCommand.self,
             ReadCommand.self,

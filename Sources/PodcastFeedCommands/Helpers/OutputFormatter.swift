@@ -289,17 +289,68 @@ enum OutputFormatter {
         }
         return string
     }
+}
 
-    // MARK: - Private Helpers
+// MARK: - Template Validation
 
-    private static func formatDate(_ date: Date) -> String {
+extension OutputFormatter {
+
+    /// Formats a template validation report for display.
+    static func formatTemplateReport(
+        _ report: TemplateValidationReport,
+        verbose: Bool = false
+    ) -> String {
+        var lines: [String] = []
+
+        let results =
+            verbose
+            ? report.results
+            : report.results.filter { $0.severity != .info }
+
+        for result in results {
+            switch result.severity {
+            case .error:
+                lines.append("  \(ColorOutput.error("ERROR")): \(result.message)")
+            case .warning:
+                lines.append("  \(ColorOutput.warning("WARNING")): \(result.message)")
+            case .info:
+                lines.append("  \(ColorOutput.info("INFO")): \(result.message)")
+            }
+        }
+
+        let level = report.level.description
+        if report.isCompliant && report.warnings.isEmpty {
+            lines.append(ColorOutput.success("  Template (\(level)): compliant"))
+        } else {
+            let parts = [
+                report.errors.isEmpty ? nil : "\(report.errors.count) error(s)",
+                report.warnings.isEmpty ? nil : "\(report.warnings.count) warning(s)",
+                report.infos.isEmpty ? nil : "\(report.infos.count) info(s)"
+            ].compactMap { $0 }
+            let summary = parts.joined(separator: ", ")
+            let status =
+                report.isCompliant
+                ? ColorOutput.warning("  Template (\(level)): \(summary)")
+                : ColorOutput.error("  Template (\(level)): \(summary)")
+            lines.append(status)
+        }
+
+        return lines.joined(separator: "\n")
+    }
+}
+
+// MARK: - Private Helpers
+
+extension OutputFormatter {
+
+    static func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM dd, yyyy"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: date)
     }
 
-    private static func formatDuration(_ seconds: Int) -> String {
+    static func formatDuration(_ seconds: Int) -> String {
         let hours = seconds / 3600
         let minutes = (seconds % 3600) / 60
         let secs = seconds % 60
@@ -309,17 +360,17 @@ enum OutputFormatter {
         return String(format: "%d:%02d", minutes, secs)
     }
 
-    private static func truncate(_ string: String, to length: Int) -> String {
+    static func truncate(_ string: String, to length: Int) -> String {
         if string.count <= length { return string }
         return String(string.prefix(length - 3)) + "..."
     }
 
-    private static func pad(_ string: String, to length: Int) -> String {
+    static func pad(_ string: String, to length: Int) -> String {
         if string.count >= length { return String(string.prefix(length)) }
         return string + String(repeating: " ", count: length - string.count)
     }
 
-    private static func formatSingleDiff(_ diff: FeedDifference) -> String {
+    static func formatSingleDiff(_ diff: FeedDifference) -> String {
         switch diff.changeType {
         case .added:
             return "  \(ColorOutput.success("+")) \(diff.field): \(diff.newValue ?? "")"
@@ -332,7 +383,7 @@ enum OutputFormatter {
         }
     }
 
-    private static func sortedItems(_ items: [Item], by sort: EpisodeSort) -> [Item] {
+    static func sortedItems(_ items: [Item], by sort: EpisodeSort) -> [Item] {
         switch sort {
         case .newest:
             return items.sorted { ($0.pubDate ?? .distantPast) > ($1.pubDate ?? .distantPast) }

@@ -21,29 +21,65 @@ struct ValidateCommand: ParsableCommand {
     @Option(name: .shortAndLong, help: "Output format: text, json.")
     var format: String = "text"
 
+    @Option(name: .long, help: "Template level: basic, standard, advanced, expert.")
+    var template: TemplateName?
+
     @Flag(name: .shortAndLong, help: "Show info-level messages too.")
     var verbose: Bool = false
 
     @Flag(name: .long, help: "Disable colored output.")
     var noColor: Bool = false
 
+    // swiftlint:disable:next function_body_length
     mutating func run() throws {
         let feed = try FeedLoader.load(from: source)
         let validator = FeedValidator()
         let platforms = try resolvePlatforms()
         let reports = platforms.map { validator.validate(feed, for: $0) }
 
+        // Template validation (if requested)
+        var templateReport: TemplateValidationReport?
+        if let templateName = template {
+            let resolved = templateName.resolve()
+            templateReport = TemplateValidator().validate(feed, against: resolved)
+        }
+
         if format == "json" {
             let jsonReports = reports.map { report in
                 JSONValidationReport(
                     platform: report.platform.rawValue,
-                    errors: report.errors.map { JSONValidationEntry(field: $0.field, message: $0.message) },
-                    warnings: report.warnings.map { JSONValidationEntry(field: $0.field, message: $0.message) },
+                    errors: report.errors.map {
+                        JSONValidationEntry(field: $0.field, message: $0.message)
+                    },
+                    warnings: report.warnings.map {
+                        JSONValidationEntry(field: $0.field, message: $0.message)
+                    },
                     infos: report.results.filter { $0.severity == .info }
                         .map { JSONValidationEntry(field: $0.field, message: $0.message) }
                 )
             }
-            let json = try OutputFormatter.jsonString(jsonReports)
+            var output: JSONValidateOutput
+            if let tReport = templateReport {
+                output = JSONValidateOutput(
+                    platforms: jsonReports,
+                    template: JSONTemplateReport(
+                        level: tReport.level.description,
+                        isCompliant: tReport.isCompliant,
+                        errors: tReport.errors.map {
+                            JSONTemplateEntry(tag: $0.tag.rawValue, message: $0.message)
+                        },
+                        warnings: tReport.warnings.map {
+                            JSONTemplateEntry(tag: $0.tag.rawValue, message: $0.message)
+                        },
+                        infos: tReport.infos.map {
+                            JSONTemplateEntry(tag: $0.tag.rawValue, message: $0.message)
+                        }
+                    )
+                )
+            } else {
+                output = JSONValidateOutput(platforms: jsonReports, template: nil)
+            }
+            let json = try OutputFormatter.jsonString(output)
             print(json)
         } else {
             for report in reports {
@@ -54,11 +90,23 @@ struct ValidateCommand: ParsableCommand {
 
             let totalErrors = reports.flatMap(\.errors).count
             let totalWarnings = reports.flatMap(\.warnings).count
-            print("Summary: \(totalErrors) error(s), \(totalWarnings) warning(s) across \(reports.count) platform(s)")
+            print(
+                "Summary: \(totalErrors) error(s), \(totalWarnings) warning(s) "
+                    + "across \(reports.count) platform(s)")
+
+            if let tReport = templateReport {
+                print("")
+                print("Template validation (\(tReport.level)):")
+                print(OutputFormatter.formatTemplateReport(tReport, verbose: verbose))
+            }
         }
 
-        let hasErrors = reports.contains { !$0.isValid }
-        let hasWarnings = reports.flatMap(\.warnings).isEmpty == false
+        let hasErrors =
+            reports.contains { !$0.isValid }
+            || (templateReport?.isCompliant == false)
+        let hasWarnings =
+            reports.flatMap(\.warnings).isEmpty == false
+            || (templateReport?.warnings.isEmpty == false)
 
         if hasErrors {
             throw ExitCode(rawValue: ExitCodes.error)
@@ -86,6 +134,11 @@ struct ValidateCommand: ParsableCommand {
 
 // MARK: - JSON Output Types
 
+private struct JSONValidateOutput: Encodable {
+    let platforms: [JSONValidationReport]
+    let template: JSONTemplateReport?
+}
+
 private struct JSONValidationReport: Encodable {
     let platform: String
     let errors: [JSONValidationEntry]
@@ -95,5 +148,18 @@ private struct JSONValidationReport: Encodable {
 
 private struct JSONValidationEntry: Encodable {
     let field: String?
+    let message: String
+}
+
+private struct JSONTemplateReport: Encodable {
+    let level: String
+    let isCompliant: Bool
+    let errors: [JSONTemplateEntry]
+    let warnings: [JSONTemplateEntry]
+    let infos: [JSONTemplateEntry]
+}
+
+private struct JSONTemplateEntry: Encodable {
+    let tag: String
     let message: String
 }

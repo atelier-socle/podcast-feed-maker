@@ -30,6 +30,14 @@ struct GenerateCommand: ParsableCommand {
         help: "Platform(s) to validate against when --validate is used.")
     var platform: [String] = []
 
+    @Option(name: .long, help: "Template level: basic, standard, advanced, expert.")
+    var template: TemplateName?
+
+    @Option(
+        name: .long, parsing: .upToNextOption,
+        help: "Override template platforms: apple, spotify, amazon, podcastIndex, psp1, all.")
+    var platforms: [String] = []
+
     @Flag(name: .long, help: "Disable colored output.")
     var noColor: Bool = false
 
@@ -64,8 +72,8 @@ struct GenerateCommand: ParsableCommand {
 
         if validate {
             let validator = FeedValidator()
-            let platforms = resolvePlatforms()
-            let reports = platforms.map { validator.validate(feed, for: $0) }
+            let validationPlatforms = resolvePlatforms()
+            let reports = validationPlatforms.map { validator.validate(feed, for: $0) }
 
             print("")
             for report in reports {
@@ -76,6 +84,20 @@ struct GenerateCommand: ParsableCommand {
             let hasErrors = reports.contains { !$0.isValid }
             if hasErrors {
                 throw ExitCode(rawValue: ExitCodes.error)
+            }
+        }
+
+        // Template validation (if requested) — informational warnings to stderr
+        if let templateName = template {
+            let resolvedTemplate = templateName.resolve(platforms: platforms)
+            let report = TemplateValidator().validate(feed, against: resolvedTemplate)
+            if !report.isCompliant || !report.warnings.isEmpty {
+                FileHandle.standardError.write(
+                    Data(
+                        "\nTemplate validation (\(report.level)):\n".utf8))
+                FileHandle.standardError.write(
+                    Data(
+                        (OutputFormatter.formatTemplateReport(report) + "\n").utf8))
             }
         }
     }

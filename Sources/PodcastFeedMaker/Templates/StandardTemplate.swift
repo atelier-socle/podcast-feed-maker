@@ -11,6 +11,8 @@ import Foundation
 /// - SeeAlso: ``FeedTemplate``, ``ExpertiseLevel/standard``, ``PSP1Configuration``
 public struct StandardTemplate: FeedTemplate, Sendable, Hashable {
 
+    public init() {}
+
     public let level: ExpertiseLevel = .standard
     public let name: String = "Standard"
 

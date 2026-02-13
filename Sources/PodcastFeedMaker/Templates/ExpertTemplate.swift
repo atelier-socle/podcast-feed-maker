@@ -11,6 +11,8 @@ import Foundation
 /// - SeeAlso: ``FeedTemplate``, ``ExpertiseLevel/expert``
 public struct ExpertTemplate: FeedTemplate, Sendable, Hashable {
 
+    public init() {}
+
     public let level: ExpertiseLevel = .expert
     public let name: String = "Expert"
 
