@@ -5,7 +5,7 @@ import Foundation
 /// `ComposedTemplate` is a concrete value type that conforms to ``FeedTemplate``.
 /// It is created by the `+` operator or fluent builder methods like
 /// ``FeedTemplate/requiring(_:)``, ``FeedTemplate/recommending(_:)``,
-/// and ``FeedTemplate/targeting(_:)-7ql2q``.
+/// and ``FeedTemplate/targeting(_:)-(PlatformPreset)``.
 ///
 /// ```swift
 /// let networkTemplate = StandardTemplate()

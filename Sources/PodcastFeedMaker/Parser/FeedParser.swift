@@ -18,7 +18,7 @@ import Foundation
 /// ## Best-Effort Parsing
 ///
 /// The parser collects non-fatal errors (e.g., malformed dates, missing
-/// optional attributes) and continues parsing. Use ``parseWithDiagnostics(_:)-7wrnk``
+/// optional attributes) and continues parsing. Use ``parseWithDiagnostics(_:)``
 /// to access both the feed and any warnings.
 public struct FeedParser: Sendable {
 

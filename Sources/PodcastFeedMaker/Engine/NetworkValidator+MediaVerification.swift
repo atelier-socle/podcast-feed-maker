@@ -9,7 +9,7 @@ extension NetworkValidator {
     /// Verifies actual media file types by downloading first 12 bytes (magic bytes).
     ///
     /// For each enclosure in the feed, downloads the first 12 bytes via a Range
-    /// request, detects the actual file format using ``MediaSignature``, and
+    /// request, detects the actual file format using magic-byte signatures, and
     /// compares it against the declared MIME type.
     ///
     /// For artwork URLs, verifies that the file is a JPEG or PNG.

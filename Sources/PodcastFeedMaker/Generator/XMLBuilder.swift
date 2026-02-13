@@ -267,7 +267,9 @@ public struct XMLBuilder: Sendable {
 
     /// Validates that a URL is safe for use in an RSS feed.
     ///
-    /// - Parameter url: The URL to validate.
+    /// - Parameters:
+    ///   - url: The URL to validate.
+    ///   - context: A description of where the URL appears (e.g., `"enclosure"`). Defaults to `""`.
     /// - Throws: ``GeneratorError/invalidURL(_:_:)`` if the URL is invalid.
     public static func validateURL(_ url: URL, context: String = "") throws {
         guard let scheme = url.scheme else {

@@ -42,6 +42,7 @@ public struct PodcastFeed: Sendable, Hashable, Equatable, Codable {
     ///   - version: The RSS version. Defaults to `"2.0"`.
     ///   - namespaces: The XML namespaces. Defaults to all standard namespaces.
     ///   - channel: The channel data. Optional for partial/incremental construction.
+    ///   - namespacePrefixes: Original prefix-to-URI mappings from parsed XML. Defaults to empty.
     public init(
         version: String = "2.0",
         namespaces: [PodcastNamespace] = PodcastNamespace.allStandard,
