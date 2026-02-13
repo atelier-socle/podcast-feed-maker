@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
 /// High-level facade combining generation, parsing, and validation.
 ///
 /// `PodcastFeedEngine` provides a single entry point for the most common

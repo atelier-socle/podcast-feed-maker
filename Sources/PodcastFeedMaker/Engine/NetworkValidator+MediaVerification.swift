@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
 // MARK: - Media Type Verification & Artwork Dimension Checking
 
 extension NetworkValidator {

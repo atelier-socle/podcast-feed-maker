@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationXML)
+    import FoundationXML
+#endif
+
 // MARK: - XMLParserDelegate — Start Element
 
 extension FeedParserDelegate {

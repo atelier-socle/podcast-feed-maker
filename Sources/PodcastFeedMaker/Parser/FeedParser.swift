@@ -1,5 +1,13 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
+#if canImport(FoundationXML)
+    import FoundationXML
+#endif
+
 /// Parses podcast RSS feeds from XML into ``PodcastFeed`` models.
 ///
 /// `FeedParser` is the primary public API for feed parsing. It supports
@@ -53,7 +61,7 @@ public struct FeedParser: Sendable {
         return result.feed
     }
 
-    /// Parses a remote feed from a URL.
+    /// Parses a feed from a URL (remote or local file).
     ///
     /// - Parameter url: The feed URL.
     /// - Returns: The parsed feed.
@@ -61,13 +69,21 @@ public struct FeedParser: Sendable {
     ///   the XML is invalid, or required elements are missing.
     public func parse(url: URL) async throws -> PodcastFeed {
         let data: Data
-        do {
-            let (fetchedData, _) = try await URLSession.shared.data(
-                from: url
-            )
-            data = fetchedData
-        } catch {
-            throw ParserError.networkError(error.localizedDescription)
+        if url.isFileURL {
+            do {
+                data = try Data(contentsOf: url)
+            } catch {
+                throw ParserError.networkError(error.localizedDescription)
+            }
+        } else {
+            do {
+                let (fetchedData, _) = try await URLSession.shared.data(
+                    from: url
+                )
+                data = fetchedData
+            } catch {
+                throw ParserError.networkError(error.localizedDescription)
+            }
         }
         return try parse(data: data)
     }

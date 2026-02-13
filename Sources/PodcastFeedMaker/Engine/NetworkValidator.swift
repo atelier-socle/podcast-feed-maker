@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
 /// Validates feed URLs by performing HTTP HEAD requests.
 ///
 /// `NetworkValidator` checks that artwork, enclosure, and other URLs

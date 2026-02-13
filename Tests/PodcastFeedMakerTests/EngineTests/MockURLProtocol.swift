@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
 // MARK: - MockResponse
 
 /// A mock HTTP response for use with ``MockURLProtocol``.

@@ -3,6 +3,11 @@ import Testing
 
 @testable import PodcastFeedCommands
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
+
 @Suite("FeedLoader Tests")
 struct FeedLoaderTests {
 

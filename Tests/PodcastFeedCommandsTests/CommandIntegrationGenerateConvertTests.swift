@@ -5,6 +5,11 @@ import Testing
 
 @testable import PodcastFeedCommands
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
+
 // MARK: - Shared Helpers
 
 /// Comprehensive feed XML that passes all 5 platform validations with 0 errors.

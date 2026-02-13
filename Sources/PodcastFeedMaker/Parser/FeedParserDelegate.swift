@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationXML)
+    import FoundationXML
+#endif
+
 // MARK: - Parser Context
 
 /// Tracks the current position in the XML element hierarchy.

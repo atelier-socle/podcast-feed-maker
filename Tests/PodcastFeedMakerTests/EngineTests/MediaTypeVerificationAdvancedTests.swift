@@ -3,6 +3,11 @@ import Testing
 
 @testable import PodcastFeedMaker
 
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
+
+
 // MARK: - Helpers
 
 private func feedWithEnclosure(
