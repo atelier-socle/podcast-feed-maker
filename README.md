@@ -8,7 +8,7 @@
 
 ![podcast-feed-maker](./assets/banner.png)
 
-Reference-quality Swift library for generating, parsing, and validating podcast RSS feeds. PodcastFeedMaker is fully bi-directional: build feeds from Swift models and generate standards-compliant XML, or parse existing XML back into the same strongly-typed model. It covers all seven XML namespaces used in podcasting — RSS 2.0, iTunes, Podcast Namespace 2.0 (all 32 tags), Atom, Dublin Core, Content Module, and Podlove Simple Chapters — with multi-platform validation for Apple Podcasts, Spotify, Amazon Music, Podcast Index, and PSP-1. Import and export OPML subscription lists with validation and bidirectional feed conversion. Zero third-party dependencies in the core library, pure Swift + Foundation, Linux-compatible from day one. Suitable for podcast hosting platforms, feed migration tools, podcast apps, and server-side Swift.
+Reference-quality Swift library for generating, parsing, and validating podcast RSS feeds. PodcastFeedMaker is fully bi-directional: build feeds from Swift models and generate standards-compliant XML, or parse existing XML back into the same strongly-typed model. It covers all seven XML namespaces used in podcasting — RSS 2.0, iTunes, Podcast Namespace 2.0 (all 32 tags), Atom, Dublin Core, Content Module, and Podlove Simple Chapters — with multi-platform validation for Apple Podcasts, Spotify, Amazon Music, Podcast Index, and PSP-1. Import and export OPML subscription lists with validation and bidirectional feed conversion. Audit feed quality with a weighted scoring engine that produces actionable recommendations and a cross-platform compatibility matrix. Zero third-party dependencies in the core library, pure Swift + Foundation, Linux-compatible from day one. Suitable for podcast hosting platforms, feed migration tools, podcast apps, and server-side Swift.
 
 Part of the [Atelier Socle](https://www.atelier-socle.com) ecosystem.
 
@@ -25,7 +25,8 @@ Part of the [Atelier Socle](https://www.atelier-socle.com) ecosystem.
 - **Chapters** — JSON Chapters (Podcast NS 2.0) and Podlove Simple Chapters (PSC), both Codable, supporting inline and linked formats
 - **Feed diff** — Compare two feeds and detect added, removed, and modified episodes, channel changes, and namespace differences
 - **OPML** — Import and export podcast subscription lists (OPML 1.0 and 2.0) with validation and feed conversion
-- **CLI** — 12 commands: `init`, `generate`, `read`, `validate`, `lint`, `episodes`, `chapters`, `diff`, `convert`, `add-episode`, `opml-export`, `opml-import`
+- **Audit** — Quality scoring (0-100) with 5 weighted categories, actionable recommendations, and cross-platform compatibility matrix
+- **CLI** — 13 commands: `init`, `generate`, `read`, `validate`, `lint`, `episodes`, `chapters`, `diff`, `convert`, `add-episode`, `opml-export`, `opml-import`, `audit`
 - **Strict concurrency** — All public types are `Sendable`, built with Swift 6.2 strict concurrency throughout
 
 ---
@@ -346,6 +347,37 @@ let report = OPMLValidator().validate(document)
 print("Valid: \(report.isValid)")
 ```
 
+### Feed Auditing
+
+Score your feed's quality from 0 to 100 across five weighted categories, with actionable recommendations and a cross-platform compatibility matrix:
+
+```swift
+import PodcastFeedMaker
+
+let feed = try FeedParser().parse(xmlString)
+let auditor = FeedAuditor()
+let report = auditor.audit(feed)
+
+print("Score: \(report.score)/100 (\(report.grade.rawValue))")
+
+for category in report.categoryScores {
+    print("\(category.category.displayName): \(category.earned)/\(category.maximum)")
+}
+
+for rec in report.recommendations where rec.priority == .critical {
+    print("\(rec.message)")
+}
+
+// Platform compatibility
+for result in report.compatibility {
+    print("\(result.platform): \(result.status)")
+}
+
+// Compare two versions
+let evolution = auditor.compare(before: oldFeed, after: newFeed)
+print("Score: \(evolution.beforeScore) -> \(evolution.afterScore)")
+```
+
 ### Chapters
 
 Two chapter systems are supported: JSON Chapters (linked via `podcast:chapters`) and Podlove Simple Chapters (inline `psc:chapters`). Both are fully Codable:
@@ -373,11 +405,12 @@ Sources/
         Templates/                  # FeedTemplate, 4 levels, composition, FeedTag
         Engine/                     # PodcastFeedEngine facade, FeedDiff, NetworkValidator
         OPML/                       # OPML import/export, validation, feed conversion
-        Documentation.docc/         # 11 DocC articles
+        Audit/                      # Feed quality scoring, recommendations, compatibility
+        Documentation.docc/         # 12 DocC articles
     PodcastFeedCommands/            # CLI implementations (depends on ArgumentParser)
     PodcastFeedCLI/                 # Executable entry point (@main)
 Tests/
-    PodcastFeedMakerTests/          # 2364+ tests across 247+ suites
+    PodcastFeedMakerTests/          # 2600+ tests across 270+ suites
         Fixtures/                   # 9 real podcast feed XML files
     PodcastFeedCommandsTests/       # CLI command tests
 ```
@@ -421,6 +454,12 @@ podcastfeed opml-export feed1.xml feed2.xml -o subscriptions.opml --title "My Po
 podcastfeed opml-import subscriptions.opml
 podcastfeed opml-import subscriptions.opml -f json
 podcastfeed opml-import subscriptions.opml --validate
+
+# Audit feed quality
+podcastfeed audit feed.xml
+podcastfeed audit feed.xml --format json
+podcastfeed audit feed.xml --min-score 80
+podcastfeed audit feed.xml --compare feed-v2.xml
 ```
 
 ### Commands
@@ -439,6 +478,7 @@ podcastfeed opml-import subscriptions.opml --validate
 | `add-episode` | Add a new episode to an existing feed |
 | `opml-export` | Export one or more feeds as an OPML subscription list |
 | `opml-import` | Parse an OPML file and list podcast subscriptions |
+| `audit` | Audit feed quality with scoring, recommendations, and platform compatibility |
 
 ### Global Options
 
@@ -476,8 +516,9 @@ The project includes a comprehensive test suite using Swift Testing (`import Tes
 | Templates | 10 | 4 levels, composition, FeedTag, factory methods |
 | Integration | 2 | End-to-end workflows |
 | OPML | 9 | Document, parser, generator, validator, converter, round-trip, edge cases |
+| Audit | 15 | Scoring, categories, grades, recommendations, compatibility, comparison, edge cases |
 | Showcase | 48+ | Public API demonstrations (548+ tests) |
-| CLI | 16 | All 12 commands, helpers, template integration |
+| CLI | 17 | All 13 commands, helpers, template integration |
 
 All tests run on both macOS and Linux in CI. No mocks of Foundation types — tests use real `XMLParser` and real `Data`.
 
@@ -501,9 +542,9 @@ All tests run on both macOS and Linux in CI. No mocks of Foundation types — te
 ## Roadmap
 
 - [x] OPML import/export — Import and export podcast subscription lists (0.2.0)
-- [ ] Feed migration — Automated platform-to-platform feed migration tools
-- [ ] Additional platforms — iHeartRadio, TuneIn, Pandora validation rules
-- [ ] SwiftUI integration — Feed preview components for macOS/iOS
+- [x] Feed audit — Quality scoring engine with recommendations and compatibility matrix (0.2.0)
+- [ ] Vapor Middleware — Dynamic server-side feeds with caching and Podping (separate package)
+- [ ] Additional validators — More platform-specific validation rules
 
 ---
 
@@ -511,7 +552,7 @@ All tests run on both macOS and Linux in CI. No mocks of Foundation types — te
 
 Full API documentation is available as a DocC catalog bundled with the package. Open the project in Xcode and select **Product > Build Documentation** to browse it locally.
 
-The catalog includes 11 guides:
+The catalog includes 12 guides:
 
 | Guide | Content |
 |-------|---------|
@@ -519,12 +560,13 @@ The catalog includes 11 guides:
 | Generating Feeds | Sync and streaming XML generation, namespace modes |
 | Parsing Feeds | XML parsing, 12 date formats, diagnostics, streaming |
 | Validating Feeds | 5 platforms, severity levels, cross-cutting rules |
+| Auditing Feeds | Quality scoring, recommendations, compatibility matrix |
 | Builder DSL | Result builder, fluent modifiers, enclosure factories |
 | Templates and Presets | 4 expertise levels, composition, FeedTag enum |
 | Round-Trip and Diff | Zero-loss round-trip, feed comparison, JSON export |
 | Chapters Guide | JSON Chapters and Podlove Simple Chapters |
 | OPML Guide | OPML import/export, validation, feed conversion |
-| CLI Reference | 12 commands, options, exit codes |
+| CLI Reference | 13 commands, options, exit codes |
 
 ---
 

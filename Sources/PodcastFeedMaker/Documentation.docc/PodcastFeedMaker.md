@@ -66,7 +66,8 @@ print("Valid: \(report.isValid)")
 - **Chapters** — JSON Chapters and Podlove Simple Chapters, including Codable round-trip
 - **Round-trip** — Parse, modify, and regenerate feeds with zero data loss (unknown elements, CDATA, comments, namespace prefixes)
 - **OPML** — Import and export podcast subscription lists (OPML 1.0 and 2.0), with validation and bidirectional feed conversion
-- **CLI** — Twelve command-line tools for feed management (`podcastfeed` executable)
+- **Audit** — Quality scoring engine with weighted categories, actionable recommendations, and cross-platform compatibility matrix
+- **CLI** — Thirteen command-line tools for feed management (`podcastfeed` executable)
 
 ### How It Works
 
@@ -87,6 +88,7 @@ print("Valid: \(report.isValid)")
 ### Validation
 
 - <doc:ValidatingFeeds>
+- <doc:AuditingFeeds>
 
 ### Convenience
 
@@ -251,6 +253,21 @@ print("Valid: \(report.isValid)")
 - ``OPMLValidationSeverity``
 - ``OPMLParserError``
 - ``OPMLFeedConverter``
+
+### Audit
+
+- ``FeedAuditor``
+- ``AuditReport``
+- ``AuditGrade``
+- ``AuditCategory``
+- ``AuditCategoryScore``
+- ``AuditCriterion``
+- ``AuditCriterionResult``
+- ``AuditRecommendation``
+- ``AuditScoring``
+- ``PlatformCompatibilityResult``
+- ``AuditComparison``
+- ``AuditCategoryDelta``
 
 ### Templates
 
