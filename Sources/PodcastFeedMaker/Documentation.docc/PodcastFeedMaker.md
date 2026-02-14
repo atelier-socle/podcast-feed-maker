@@ -89,6 +89,7 @@ print("Valid: \(report.isValid)")
 
 - <doc:ValidatingFeeds>
 - <doc:AuditingFeeds>
+- <doc:AuditIdentifiersReference>
 
 ### Convenience
 
