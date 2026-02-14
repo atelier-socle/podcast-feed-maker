@@ -10,7 +10,8 @@ Reference-quality Swift library for generating, parsing, and validating podcast 
 
 **PodcastFeedMaker** covers the complete podcast feed lifecycle: create feeds from scratch
 with a fluent builder DSL, parse existing XML feeds, validate against five major platforms,
-and round-trip with zero data loss. It supports all seven XML namespaces used in podcasting —
+import and export OPML subscription lists, and round-trip with zero data loss. It supports
+all seven XML namespaces used in podcasting —
 RSS 2.0, iTunes, Podcast Namespace 2.0 (all 30 tags), Atom, Dublin Core, Content Module,
 and Podlove Simple Chapters.
 
@@ -64,7 +65,8 @@ print("Valid: \(report.isValid)")
 - **Templates** — Four expertise levels (basic through expert) with composable presets
 - **Chapters** — JSON Chapters and Podlove Simple Chapters, including Codable round-trip
 - **Round-trip** — Parse, modify, and regenerate feeds with zero data loss (unknown elements, CDATA, comments, namespace prefixes)
-- **CLI** — Ten command-line tools for feed management (`podcastfeed` executable)
+- **OPML** — Import and export podcast subscription lists (OPML 1.0 and 2.0), with validation and bidirectional feed conversion
+- **CLI** — Twelve command-line tools for feed management (`podcastfeed` executable)
 
 ### How It Works
 
@@ -98,6 +100,10 @@ print("Valid: \(report.isValid)")
 ### Round-Trip
 
 - <doc:RoundTripAndDiff>
+
+### OPML
+
+- <doc:OPMLGuide>
 
 ### CLI
 
@@ -231,6 +237,20 @@ print("Valid: \(report.isValid)")
 
 - ``FeedDiff``
 - ``FeedDifference``
+
+### OPML
+
+- ``OPMLDocument``
+- ``OPMLHead``
+- ``OPMLOutline``
+- ``OPMLParser``
+- ``OPMLGenerator``
+- ``OPMLValidator``
+- ``OPMLValidationReport``
+- ``OPMLValidationIssue``
+- ``OPMLValidationSeverity``
+- ``OPMLParserError``
+- ``OPMLFeedConverter``
 
 ### Templates
 

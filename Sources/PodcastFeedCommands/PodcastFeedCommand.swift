@@ -20,7 +20,9 @@ public struct PodcastFeedCommand: ParsableCommand {
             DiffCommand.self,
             GenerateCommand.self,
             ConvertCommand.self,
-            AddEpisodeCommand.self
+            AddEpisodeCommand.self,
+            OPMLExportCommand.self,
+            OPMLImportCommand.self
         ],
         defaultSubcommand: nil
     )

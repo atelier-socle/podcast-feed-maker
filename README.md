@@ -8,7 +8,7 @@
 
 ![podcast-feed-maker](./assets/banner.png)
 
-Reference-quality Swift library for generating, parsing, and validating podcast RSS feeds. PodcastFeedMaker is fully bi-directional: build feeds from Swift models and generate standards-compliant XML, or parse existing XML back into the same strongly-typed model. It covers all seven XML namespaces used in podcasting — RSS 2.0, iTunes, Podcast Namespace 2.0 (all 32 tags), Atom, Dublin Core, Content Module, and Podlove Simple Chapters — with multi-platform validation for Apple Podcasts, Spotify, Amazon Music, Podcast Index, and PSP-1. Zero third-party dependencies in the core library, pure Swift + Foundation, Linux-compatible from day one. Suitable for podcast hosting platforms, feed migration tools, podcast apps, and server-side Swift.
+Reference-quality Swift library for generating, parsing, and validating podcast RSS feeds. PodcastFeedMaker is fully bi-directional: build feeds from Swift models and generate standards-compliant XML, or parse existing XML back into the same strongly-typed model. It covers all seven XML namespaces used in podcasting — RSS 2.0, iTunes, Podcast Namespace 2.0 (all 32 tags), Atom, Dublin Core, Content Module, and Podlove Simple Chapters — with multi-platform validation for Apple Podcasts, Spotify, Amazon Music, Podcast Index, and PSP-1. Import and export OPML subscription lists with validation and bidirectional feed conversion. Zero third-party dependencies in the core library, pure Swift + Foundation, Linux-compatible from day one. Suitable for podcast hosting platforms, feed migration tools, podcast apps, and server-side Swift.
 
 Part of the [Atelier Socle](https://www.atelier-socle.com) ecosystem.
 
@@ -24,7 +24,8 @@ Part of the [Atelier Socle](https://www.atelier-socle.com) ecosystem.
 - **Templates** — 4 expertise levels (basic, standard, advanced, expert), platform presets, 58-case FeedTag enum, and composable templates via `+` operator and fluent builder
 - **Chapters** — JSON Chapters (Podcast NS 2.0) and Podlove Simple Chapters (PSC), both Codable, supporting inline and linked formats
 - **Feed diff** — Compare two feeds and detect added, removed, and modified episodes, channel changes, and namespace differences
-- **CLI** — 10 commands: `init`, `generate`, `read`, `validate`, `lint`, `episodes`, `chapters`, `diff`, `convert`, `add-episode`
+- **OPML** — Import and export podcast subscription lists (OPML 1.0 and 2.0) with validation and feed conversion
+- **CLI** — 12 commands: `init`, `generate`, `read`, `validate`, `lint`, `episodes`, `chapters`, `diff`, `convert`, `add-episode`, `opml-export`, `opml-import`
 - **Strict concurrency** — All public types are `Sendable`, built with Swift 6.2 strict concurrency throughout
 
 ---
@@ -316,6 +317,35 @@ for diff in diffs {
 }
 ```
 
+### OPML Subscription Lists
+
+Import and export podcast subscription lists in OPML format. Supports OPML 1.0 and 2.0 with full round-trip fidelity, including custom attributes:
+
+```swift
+import PodcastFeedMaker
+
+// Parse an OPML file
+let opml = try OPMLParser().parse(opmlString)
+print("Subscriptions: \(opml.podcastFeeds.count)")
+
+// List all podcast feeds (depth-first across nested categories)
+for feed in opml.podcastFeeds {
+    print("\(feed.text) — \(feed.xmlUrl?.absoluteString ?? "")")
+}
+
+// Export feeds to OPML
+let document = OPMLFeedConverter.document(
+    from: feeds,
+    title: "My Podcasts",
+    ownerName: "Jane Doe"
+)
+let xml = OPMLGenerator().generate(document)
+
+// Validate OPML
+let report = OPMLValidator().validate(document)
+print("Valid: \(report.isValid)")
+```
+
 ### Chapters
 
 Two chapter systems are supported: JSON Chapters (linked via `podcast:chapters`) and Podlove Simple Chapters (inline `psc:chapters`). Both are fully Codable:
@@ -342,11 +372,12 @@ Sources/
         Builders/                   # PodcastFeedBuilder, fluent modifiers, PSP-1 helper
         Templates/                  # FeedTemplate, 4 levels, composition, FeedTag
         Engine/                     # PodcastFeedEngine facade, FeedDiff, NetworkValidator
-        Documentation.docc/         # 10 DocC articles
+        OPML/                       # OPML import/export, validation, feed conversion
+        Documentation.docc/         # 11 DocC articles
     PodcastFeedCommands/            # CLI implementations (depends on ArgumentParser)
     PodcastFeedCLI/                 # Executable entry point (@main)
 Tests/
-    PodcastFeedMakerTests/          # 2264 tests in 209 suites
+    PodcastFeedMakerTests/          # 2364+ tests across 247+ suites
         Fixtures/                   # 9 real podcast feed XML files
     PodcastFeedCommandsTests/       # CLI command tests
 ```
@@ -382,6 +413,14 @@ podcastfeed episodes feed.xml --sort date --limit 10
 
 # Add an episode
 podcastfeed add-episode feed.xml --title "New Episode" --audio https://example.com/ep.mp3 --output updated.xml
+
+# Export feeds to OPML
+podcastfeed opml-export feed1.xml feed2.xml -o subscriptions.opml --title "My Podcasts"
+
+# Import and list feeds from OPML
+podcastfeed opml-import subscriptions.opml
+podcastfeed opml-import subscriptions.opml -f json
+podcastfeed opml-import subscriptions.opml --validate
 ```
 
 ### Commands
@@ -398,6 +437,8 @@ podcastfeed add-episode feed.xml --title "New Episode" --audio https://example.c
 | `diff` | Compare two podcast feeds and show differences |
 | `convert` | Convert between feed formats (XML, JSON, PSC) |
 | `add-episode` | Add a new episode to an existing feed |
+| `opml-export` | Export one or more feeds as an OPML subscription list |
+| `opml-import` | Parse an OPML file and list podcast subscriptions |
 
 ### Global Options
 
@@ -434,8 +475,9 @@ The project includes a comprehensive test suite using Swift Testing (`import Tes
 | Builders | 6 | DSL, fluent modifiers, PSP-1 helper |
 | Templates | 10 | 4 levels, composition, FeedTag, factory methods |
 | Integration | 2 | End-to-end workflows |
-| Showcase | 48 | Public API demonstrations (548 tests) |
-| CLI | 14 | All 10 commands, helpers, template integration |
+| OPML | 9 | Document, parser, generator, validator, converter, round-trip, edge cases |
+| Showcase | 48+ | Public API demonstrations (548+ tests) |
+| CLI | 16 | All 12 commands, helpers, template integration |
 
 All tests run on both macOS and Linux in CI. No mocks of Foundation types — tests use real `XMLParser` and real `Data`.
 
@@ -458,6 +500,7 @@ All tests run on both macOS and Linux in CI. No mocks of Foundation types — te
 
 ## Roadmap
 
+- [x] OPML import/export — Import and export podcast subscription lists (0.2.0)
 - [ ] Feed migration — Automated platform-to-platform feed migration tools
 - [ ] Additional platforms — iHeartRadio, TuneIn, Pandora validation rules
 - [ ] SwiftUI integration — Feed preview components for macOS/iOS
@@ -468,7 +511,7 @@ All tests run on both macOS and Linux in CI. No mocks of Foundation types — te
 
 Full API documentation is available as a DocC catalog bundled with the package. Open the project in Xcode and select **Product > Build Documentation** to browse it locally.
 
-The catalog includes 10 guides:
+The catalog includes 11 guides:
 
 | Guide | Content |
 |-------|---------|
@@ -480,7 +523,8 @@ The catalog includes 10 guides:
 | Templates and Presets | 4 expertise levels, composition, FeedTag enum |
 | Round-Trip and Diff | Zero-loss round-trip, feed comparison, JSON export |
 | Chapters Guide | JSON Chapters and Podlove Simple Chapters |
-| CLI Reference | 10 commands, options, exit codes |
+| OPML Guide | OPML import/export, validation, feed conversion |
+| CLI Reference | 12 commands, options, exit codes |
 
 ---
 
