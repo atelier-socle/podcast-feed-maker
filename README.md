@@ -541,9 +541,12 @@ All tests run on both macOS and Linux in CI. No mocks of Foundation types — te
 
 ## Roadmap
 
+- [x] Full coverage of RSS + Apple + Podcast Namespace
+- [x] GitHub Pages deploy for DocC
+- [x] Code Coverage + CI
 - [x] OPML import/export — Import and export podcast subscription lists (0.2.0)
 - [x] Feed audit — Quality scoring engine with recommendations and compatibility matrix (0.2.0)
-- [ ] Vapor Middleware — Dynamic server-side feeds with caching and Podping (separate package)
+- [x] Vapor Middleware — Dynamic server-side feeds with caching and Podping ([PodcastFeedVapor](https://github.com/atelier-socle/podcast-feed-maker-vapor))
 - [ ] Additional validators — More platform-specific validation rules
 
 ---
