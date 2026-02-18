@@ -70,10 +70,17 @@ public struct Enclosure: Sendable, Hashable, Equatable, Codable {
 
 extension Enclosure {
 
-    /// Common MIME types for podcast enclosures.
+    /// MIME types for podcast enclosures covering audio, video, streaming, and document formats.
     public enum MIMEType: String, CaseIterable, Hashable, Equatable, Sendable, Codable {
+
+        // MARK: - Audio
+
         /// AAC audio (`audio/aac`).
         case aac = "audio/aac"
+        /// AIFF audio (`audio/aiff`).
+        case aiff = "audio/aiff"
+        /// FLAC audio (`audio/flac`).
+        case flac = "audio/flac"
         /// M4A audio (`audio/m4a`).
         case m4a = "audio/m4a"
         /// MP3 audio (`audio/mpeg`).
@@ -84,15 +91,88 @@ extension Enclosure {
         case opus = "audio/opus"
         /// WAV audio (`audio/wav`).
         case wav = "audio/wav"
-        /// FLAC audio (`audio/flac`).
-        case flac = "audio/flac"
-        /// QuickTime video (`video/quicktime`).
-        case quicktime = "video/quicktime"
+        /// WebM audio (`audio/webm`).
+        case webmAudio = "audio/webm"
+        /// Matroska audio (`audio/x-matroska`).
+        case matroskaAudio = "audio/x-matroska"
+        /// Windows Media Audio (`audio/x-ms-wma`).
+        case wma = "audio/x-ms-wma"
+
+        // MARK: - Video
+
+        /// AVI video (`video/x-msvideo`).
+        case avi = "video/x-msvideo"
+        /// Matroska video (`video/x-matroska`).
+        case matroska = "video/x-matroska"
         /// MP4 video (`video/mp4`).
         case mp4 = "video/mp4"
+        /// MPEG-TS segments (`video/MP2T`).
+        case mpegTS = "video/MP2T"
         /// M4V video (`video/m4v`).
         case m4v = "video/m4v"
+        /// QuickTime video (`video/quicktime`).
+        case quicktime = "video/quicktime"
+        /// WebM video (`video/webm`).
+        case webm = "video/webm"
+        /// Windows Media Video (`video/x-ms-wmv`).
+        case wmv = "video/x-ms-wmv"
+        /// 3GP mobile video (`video/3gpp`).
+        case threeGP = "video/3gpp"
+        /// 3GP2 mobile video (`video/3gpp2`).
+        case threeGP2 = "video/3gpp2"
+
+        // MARK: - Streaming
+
+        /// HLS manifest (`application/x-mpegURL`) — RFC 8216.
+        case hlsManifest = "application/x-mpegURL"
+        /// HLS audio manifest (`audio/mpegurl`).
+        case hlsAudioManifest = "audio/mpegurl"
+
+        // MARK: - Document
+
         /// PDF document (`application/pdf`).
         case pdf = "application/pdf"
+    }
+}
+
+// MARK: - MIMEType Classification
+
+extension Enclosure.MIMEType {
+
+    /// Whether this MIME type represents a video format.
+    public var isVideo: Bool {
+        switch self {
+        case .avi, .matroska, .mp4, .mpegTS, .m4v, .quicktime,
+            .webm, .wmv, .threeGP, .threeGP2:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Whether this MIME type represents an audio format.
+    public var isAudio: Bool {
+        switch self {
+        case .aac, .aiff, .flac, .m4a, .mpeg, .ogg, .opus, .wav,
+            .webmAudio, .matroskaAudio, .wma, .hlsAudioManifest:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Whether this MIME type represents an HLS manifest.
+    public var isHLS: Bool {
+        switch self {
+        case .hlsManifest, .hlsAudioManifest:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Whether this MIME type represents a streaming format (not a downloadable file).
+    public var isStreaming: Bool {
+        isHLS || self == .mpegTS
     }
 }

@@ -15,7 +15,7 @@ errors before submitting your feed.
 | Platform | Key Requirements |
 |----------|-----------------|
 | Apple Podcasts | HTTPS required for artwork and enclosures, artwork 1400-3000px JPEG/PNG, `itunes:image` required, `itunes:category` required, `itunes:explicit` required |
-| Spotify | MP3 preferred, max 200 MB file size, artwork 1400-2048px square, max 4000-byte description |
+| Spotify | MP3 preferred (audio), MP4 preferred (video), max 200 MB audio / 500 MB video, artwork 1400-2048px square, max 4000-byte description |
 | Amazon Music | Broadest format support (MP3/M4A/FLAC/OGG/ALAC), artwork 1400-3000px |
 | Podcast Index | Podcast NS 2.0 tags (`podcast:locked`, `podcast:guid`, `podcast:funding`), V4V config |
 | PSP-1 | `language` required, `atom:link` self required, `podcast:locked` required, `podcast:guid` required |
@@ -282,6 +282,62 @@ does not use HTTPS:
 feed.channel?.itunesNewFeedUrl = URL(string: "http://example.com/new-feed.xml")
 let report = validator.validate(feed, for: .apple)
 // warning: channel.itunesNewFeedUrl should use HTTPS
+```
+
+## Video Enclosure Validation
+
+Each platform handles video enclosures differently. The validator applies video-specific rules
+when it detects video MIME types in enclosures.
+
+### Apple Podcasts
+
+Apple accepts `video/mp4`, `video/quicktime`, and `video/m4v` for video enclosures. Other
+video formats (such as `video/webm`) produce a **warning** recommending the preferred formats,
+while non-media types produce an **error**. HLS manifests (`application/x-mpegURL`) in an
+`<enclosure>` produce an **info** note explaining that Apple delivers HLS via Podcasts Connect,
+not RSS. Feeds with video enclosures but no `podcast:medium` set produce a **warning**
+recommending `video` or `mixed`.
+
+```swift
+// Video enclosure without podcast:medium
+var feed = // ... feed with video/mp4 enclosure, no medium set
+let report = validator.validate(feed, for: .apple)
+// warning: channel.medium — consider setting to video or mixed
+
+// HLS in enclosure
+var hlsFeed = // ... feed with application/x-mpegURL enclosure
+let report2 = validator.validate(hlsFeed, for: .apple)
+// info: Apple delivers HLS via Podcasts Connect
+```
+
+### Spotify
+
+Spotify supports video podcasts with `video/mp4` as the preferred format. Other video formats
+produce a **warning**. Video enclosures have a higher size limit of 500 MB (compared to 200 MB
+for audio). The existing non-MP3 format warning applies only to audio enclosures, not video.
+
+```swift
+// Video over 500 MB
+var feed = // ... feed with 600 MB video/mp4 enclosure
+let report = validator.validate(feed, for: .spotify)
+// warning: enclosure.length exceeds 500 MB
+
+// Audio still uses 200 MB limit
+var audioFeed = // ... feed with 250 MB audio/mpeg enclosure
+let report2 = validator.validate(audioFeed, for: .spotify)
+// warning: enclosure.length exceeds 200 MB
+```
+
+### Podcast Index
+
+Podcast Index encourages using `podcast:alternateEnclosure` with HLS manifests for
+multi-quality video delivery. If a feed has video enclosures without any
+`alternateEnclosure` elements, an **info** note suggests adding HLS support.
+
+```swift
+var feed = // ... feed with video enclosure, no alternateEnclosures
+let report = validator.validate(feed, for: .podcastIndex)
+// info: consider podcast:alternateEnclosure with HLS for video delivery
 ```
 
 ## Next Steps

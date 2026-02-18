@@ -4,7 +4,7 @@ Learn how to add PodcastFeedMaker to your project and create your first podcast 
 
 ## Overview
 
-PodcastFeedMaker is a bi-directional Swift library for generating, parsing, and validating podcast RSS feeds. It covers RSS 2.0, iTunes, Podcast Namespace 2.0, Atom, Dublin Core, Content, and Podlove Simple Chapters with zero third-party dependencies. You can build feeds from Swift structs, parse existing XML into the same model, validate against five major podcast platforms, and round-trip feeds with zero data loss.
+PodcastFeedMaker is a bi-directional Swift library for generating, parsing, and validating podcast RSS feeds. It covers RSS 2.0, iTunes, Podcast Namespace 2.0, Atom, Dublin Core, Content, and Podlove Simple Chapters with zero third-party dependencies. It supports 24 MIME types across audio, video, HLS streaming, and document formats. You can build feeds from Swift structs, parse existing XML into the same model, validate against five major podcast platforms, and round-trip feeds with zero data loss.
 
 ## Adding the Dependency
 

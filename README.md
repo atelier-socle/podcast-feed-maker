@@ -20,7 +20,7 @@ Part of the [Atelier Socle](https://www.atelier-socle.com) ecosystem.
 - **Parse** — Full-fidelity XML parsing with diagnostics, 12 date formats (RFC 2822, ISO 8601, fuzzy), best-effort error recovery, and streaming item parsing
 - **Validate** — 5 platform validators (Apple Podcasts, Spotify, Amazon Music, Podcast Index, PSP-1) with 3 severity levels and cross-cutting rules (GUID uniqueness, HTTPS enforcement, enclosure checks)
 - **Round-trip** — Parse, modify, and regenerate with zero data loss: unknown elements, CDATA sections, XML comments, and namespace prefixes are all preserved
-- **Builder DSL** — Result builder syntax with 18 channel and 14 item fluent modifiers, enclosure factories (`.mp3`, `.m4a`, `.mp4`), and a PSP-1 compliance helper
+- **Builder DSL** — Result builder syntax with 18 channel and 14 item fluent modifiers, 15 enclosure factories (audio, video, HLS), 24 MIME types, and a PSP-1 compliance helper
 - **Templates** — 4 expertise levels (basic, standard, advanced, expert), platform presets, 58-case FeedTag enum, and composable templates via `+` operator and fluent builder
 - **Chapters** — JSON Chapters (Podcast NS 2.0) and Podlove Simple Chapters (PSC), both Codable, supporting inline and linked formats
 - **Feed diff** — Compare two feeds and detect added, removed, and modified episodes, channel changes, and namespace differences
@@ -207,13 +207,39 @@ let feed = PodcastFeed {
 
 #### Enclosure Factories
 
-Three static factory methods on `Enclosure` set the MIME type automatically:
+15 static factory methods on `Enclosure` set the MIME type automatically. Each returns an optional (validates the URL string).
+
+**Audio:**
 
 | Factory | MIME Type |
 |---------|-----------|
 | `.mp3(url:length:)` | `audio/mpeg` |
-| `.m4a(url:length:)` | `audio/x-m4a` |
+| `.m4a(url:length:)` | `audio/m4a` |
+| `.aac(url:length:)` | `audio/aac` |
+| `.ogg(url:length:)` | `audio/ogg` |
+| `.opus(url:length:)` | `audio/opus` |
+| `.wav(url:length:)` | `audio/wav` |
+| `.flac(url:length:)` | `audio/flac` |
+| `.aiff(url:length:)` | `audio/aiff` |
+| `.webmAudio(url:length:)` | `audio/webm` |
+
+**Video:**
+
+| Factory | MIME Type |
+|---------|-----------|
 | `.mp4(url:length:)` | `video/mp4` |
+| `.mov(url:length:)` | `video/quicktime` |
+| `.m4v(url:length:)` | `video/m4v` |
+| `.webm(url:length:)` | `video/webm` |
+
+**HLS Streaming:**
+
+| Factory | MIME Type |
+|---------|-----------|
+| `.hls(url:length:)` | `application/x-mpegURL` |
+| `.hlsAudio(url:length:)` | `audio/mpegurl` |
+
+The `Enclosure.MIMEType` enum covers 24 formats total, with `isVideo`, `isAudio`, `isHLS`, and `isStreaming` classification properties.
 
 ### Generating XML
 
@@ -266,8 +292,8 @@ for report in reports {
 | Platform | Key Requirements |
 |----------|-----------------|
 | Apple Podcasts | HTTPS required, artwork 1400-3000px JPEG/PNG, `itunes:image` + `itunes:category` + `itunes:explicit` required |
-| Spotify | MP3 preferred, max 200 MB file size, artwork 1400-2048px square, max 4000-byte description |
-| Amazon Music | Broadest format support (MP3/M4A/FLAC/OGG/ALAC), artwork 1400-3000px |
+| Spotify | MP3 preferred (audio), MP4 preferred (video), max 200 MB audio / 500 MB video, artwork 1400-2048px square, max 4000-byte description |
+| Amazon Music | Broadest format support (MP3/M4A/FLAC/OGG/ALAC/MP4/WebM), artwork 1400-3000px |
 | Podcast Index | Podcast NS 2.0 tags (`podcast:locked`, `podcast:guid`, `podcast:funding`), V4V config |
 | PSP-1 | `language` required, `atom:link` self required, `podcast:locked` + `podcast:guid` required, GUID on every item |
 

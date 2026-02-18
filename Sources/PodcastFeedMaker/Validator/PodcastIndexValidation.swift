@@ -170,15 +170,30 @@ enum PodcastIndexValidation {
             }
         }
 
-        for (idx, item) in channel.items.enumerated()
-        where !item.alternateEnclosures.isEmpty {
-            results.append(
-                ValidationResult(
-                    severity: .info,
-                    message: "Item has alternate enclosures for enhanced delivery",
-                    field: "channel.items[\(idx)].alternateEnclosures",
-                    platform: .podcastIndex
-                ))
+        for (idx, item) in channel.items.enumerated() {
+            if !item.alternateEnclosures.isEmpty {
+                results.append(
+                    ValidationResult(
+                        severity: .info,
+                        message: "Item has alternate enclosures for enhanced delivery",
+                        field: "channel.items[\(idx)].alternateEnclosures",
+                        platform: .podcastIndex
+                    ))
+            }
+            if let enclosure = item.enclosure {
+                let mimeType = Enclosure.MIMEType(rawValue: enclosure.type)
+                let isVideo = mimeType?.isVideo ?? enclosure.type.hasPrefix("video/")
+                if isVideo && item.alternateEnclosures.isEmpty {
+                    results.append(
+                        ValidationResult(
+                            severity: .info,
+                            message: "Podcast Index supports podcast:alternateEnclosure "
+                                + "with HLS manifests for multi-quality video delivery",
+                            field: "channel.items[\(idx)].enclosure",
+                            platform: .podcastIndex
+                        ))
+                }
+            }
         }
 
         return results

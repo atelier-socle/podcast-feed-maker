@@ -210,6 +210,146 @@ extension Enclosure {
         guard let parsed = URL(string: url) else { return nil }
         return Enclosure(url: parsed, length: length, mimeType: .mp4)
     }
+
+    // MARK: - Audio Factories
+
+    /// Creates an AAC enclosure (`audio/aac`).
+    ///
+    /// - Parameters:
+    ///   - url: The AAC file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for AAC, or `nil` if the URL is invalid.
+    public static func aac(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .aac)
+    }
+
+    /// Creates an OGG enclosure (`audio/ogg`).
+    ///
+    /// - Parameters:
+    ///   - url: The OGG file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for OGG, or `nil` if the URL is invalid.
+    public static func ogg(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .ogg)
+    }
+
+    /// Creates an Opus enclosure (`audio/opus`).
+    ///
+    /// - Parameters:
+    ///   - url: The Opus file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for Opus, or `nil` if the URL is invalid.
+    public static func opus(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .opus)
+    }
+
+    /// Creates a WAV enclosure (`audio/wav`).
+    ///
+    /// - Parameters:
+    ///   - url: The WAV file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for WAV, or `nil` if the URL is invalid.
+    public static func wav(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .wav)
+    }
+
+    /// Creates a FLAC enclosure (`audio/flac`).
+    ///
+    /// - Parameters:
+    ///   - url: The FLAC file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for FLAC, or `nil` if the URL is invalid.
+    public static func flac(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .flac)
+    }
+
+    /// Creates an AIFF enclosure (`audio/aiff`).
+    ///
+    /// - Parameters:
+    ///   - url: The AIFF file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for AIFF, or `nil` if the URL is invalid.
+    public static func aiff(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .aiff)
+    }
+
+    /// Creates a WebM audio enclosure (`audio/webm`).
+    ///
+    /// - Parameters:
+    ///   - url: The WebM audio file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for WebM audio, or `nil` if the URL is invalid.
+    public static func webmAudio(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .webmAudio)
+    }
+
+    // MARK: - Video Factories
+
+    /// Creates a MOV (QuickTime) video enclosure (`video/quicktime`).
+    ///
+    /// - Parameters:
+    ///   - url: The MOV file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for QuickTime, or `nil` if the URL is invalid.
+    public static func mov(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .quicktime)
+    }
+
+    /// Creates an M4V video enclosure (`video/m4v`).
+    ///
+    /// - Parameters:
+    ///   - url: The M4V file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for M4V, or `nil` if the URL is invalid.
+    public static func m4v(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .m4v)
+    }
+
+    /// Creates a WebM video enclosure (`video/webm`).
+    ///
+    /// - Parameters:
+    ///   - url: The WebM file URL as a string.
+    ///   - length: The file size in bytes.
+    /// - Returns: An `Enclosure` configured for WebM video, or `nil` if the URL is invalid.
+    public static func webm(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .webm)
+    }
+
+    // MARK: - HLS Factories
+
+    /// Creates an HLS manifest enclosure (`application/x-mpegURL`).
+    ///
+    /// Used in `podcast:alternateEnclosure` for HLS streams referenced in RSS feeds.
+    ///
+    /// - Parameters:
+    ///   - url: The HLS manifest URL as a string.
+    ///   - length: The file size in bytes (typically 0 for manifests).
+    /// - Returns: An `Enclosure` configured for HLS, or `nil` if the URL is invalid.
+    public static func hls(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .hlsManifest)
+    }
+
+    /// Creates an HLS audio-only manifest enclosure (`audio/mpegurl`).
+    ///
+    /// - Parameters:
+    ///   - url: The HLS audio manifest URL as a string.
+    ///   - length: The file size in bytes (typically 0 for manifests).
+    /// - Returns: An `Enclosure` configured for HLS audio, or `nil` if the URL is invalid.
+    public static func hlsAudio(url: String, length: Int) -> Enclosure? {
+        guard let parsed = URL(string: url) else { return nil }
+        return Enclosure(url: parsed, length: length, mimeType: .hlsAudioManifest)
+    }
 }
 
 // MARK: - PodcastPerson.Role

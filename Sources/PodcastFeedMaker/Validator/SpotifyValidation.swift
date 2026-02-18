@@ -27,8 +27,11 @@ enum SpotifyValidation {
     /// Maximum description size in bytes.
     private static let maxDescriptionBytes = 4000
 
-    /// Maximum enclosure size in bytes (200 MB).
+    /// Maximum audio enclosure size in bytes (200 MB).
     private static let maxEnclosureBytes = 200_000_000
+
+    /// Maximum video enclosure size in bytes (500 MB).
+    private static let maxVideoEnclosureBytes = 500_000_000
 
     // MARK: - Public API
 
@@ -133,18 +136,23 @@ enum SpotifyValidation {
 
         for (idx, item) in channel.items.enumerated() {
             let prefix = "channel.items[\(idx)]"
-            if let enclosure = item.enclosure,
-                enclosure.type != "audio/mpeg" && enclosure.type != "audio/mp3",
-                enclosure.length > maxEnclosureBytes
-            {
-                results.append(
-                    ValidationResult(
-                        severity: .warning,
-                        message: "Non-MP3 enclosure exceeds 200 MB; "
-                            + "may not be accepted by Spotify",
-                        field: "\(prefix).enclosure",
-                        platform: .spotify
-                    ))
+            if let enclosure = item.enclosure {
+                let mimeType = Enclosure.MIMEType(rawValue: enclosure.type)
+                let isVideo = mimeType?.isVideo ?? enclosure.type.hasPrefix("video/")
+
+                if !isVideo,
+                    enclosure.type != "audio/mpeg" && enclosure.type != "audio/mp3",
+                    enclosure.length > maxEnclosureBytes
+                {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Non-MP3 enclosure exceeds 200 MB; "
+                                + "may not be accepted by Spotify",
+                            field: "\(prefix).enclosure",
+                            platform: .spotify
+                        ))
+                }
             }
 
             if item.podloveChapters != nil {
@@ -182,25 +190,49 @@ enum SpotifyValidation {
                 continue
             }
 
-            if enclosure.type != "audio/mpeg" && enclosure.type != "audio/mp3" {
-                results.append(
-                    ValidationResult(
-                        severity: .warning,
-                        message: "Spotify recommends audio/mpeg (MP3); "
-                            + "'\(enclosure.type)' may not stream correctly",
-                        field: "\(prefix).enclosure.type",
-                        platform: .spotify
-                    ))
-            }
+            let mimeType = Enclosure.MIMEType(rawValue: enclosure.type)
+            let isVideo = mimeType?.isVideo ?? enclosure.type.hasPrefix("video/")
 
-            if enclosure.length > maxEnclosureBytes {
-                results.append(
-                    ValidationResult(
-                        severity: .warning,
-                        message: "Enclosure exceeds 200 MB",
-                        field: "\(prefix).enclosure.length",
-                        platform: .spotify
-                    ))
+            if isVideo {
+                if enclosure.type != "video/mp4" {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Spotify video podcasts require MP4 format; "
+                                + "'\(enclosure.type)' may not be accepted",
+                            field: "\(prefix).enclosure.type",
+                            platform: .spotify
+                        ))
+                }
+                if enclosure.length > maxVideoEnclosureBytes {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Video exceeds 500 MB",
+                            field: "\(prefix).enclosure.length",
+                            platform: .spotify
+                        ))
+                }
+            } else {
+                if enclosure.type != "audio/mpeg" && enclosure.type != "audio/mp3" {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Spotify recommends audio/mpeg (MP3); "
+                                + "'\(enclosure.type)' may not stream correctly",
+                            field: "\(prefix).enclosure.type",
+                            platform: .spotify
+                        ))
+                }
+                if enclosure.length > maxEnclosureBytes {
+                    results.append(
+                        ValidationResult(
+                            severity: .warning,
+                            message: "Enclosure exceeds 200 MB",
+                            field: "\(prefix).enclosure.length",
+                            platform: .spotify
+                        ))
+                }
             }
         }
 

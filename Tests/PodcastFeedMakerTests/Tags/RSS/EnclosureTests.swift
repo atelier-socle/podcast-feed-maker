@@ -79,7 +79,7 @@ struct EnclosureTests {
 
     @Test("MIMEType has all expected cases")
     func mimeTypeAllCases() {
-        #expect(Enclosure.MIMEType.allCases.count == 11)
+        #expect(Enclosure.MIMEType.allCases.count == 24)
     }
 
     // MARK: - Properties

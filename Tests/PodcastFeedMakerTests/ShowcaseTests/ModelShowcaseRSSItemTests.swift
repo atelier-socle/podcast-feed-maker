@@ -165,10 +165,10 @@ struct RSS20ItemShowcase {
         #expect(enclosure.type == "audio/opus")
     }
 
-    @Test("Enclosure.MIMEType covers all 11 audio/video/document formats")
+    @Test("Enclosure.MIMEType covers all 24 audio/video/streaming/document formats")
     func enclosureMIMETypeAllCases() {
         let allCases = Enclosure.MIMEType.allCases
-        #expect(allCases.count == 11)
+        #expect(allCases.count == 24)
         #expect(Enclosure.MIMEType.aac.rawValue == "audio/aac")
         #expect(Enclosure.MIMEType.m4a.rawValue == "audio/m4a")
         #expect(Enclosure.MIMEType.mpeg.rawValue == "audio/mpeg")

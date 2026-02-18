@@ -160,7 +160,9 @@ The `.transcript(url:type:)` modifier accepts a ``Transcript/TranscriptType`` va
 
 ## Enclosure Factories
 
-``Enclosure`` provides three static factory methods that create enclosures with the correct MIME type. Each factory returns an optional because it validates the URL string.
+``Enclosure`` provides 15 static factory methods that create enclosures with the correct MIME type. Each factory returns an optional because it validates the URL string.
+
+### Audio Factories
 
 ```swift
 let mp3 = Enclosure.mp3(url: "https://cdn.example.com/ep.mp3", length: 10_000_000)
@@ -169,22 +171,68 @@ let mp3 = Enclosure.mp3(url: "https://cdn.example.com/ep.mp3", length: 10_000_00
 let m4a = Enclosure.m4a(url: "https://cdn.example.com/ep.m4a", length: 8_000_000)
 // type == "audio/m4a"
 
-let mp4 = Enclosure.mp4(url: "https://cdn.example.com/ep.mp4", length: 50_000_000)
-// type == "video/mp4"
+let aac = Enclosure.aac(url: "https://cdn.example.com/ep.aac", length: 7_000_000)
+// type == "audio/aac"
+
+let ogg = Enclosure.ogg(url: "https://cdn.example.com/ep.ogg", length: 6_000_000)
+// type == "audio/ogg"
+
+let opus = Enclosure.opus(url: "https://cdn.example.com/ep.opus", length: 5_000_000)
+// type == "audio/opus"
+
+let wav = Enclosure.wav(url: "https://cdn.example.com/ep.wav", length: 50_000_000)
+// type == "audio/wav"
+
+let flac = Enclosure.flac(url: "https://cdn.example.com/ep.flac", length: 30_000_000)
+// type == "audio/flac"
+
+let aiff = Enclosure.aiff(url: "https://cdn.example.com/ep.aiff", length: 40_000_000)
+// type == "audio/aiff"
+
+let webmAudio = Enclosure.webmAudio(url: "https://cdn.example.com/ep-audio.webm", length: 4_000_000)
+// type == "audio/webm"
 ```
 
-For other formats, use the ``Enclosure/MIMEType`` enum with the standard initializer:
+### Video Factories
+
+```swift
+let mp4 = Enclosure.mp4(url: "https://cdn.example.com/ep.mp4", length: 150_000_000)
+// type == "video/mp4"
+
+let mov = Enclosure.mov(url: "https://cdn.example.com/ep.mov", length: 200_000_000)
+// type == "video/quicktime"
+
+let m4v = Enclosure.m4v(url: "https://cdn.example.com/ep.m4v", length: 120_000_000)
+// type == "video/m4v"
+
+let webm = Enclosure.webm(url: "https://cdn.example.com/ep.webm", length: 100_000_000)
+// type == "video/webm"
+```
+
+### HLS Factories
+
+```swift
+let hls = Enclosure.hls(url: "https://cdn.example.com/ep/master.m3u8", length: 0)
+// type == "application/x-mpegURL"
+
+let hlsAudio = Enclosure.hlsAudio(url: "https://cdn.example.com/ep/audio.m3u8", length: 0)
+// type == "audio/mpegurl"
+```
+
+For additional formats not covered by factories, use the ``Enclosure/MIMEType`` enum with the standard initializer:
 
 ```swift
 let enc = Enclosure(
-    url: URL(string: "https://cdn.example.com/ep.opus")!,
-    length: 5_000_000,
-    mimeType: .opus
+    url: URL(string: "https://cdn.example.com/ep.mkv")!,
+    length: 300_000_000,
+    mimeType: .matroska
 )
-// type == "audio/opus"
+// type == "video/x-matroska"
 ```
 
-``Enclosure/MIMEType`` covers all common podcast formats: `.mpeg`, `.m4a`, `.aac`, `.ogg`, `.opus`, `.wav`, `.flac`, `.mp4`, `.quicktime`, `.m4v`, and `.pdf`.
+``Enclosure/MIMEType`` covers 24 podcast and streaming formats: audio (`.mpeg`, `.m4a`, `.aac`, `.ogg`, `.opus`, `.wav`, `.flac`, `.aiff`, `.wma`, `.webmAudio`, `.matroskaAudio`, `.hlsAudioManifest`), video (`.mp4`, `.quicktime`, `.m4v`, `.webm`, `.threeGP`, `.threeGP2`, `.avi`, `.matroska`, `.wmv`, `.mpegTS`), streaming (`.hlsManifest`, `.hlsAudioManifest`), and document (`.pdf`).
+
+The enum also provides classification properties: ``Enclosure/MIMEType/isVideo``, ``Enclosure/MIMEType/isAudio``, ``Enclosure/MIMEType/isHLS``, and ``Enclosure/MIMEType/isStreaming``.
 
 ## PSP-1 Compliance Helper
 

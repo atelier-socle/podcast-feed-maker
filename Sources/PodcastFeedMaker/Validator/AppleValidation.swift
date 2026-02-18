@@ -20,11 +20,15 @@ import Foundation
 
 // MARK: - Audio Types
 
-private let appleAllowedAudioTypes: Set<String> = [
+private let appleAllowedMediaTypes: Set<String> = [
     "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/mp4",
     "audio/m4a", "audio/aac", "audio/x-aac", "audio/wav",
     "audio/x-wav", "audio/ogg", "audio/opus", "audio/flac",
-    "video/mp4", "video/quicktime", "video/x-m4v"
+    "video/mp4", "video/quicktime", "video/x-m4v", "video/m4v"
+]
+
+private let applePreferredVideoTypes: Set<String> = [
+    "video/mp4", "video/quicktime", "video/x-m4v", "video/m4v"
 ]
 
 /// Validates a feed against Apple Podcasts requirements.
@@ -183,6 +187,52 @@ enum AppleValidation {  // swiftlint:disable:this type_body_length
         return results
     }
 
+    // MARK: - Enclosure Format
+
+    private static func validateEnclosureFormat(
+        _ enclosure: Enclosure,
+        field: String
+    ) -> [ValidationResult] {
+        var results: [ValidationResult] = []
+        if !appleAllowedMediaTypes.contains(enclosure.type) {
+            let mimeType = Enclosure.MIMEType(rawValue: enclosure.type)
+            let isVideo = mimeType?.isVideo ?? enclosure.type.hasPrefix("video/")
+            if isVideo {
+                results.append(
+                    ValidationResult(
+                        severity: .warning,
+                        message: "Video type '\(enclosure.type)' "
+                            + "is not preferred by Apple Podcasts; "
+                            + "use video/mp4 or video/quicktime",
+                        field: "\(field).type",
+                        platform: .apple
+                    ))
+            } else {
+                results.append(
+                    ValidationResult(
+                        severity: .error,
+                        message: "Enclosure type '\(enclosure.type)' "
+                            + "is not a supported audio/video format",
+                        field: "\(field).type",
+                        platform: .apple
+                    ))
+            }
+        }
+        if let mimeType = Enclosure.MIMEType(rawValue: enclosure.type),
+            mimeType.isHLS
+        {
+            results.append(
+                ValidationResult(
+                    severity: .info,
+                    message: "Apple Podcasts delivers HLS via Podcasts Connect, "
+                        + "not RSS enclosure. Consider podcast:alternateEnclosure",
+                    field: "\(field).type",
+                    platform: .apple
+                ))
+        }
+        return results
+    }
+
     // MARK: - Items
 
     // swiftlint:disable:next function_body_length
@@ -206,16 +256,7 @@ enum AppleValidation {  // swiftlint:disable:this type_body_length
                     ))
             }
             if let enclosure = item.enclosure {
-                if !appleAllowedAudioTypes.contains(enclosure.type) {
-                    results.append(
-                        ValidationResult(
-                            severity: .error,
-                            message: "Enclosure type '\(enclosure.type)' "
-                                + "is not a supported audio/video format",
-                            field: "\(prefix).enclosure.type",
-                            platform: .apple
-                        ))
-                }
+                results += validateEnclosureFormat(enclosure, field: "\(prefix).enclosure")
             }
             if item.guid == nil {
                 results.append(
@@ -345,6 +386,21 @@ enum AppleValidation {  // swiftlint:disable:this type_body_length
                     severity: .info,
                     message: "Serial show has no items with itunes:season or itunes:episode",
                     field: "channel.itunesType",
+                    platform: .apple
+                ))
+        }
+        let hasVideoEnclosure = channel.items.contains { item in
+            guard let type = item.enclosure?.type else { return false }
+            let mimeType = Enclosure.MIMEType(rawValue: type)
+            return mimeType?.isVideo ?? type.hasPrefix("video/")
+        }
+        if hasVideoEnclosure && channel.medium == nil {
+            results.append(
+                ValidationResult(
+                    severity: .warning,
+                    message: "Feed has video enclosures but no podcast:medium. "
+                        + "Consider setting it to video or mixed",
+                    field: "channel.medium",
                     platform: .apple
                 ))
         }
