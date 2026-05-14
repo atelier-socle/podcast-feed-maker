@@ -55,7 +55,7 @@ jobs:
     name: "Build (Linux x86_64)"
     runs-on: ubuntu-latest
     container:
-      image: swift:6.2
+      image: swift:6.3
     steps:
       - uses: actions/checkout@v5
 
